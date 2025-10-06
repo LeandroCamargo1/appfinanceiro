@@ -180,6 +180,7 @@
             let financialData = {};
             let chartInstance = null;
             const monthSelector = document.getElementById('month-selector');
+            let isInitialLoad = true; // Flag for initial load logic
             
             // --- DADOS INICIAIS (PARA PRIMEIRO USO) ---
             const initialData = { "2025-09": { receitas: [ { id: 1001, descricao: "SALÁRIO LEANDRO", valor: 2800.00 }, { id: 1002, descricao: "SALÁRIO LEIDIANE", valor: 2800.00 } ], despesas: { "Gastos Casa": [ { id: 1, descricao: "LUZ", valor: 200.31, parcelas: "", pago: true }, { id: 2, descricao: "VIVO", valor: 355.00, parcelas: "", pago: true }, { id: 3, descricao: "PAINEL", valor: 30.00, parcelas: "", pago: true }, { id: 4, descricao: "ÁGUA", valor: 68.64, parcelas: "", pago: true }], "Gastos Leandro": [ { id: 5, descricao: "ALURA", valor: 110.00, parcelas: "10/12", pago: true }, { id: 6, descricao: "FACULDADE", valor: 356.00, parcelas: "FIXO", pago: true }, { id: 7, descricao: "JIU-JITSU", valor: 423.00, parcelas: "FIXO", pago: true }, { id: 8, descricao: "CHUTEIRA VITOR", valor: 50.00, parcelas: "04/05", pago: true }, { id: 9, descricao: "SHOW", valor: 72.17, parcelas: "02/05", pago: true }, { id: 10, descricao: "STEFAN", valor: 108.00, parcelas: "04/04", pago: true }], "Gastos Leidiane": [ { id: 11, descricao: "STEFAN", valor: 100.00, parcelas: "01/03", pago: true }, { id: 12, descricao: "PAI", valor: 165.00, parcelas: "06/10", pago: true }, { id: 13, descricao: "ÓTICA", valor: 103.00, parcelas: "02/05", pago: true }, { id: 14, descricao: "C&A", valor: 57.39, parcelas: "02/04", pago: true }, { id: 15, descricao: "SHOW", valor: 75.00, parcelas: "02/05", pago: true }, { id: 16, descricao: "VALUTI", valor: 55.00, parcelas: "03/05", pago: true }, { id: 17, descricao: "JULIANA (UNHA)", valor: 100.00, parcelas: "FIXO", pago: true }, { id: 18, descricao: "FACULDADE", valor: 276.38, parcelas: "FIXO", pago: true }, { id: 19, descricao: "VALUTI", valor: 90.00, parcelas: "02/04", pago: true }], "Cartão BB (Fixos)": [ { id: 20, descricao: "INGLÊS", valor: 29.81, parcelas: "10/12", pago: true }, { id: 21, descricao: "TATTO", valor: 101.00, parcelas: "06/10", pago: true }, { id: 22, descricao: "KIMONO", valor: 58.33, parcelas: "03/06", pago: true }, { id: 23, descricao: "NUTRICIONISTA", valor: 74.50, parcelas: "03/03", pago: true }, { id: 24, descricao: "PRESENTE PAIS", valor: 57.50, parcelas: "02/04", pago: true }], "Cartão BB (Extras)": [ { id: 25, descricao: "SUPLEMENTO", valor: 90.00, parcelas: "", pago: true }, { id: 26, descricao: "PAPA-BOLINHA", valor: 24.99, parcelas: "", pago: true }, { id: 27, descricao: "GASOLINA", valor: 100.02, parcelas: "", pago: true }, { id: 28, descricao: "C&A", valor: 45.99, parcelas: "", pago: true }, { id: 29, descricao: "SORVETE", valor: 46.00, parcelas: "", pago: true }, { id: 30, descricao: "MCDONALDS", valor: 157.00, parcelas: "", pago: true }, { id: 31, descricao: "SHORT MALU", valor: 70.96, parcelas: "", pago: true }], "Cartão Nubank (Fixos)": [ { id: 32, descricao: "WEGOVY", valor: 112.00, parcelas: "05/10", pago: true }, { id: 33, descricao: "FONE", valor: 52.59, parcelas: "01/04", pago: true }, { id: 34, descricao: "SHOPPING ORIENTE", valor: 54.66, parcelas: "03/03", pago: true }, { id: 35, descricao: "CELULAR MALU", valor: 84.03, parcelas: "01/02", pago: true }, { id: 36, descricao: "GAMEPASS", valor: 59.99, parcelas: "FIXO", pago: true }, { id: 37, descricao: "GOOGLE(NUVEM)", valor: 2.49, parcelas: "FIXO", pago: true }, { id: 38, descricao: "PENTEADEIRA", valor: 110.81, parcelas: "02/03", pago: true }, { id: 39, descricao: "GYMPASS", valor: 120.00, parcelas: "FIXO", pago: true }], "Cartão Nubank (Extras)": [ { id: 40, descricao: "GASOLINA", valor: 100.00, parcelas: "", pago: true }, { id: 41, descricao: "RAÇÃO", valor: 50.00, parcelas: "", pago: true }, { id: 42, descricao: "ROSALINA", valor: 165.72, parcelas: "", pago: true }, { id: 43, descricao: "TERRAÇO", valor: 381.16, parcelas: "", pago: true }, { id: 44, descricao: "BUSCA-BUSCA", valor: 53.04, parcelas: "", pago: true }, { id: 45, descricao: "MERCADINHO", valor: 17.19, parcelas: "", pago: true }, { id: 46, descricao: "BARBOZA", valor: 263.76, parcelas: "", pago: true }, { id: 47, descricao: "SOBRANCELHA", valor: 38.11, parcelas: "", pago: true }] } } };
@@ -381,7 +382,7 @@
             };
             
             const populateMonthSelector = () => {
-                const sortedMonths = Object.keys(financialData).sort().reverse();
+                const sortedMonths = Object.keys(financialData).sort();
                 const currentSelection = monthSelector.value;
                 monthSelector.innerHTML = '';
                 sortedMonths.forEach(monthKey => {
@@ -418,18 +419,44 @@
                     });
                     financialData = remoteData;
 
-                    const currentMonth = monthSelector.value || Object.keys(financialData).sort().reverse()[0];
-                    populateMonthSelector();
-                    
-                    if (financialData[currentMonth]) {
-                         monthSelector.value = currentMonth;
-                         renderDashboard(currentMonth);
-                    } else if (Object.keys(financialData).length > 0) {
-                        const latestMonth = Object.keys(financialData).sort().reverse()[0];
-                        monthSelector.value = latestMonth;
-                        renderDashboard(latestMonth);
+                    // Determine which month should be displayed
+                    let monthToDisplay;
+                    if (isInitialLoad) {
+                        const now = new Date();
+                        const year = now.getFullYear();
+                        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                        const currentRealMonthKey = `${year}-${month}`; // The actual current month
+
+                        // If the current real-world month exists in the data, show it.
+                        if (financialData[currentRealMonthKey]) {
+                            monthToDisplay = currentRealMonthKey;
+                        } else if (Object.keys(financialData).length > 0) {
+                            // Otherwise, if there's any data, show the latest month available.
+                            monthToDisplay = Object.keys(financialData).sort().reverse()[0];
+                        } else {
+                            // If there's no data at all, prepare to show the current month's empty state.
+                            monthToDisplay = currentRealMonthKey;
+                        }
+                        isInitialLoad = false;
                     } else {
-                        renderDashboard(null);
+                        // For any subsequent updates, just respect the user's current selection.
+                        monthToDisplay = monthSelector.value;
+                    }
+                    
+                    // If the target month doesn't exist yet (e.g., first launch in a new month),
+                    // create an empty object for it so it appears in the dropdown.
+                    if (!financialData[monthToDisplay] && monthToDisplay) {
+                        financialData[monthToDisplay] = { receitas: [], despesas: {} };
+                    }
+
+                    // Now, update the UI
+                    populateMonthSelector(); // This will now include the new empty month if it was created
+                    
+                    if (monthToDisplay) {
+                        monthSelector.value = monthToDisplay;
+                        renderDashboard(monthToDisplay);
+                    } else {
+                        renderDashboard(null); // Fallback for the rare case of no data at all
                     }
                 });
             }
@@ -709,4 +736,5 @@
     </script>
 </body>
 </html>
+
 
