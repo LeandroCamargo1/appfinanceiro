@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controle Financeiro Dinâmico</title>
+    <title>Painel de Controle Financeiro PRO</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
@@ -19,7 +19,6 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; }
-        /* Estilos do Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         .modal-content { background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 500px; transform: translateY(-20px); transition: transform 0.3s ease; }
@@ -39,7 +38,7 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <select id="month-selector" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></select>
-                    <button id="add-transaction-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-transform transform hover:scale-105">
+                    <button id="add-transaction-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full shadow-lg transition-transform transform hover:scale-105" title="Adicionar Lançamento">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                     </button>
                 </div>
@@ -48,41 +47,49 @@
 
         <!-- Navegação por Abas -->
         <div class="mb-6 border-b border-gray-200">
-            <nav class="flex space-x-2" id="tabs">
-                <button data-tab="resumo" class="tab-btn active text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800">Resumo Mensal</button>
-                <button data-tab="detalhados" class="tab-btn text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800">Lançamentos Detalhados</button>
-                <button data-tab="cartoes" class="tab-btn text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800">Cartões de Crédito</button>
-                <button data-tab="historico" class="tab-btn text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800">Histórico Anual</button>
+            <nav class="flex space-x-2 overflow-x-auto pb-2" id="tabs">
+                <button data-tab="resumo" class="tab-btn active text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800 whitespace-nowrap">Resumo Mensal</button>
+                <button data-tab="detalhados" class="tab-btn text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800 whitespace-nowrap">Lançamentos</button>
+                <button data-tab="cartoes" class="tab-btn text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800 whitespace-nowrap">Cartões</button>
+                <button data-tab="historico" class="tab-btn text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800 whitespace-nowrap">Histórico Anual</button>
+                <button data-tab="configuracoes" class="tab-btn text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800 whitespace-nowrap">Configurações</button>
             </nav>
         </div>
 
         <!-- Conteúdo das Abas -->
         <main id="tab-contents">
             <!-- Aba de Resumo -->
-            <div id="resumo" class="tab-content active">
-                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div id="resumo" class="tab-content active space-y-8">
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                      <div class="card bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500"><h2 class="text-lg font-semibold text-gray-600">Receitas</h2><p id="total-receitas" class="text-3xl font-bold text-gray-800 mt-2">R$ 0,00</p></div>
                      <div class="card bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500"><h2 class="text-lg font-semibold text-gray-600">Despesas Pagas</h2><p id="total-despesas" class="text-3xl font-bold text-gray-800 mt-2">R$ 0,00</p></div>
                      <div class="card bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500"><h2 class="text-lg font-semibold text-gray-600">Contas a Pagar</h2><p id="total-a-pagar" class="text-3xl font-bold text-gray-800 mt-2">R$ 0,00</p></div>
                      <div class="card bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500"><h2 class="text-lg font-semibold text-gray-600">Saldo Final</h2><p id="saldo-final" class="text-3xl font-bold text-gray-800 mt-2">R$ 0,00</p></div>
                  </div>
-                 <div class="bg-white p-6 rounded-lg shadow-md"><h2 class="text-xl font-bold text-gray-800 mb-4">Distribuição de Despesas (Previsto)</h2><div class="max-w-md mx-auto"><canvas id="expensesChart"></canvas></div></div>
+                 <!-- Painel de Fechamento do Mês -->
+                 <div id="insights-panel" class="bg-white p-6 rounded-lg shadow-md">
+                     <h2 class="text-xl font-bold text-gray-800 mb-4">Insights do Mês</h2>
+                     <div id="insights-content" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-gray-700">
+                        <!-- Conteúdo injetado pelo JS -->
+                     </div>
+                 </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md"><h2 class="text-xl font-bold text-gray-800 mb-4">Distribuição de Despesas</h2><div class="max-w-md mx-auto"><canvas id="expensesChart"></canvas></div></div>
             </div>
 
             <!-- Aba de Lançamentos Detalhados -->
-            <div id="detalhados" class="tab-content space-y-8">
-                <!-- Tabelas de Receitas e Despesas Gerais serão preenchidas por JS -->
-            </div>
+            <div id="detalhados" class="tab-content space-y-8"></div>
 
             <!-- Aba de Cartões de Crédito -->
             <div id="cartoes" class="tab-content">
-                 <div id="cartoes-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                     <!-- Tabelas de cartões serão inseridas aqui -->
-                 </div>
+                 <div id="cartoes-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-8"></div>
             </div>
             
             <!-- Aba de Histórico Anual -->
-            <div id="historico" class="tab-content">
+            <div id="historico" class="tab-content space-y-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Evolução Mensal (Receitas vs Despesas)</h2>
+                    <canvas id="evolutionChart"></canvas>
+                </div>
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Resumo Comparativo Anual</h2>
                     <div class="overflow-x-auto">
@@ -100,7 +107,22 @@
                     </div>
                 </div>
             </div>
-
+            
+            <!-- Aba de Configurações -->
+            <div id="configuracoes" class="tab-content">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Gerenciar Categorias de Despesa</h2>
+                    <div class="max-w-md">
+                        <form id="category-form" class="flex items-center gap-4 mb-6">
+                            <input type="text" id="new-category-name" placeholder="Nome da nova categoria" class="flex-grow p-2 border border-gray-300 rounded-md" required>
+                            <button type="submit" class="py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700">Adicionar</button>
+                        </form>
+                        <div id="category-list" class="space-y-2">
+                            <!-- Lista de categorias injetada pelo JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -110,42 +132,51 @@
             <h2 class="text-2xl font-bold mb-4" id="modal-title">Adicionar Lançamento</h2>
             <form id="transaction-form">
                 <input type="hidden" id="transaction-id" name="id">
-                 <div class="mb-4">
-                    <label for="transaction-date" class="block text-sm font-medium text-gray-700">Data</label>
-                    <input type="date" id="transaction-date" name="date" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                     <div>
+                        <label for="transaction-date" class="block text-sm font-medium text-gray-700">Data</label>
+                        <input type="date" id="transaction-date" name="date" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+                    </div>
+                     <div>
+                        <label for="transaction-type" class="block text-sm font-medium text-gray-700">Tipo</label>
+                        <select id="transaction-type" name="type" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                            <option value="despesa">Despesa</option>
+                            <option value="receita">Receita</option>
+                        </select>
+                    </div>
                 </div>
-                 <div class="mb-4">
-                    <label for="transaction-type" class="block text-sm font-medium text-gray-700">Tipo</label>
-                    <select id="transaction-type" name="type" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                        <option value="despesa">Despesa</option>
-                        <option value="receita">Receita</option>
-                    </select>
-                </div>
-                 <div class="mb-4">
+                 <div class="mt-4">
                     <label for="transaction-description" class="block text-sm font-medium text-gray-700">Descrição</label>
                     <input type="text" id="transaction-description" name="description" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
                 </div>
-                 <div class="mb-4">
-                    <label for="transaction-amount" class="block text-sm font-medium text-gray-700">Valor</label>
-                    <input type="number" id="transaction-amount" name="amount" step="0.01" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
-                </div>
-                 <div class="mb-4" id="category-wrapper">
-                    <label for="transaction-category" class="block text-sm font-medium text-gray-700">Categoria</label>
-                    <select id="transaction-category" name="category" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                        <option value="Gastos Casa">Gastos Casa</option>
-                        <option value="Gastos Leandro">Gastos Leandro</option>
-                        <option value="Gastos Leidiane">Gastos Leidiane</option>
-                        <option value="Cartão BB (Fixos)">Cartão BB (Fixos)</option>
-                        <option value="Cartão BB (Extras)">Cartão BB (Extras)</option>
-                        <option value="Cartão Nubank (Fixos)">Cartão Nubank (Fixos)</option>
-                        <option value="Cartão Nubank (Extras)">Cartão Nubank (Extras)</option>
-                        <option value="Outras Despesas">Outras Despesas</option>
-                    </select>
-                </div>
-                 <div class="mb-4" id="installments-wrapper">
-                    <label for="transaction-installments" class="block text-sm font-medium text-gray-700">Parcelas (ex: 01/10)</label>
-                    <input type="text" id="transaction-installments" name="installments" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                </div>
+                 <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                     <div>
+                        <label for="transaction-amount" class="block text-sm font-medium text-gray-700">Valor</label>
+                        <input type="number" id="transaction-amount" name="amount" step="0.01" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+                    </div>
+                    <div>
+                        <label for="transaction-responsavel" class="block text-sm font-medium text-gray-700">Responsável</label>
+                        <select id="transaction-responsavel" name="responsavel" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                            <option value="N/A">N/A</option>
+                            <option value="Leandro">Leandro</option>
+                            <option value="Leidiane">Leidiane</option>
+                        </select>
+                    </div>
+                 </div>
+                 <div id="despesa-fields">
+                     <div class="mt-4">
+                        <label for="transaction-category" class="block text-sm font-medium text-gray-700">Categoria</label>
+                        <select id="transaction-category" name="category" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></select>
+                    </div>
+                     <div class="mt-4">
+                        <label for="transaction-installments" class="block text-sm font-medium text-gray-700">Parcelas (ex: 01/10)</label>
+                        <input type="text" id="transaction-installments" name="installments" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                    </div>
+                    <div class="mt-4 flex items-center">
+                        <input type="checkbox" id="transaction-recorrente" name="recorrente" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                        <label for="transaction-recorrente" class="ml-2 block text-sm text-gray-900">Despesa Recorrente (será repetida no próximo mês)</label>
+                    </div>
+                 </div>
                 <div class="flex justify-end gap-4 mt-6">
                     <button type="button" id="delete-btn" class="py-2 px-4 bg-red-600 text-white rounded-md hover:bg-red-700 hidden">Excluir</button>
                     <button type="button" id="cancel-btn" class="py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancelar</button>
@@ -157,12 +188,10 @@
     
     <!-- Firebase SDKs -->
     <script type="module">
-        // Import Firebase services
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, query, writeBatch, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, query, writeBatch, getDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         document.addEventListener('DOMContentLoaded', async () => {
-            // --- FIREBASE CONFIG ---
             const firebaseConfig = {
                 apiKey: "AIzaSyABSS2JHDfaglvW7h7osKBTW7I4sgU5GHU",
                 authDomain: "meu-painel-financeiro-bae07.firebaseapp.com",
@@ -172,43 +201,41 @@
                 appId: "1:445618493671:web:ea1ec2626ec433fe102a42"
             };
 
-            // Initialize Firebase
             const app = initializeApp(firebaseConfig);
             const db = getFirestore(app);
             
-            let userId = null;
+            let userId = "leandro-leidiane-financas-2024";
             let financialData = {};
-            let chartInstance = null;
+            let appConfig = {
+                categories: [
+                    "Gastos Casa", "Gastos Leandro", "Gastos Leidiane", 
+                    "Cartão BB (Fixos)", "Cartão BB (Extras)", 
+                    "Cartão Nubank (Fixos)", "Cartão Nubank (Extras)", "Outras Despesas"
+                ]
+            };
+            let expensesChart = null;
+            let evolutionChart = null;
             const monthSelector = document.getElementById('month-selector');
-            let isInitialLoad = true; // Flag for initial load logic
-            
-            // --- DADOS INICIAIS (PARA PRIMEIRO USO) ---
-            const initialData = { "2025-09": { receitas: [ { id: 1001, descricao: "SALÁRIO LEANDRO", valor: 2800.00 }, { id: 1002, descricao: "SALÁRIO LEIDIANE", valor: 2800.00 } ], despesas: { "Gastos Casa": [ { id: 1, descricao: "LUZ", valor: 200.31, parcelas: "", pago: true }, { id: 2, descricao: "VIVO", valor: 355.00, parcelas: "", pago: true }, { id: 3, descricao: "PAINEL", valor: 30.00, parcelas: "", pago: true }, { id: 4, descricao: "ÁGUA", valor: 68.64, parcelas: "", pago: true }], "Gastos Leandro": [ { id: 5, descricao: "ALURA", valor: 110.00, parcelas: "10/12", pago: true }, { id: 6, descricao: "FACULDADE", valor: 356.00, parcelas: "FIXO", pago: true }, { id: 7, descricao: "JIU-JITSU", valor: 423.00, parcelas: "FIXO", pago: true }, { id: 8, descricao: "CHUTEIRA VITOR", valor: 50.00, parcelas: "04/05", pago: true }, { id: 9, descricao: "SHOW", valor: 72.17, parcelas: "02/05", pago: true }, { id: 10, descricao: "STEFAN", valor: 108.00, parcelas: "04/04", pago: true }], "Gastos Leidiane": [ { id: 11, descricao: "STEFAN", valor: 100.00, parcelas: "01/03", pago: true }, { id: 12, descricao: "PAI", valor: 165.00, parcelas: "06/10", pago: true }, { id: 13, descricao: "ÓTICA", valor: 103.00, parcelas: "02/05", pago: true }, { id: 14, descricao: "C&A", valor: 57.39, parcelas: "02/04", pago: true }, { id: 15, descricao: "SHOW", valor: 75.00, parcelas: "02/05", pago: true }, { id: 16, descricao: "VALUTI", valor: 55.00, parcelas: "03/05", pago: true }, { id: 17, descricao: "JULIANA (UNHA)", valor: 100.00, parcelas: "FIXO", pago: true }, { id: 18, descricao: "FACULDADE", valor: 276.38, parcelas: "FIXO", pago: true }, { id: 19, descricao: "VALUTI", valor: 90.00, parcelas: "02/04", pago: true }], "Cartão BB (Fixos)": [ { id: 20, descricao: "INGLÊS", valor: 29.81, parcelas: "10/12", pago: true }, { id: 21, descricao: "TATTO", valor: 101.00, parcelas: "06/10", pago: true }, { id: 22, descricao: "KIMONO", valor: 58.33, parcelas: "03/06", pago: true }, { id: 23, descricao: "NUTRICIONISTA", valor: 74.50, parcelas: "03/03", pago: true }, { id: 24, descricao: "PRESENTE PAIS", valor: 57.50, parcelas: "02/04", pago: true }], "Cartão BB (Extras)": [ { id: 25, descricao: "SUPLEMENTO", valor: 90.00, parcelas: "", pago: true }, { id: 26, descricao: "PAPA-BOLINHA", valor: 24.99, parcelas: "", pago: true }, { id: 27, descricao: "GASOLINA", valor: 100.02, parcelas: "", pago: true }, { id: 28, descricao: "C&A", valor: 45.99, parcelas: "", pago: true }, { id: 29, descricao: "SORVETE", valor: 46.00, parcelas: "", pago: true }, { id: 30, descricao: "MCDONALDS", valor: 157.00, parcelas: "", pago: true }, { id: 31, descricao: "SHORT MALU", valor: 70.96, parcelas: "", pago: true }], "Cartão Nubank (Fixos)": [ { id: 32, descricao: "WEGOVY", valor: 112.00, parcelas: "05/10", pago: true }, { id: 33, descricao: "FONE", valor: 52.59, parcelas: "01/04", pago: true }, { id: 34, descricao: "SHOPPING ORIENTE", valor: 54.66, parcelas: "03/03", pago: true }, { id: 35, descricao: "CELULAR MALU", valor: 84.03, parcelas: "01/02", pago: true }, { id: 36, descricao: "GAMEPASS", valor: 59.99, parcelas: "FIXO", pago: true }, { id: 37, descricao: "GOOGLE(NUVEM)", valor: 2.49, parcelas: "FIXO", pago: true }, { id: 38, descricao: "PENTEADEIRA", valor: 110.81, parcelas: "02/03", pago: true }, { id: 39, descricao: "GYMPASS", valor: 120.00, parcelas: "FIXO", pago: true }], "Cartão Nubank (Extras)": [ { id: 40, descricao: "GASOLINA", valor: 100.00, parcelas: "", pago: true }, { id: 41, descricao: "RAÇÃO", valor: 50.00, parcelas: "", pago: true }, { id: 42, descricao: "ROSALINA", valor: 165.72, parcelas: "", pago: true }, { id: 43, descricao: "TERRAÇO", valor: 381.16, parcelas: "", pago: true }, { id: 44, descricao: "BUSCA-BUSCA", valor: 53.04, parcelas: "", pago: true }, { id: 45, descricao: "MERCADINHO", valor: 17.19, parcelas: "", pago: true }, { id: 46, descricao: "BARBOZA", valor: 263.76, parcelas: "", pago: true }, { id: 47, descricao: "SOBRANCELHA", valor: 38.11, parcelas: "", pago: true }] } } };
+            let isInitialLoad = true;
             
             // --- FUNÇÕES AUXILIARES ---
             const formatCurrency = (value) => (typeof value === 'number' ? value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00');
-            
+            const getPreviousMonthKey = (monthKey) => {
+                const [year, month] = monthKey.split('-').map(Number);
+                const date = new Date(year, month - 1, 1);
+                date.setMonth(date.getMonth() - 1);
+                return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+            };
+
             // --- FUNÇÕES DE RENDERIZAÇÃO ---
             const renderDashboard = (monthKey) => {
-                const monthData = financialData[monthKey];
+                const monthData = financialData[monthKey] || { receitas: [], despesas: {} };
                 
-                // Clear dashboard if no data
-                if (!monthData) {
-                    document.getElementById('total-receitas').textContent = formatCurrency(0);
-                    document.getElementById('total-despesas').textContent = formatCurrency(0);
-                    document.getElementById('total-a-pagar').textContent = formatCurrency(0);
-                    document.getElementById('saldo-final').textContent = formatCurrency(0);
-                    if (chartInstance) chartInstance.destroy();
-                    renderTables([], {});
-                    renderHistoryTable();
-                    return;
-                }
-
-                const allExpenses = Object.values(monthData.despesas || {}).flat();
+                const allExpenses = Object.values(monthData.despesas).flat();
                 const paidExpenses = allExpenses.filter(item => item.pago);
                 const unpaidExpenses = allExpenses.filter(item => !item.pago);
 
-                const totalReceitas = (monthData.receitas || []).reduce((sum, item) => sum + item.valor, 0);
+                const totalReceitas = monthData.receitas.reduce((sum, item) => sum + item.valor, 0);
                 const totalDespesasPagas = paidExpenses.reduce((sum, item) => sum + item.valor, 0);
                 const totalAPagar = unpaidExpenses.reduce((sum, item) => sum + item.valor, 0);
                 const saldoFinal = totalReceitas - totalDespesasPagas;
@@ -221,148 +248,82 @@
                 saldoEl.classList.toggle('text-red-500', saldoFinal < 0);
                 saldoEl.classList.toggle('text-gray-800', saldoFinal >= 0);
 
-                renderChart(monthData.despesas || {});
-                renderTables(monthData.receitas || [], monthData.despesas || {});
-                renderHistoryTable();
+                renderExpensesChart(monthData.despesas);
+                renderTables(monthData.receitas, monthData.despesas);
+                renderHistory();
+                renderInsights(monthKey);
+            };
+
+            const renderInsights = (monthKey) => {
+                const insightsContent = document.getElementById('insights-content');
+                const monthData = financialData[monthKey] || { receitas: [], despesas: {} };
+                const totalReceitas = monthData.receitas.reduce((sum, item) => sum + item.valor, 0);
+                const allExpenses = Object.values(monthData.despesas).flat();
+                const totalDespesas = allExpenses.reduce((sum, item) => sum + item.valor, 0);
+
+                let insightsHTML = '';
+
+                // 1. Categoria com maior gasto
+                const categoryTotals = Object.entries(monthData.despesas).map(([category, items]) => ({
+                    category,
+                    total: items.reduce((sum, item) => sum + item.valor, 0)
+                }));
+
+                if (categoryTotals.length > 0) {
+                    const topCategory = categoryTotals.sort((a, b) => b.total - a.total)[0];
+                    insightsHTML += `<div><h3 class="font-bold text-gray-800">Top Categoria</h3><p>${topCategory.category} (${formatCurrency(topCategory.total)})</p></div>`;
+                }
+
+                // 2. Percentual da receita gasto
+                if (totalReceitas > 0) {
+                    const percentSpent = (totalDespesas / totalReceitas) * 100;
+                    insightsHTML += `<div><h3 class="font-bold text-gray-800">% da Receita Gasto</h3><p>${percentSpent.toFixed(1)}%</p></div>`;
+                }
+
+                // 3. Comparação com mês anterior
+                const prevMonthKey = getPreviousMonthKey(monthKey);
+                const prevMonthData = financialData[prevMonthKey];
+                if (prevMonthData) {
+                    const prevTotalExpenses = Object.values(prevMonthData.despesas).flat().reduce((sum, item) => sum + item.valor, 0);
+                    const diff = totalDespesas - prevTotalExpenses;
+                    const diffText = diff > 0 ? `${formatCurrency(diff)} a mais` : `${formatCurrency(Math.abs(diff))} a menos`;
+                    const colorClass = diff > 0 ? 'text-red-500' : 'text-green-600';
+                    insightsHTML += `<div><h3 class="font-bold text-gray-800">vs Mês Anterior</h3><p class="${colorClass}">${diffText}</p></div>`;
+                }
+                 insightsContent.innerHTML = insightsHTML || '<p class="text-gray-500 col-span-full">Ainda não há dados suficientes para insights.</p>';
             };
             
-            const renderChart = (despesas) => {
-                if (typeof Chart === 'undefined') return;
+            const renderExpensesChart = (despesas) => {
                 const ctx = document.getElementById('expensesChart').getContext('2d');
                 const categoryTotals = Object.keys(despesas).map(cat => ({
                     category: cat,
                     total: despesas[cat].reduce((sum, item) => sum + item.valor, 0)
                 })).filter(c => c.total > 0);
 
-                if (chartInstance) chartInstance.destroy();
-                chartInstance = new Chart(ctx, {
+                if (expensesChart) expensesChart.destroy();
+                expensesChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: categoryTotals.map(d => d.category),
                         datasets: [{
                             data: categoryTotals.map(d => d.total),
-                            backgroundColor: ['#ef4444', '#3b82f6', '#10b981', '#f97316', '#8b5cf6', '#ec4899', '#f59e0b', '#6b7280'],
+                            backgroundColor: ['#ef4444', '#3b82f6', '#10b981', '#f97316', '#8b5cf6', '#ec4899', '#f59e0b', '#6b7280', '#14b8a6', '#84cc16'],
                             hoverOffset: 4,
-                            borderColor: '#f3f4f6',
-                            borderWidth: 2,
+                            borderColor: '#f3f4f6'
                         }]
                     },
-                    options: { responsive: true, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (c) => `${c.label}: ${formatCurrency(c.parsed)}` } } } }
+                    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
                 });
             };
 
-            const renderTables = (receitas, despesas) => {
-                const gastosDetalhadosContainer = document.getElementById('detalhados');
-                const cartoesGridContainer = document.getElementById('cartoes-grid');
-                gastosDetalhadosContainer.innerHTML = '';
-                cartoesGridContainer.innerHTML = '';
-
-                // Render Revenue Table
-                if(receitas && receitas.length > 0) {
-                    const totalRevenue = receitas.reduce((sum, i) => sum + i.valor, 0);
-                    const revenueRows = receitas.map(item => {
-                        const transactionData = JSON.stringify(item);
-                        return `
-                        <tr class="border-b dark:border-neutral-500 hover:bg-gray-50 group">
-                            <td class="whitespace-nowrap px-6 py-3 cursor-pointer" onclick='window.openEditModal(${transactionData})'>${item.descricao}</td>
-                            <td class="whitespace-nowrap px-6 py-3 text-right cursor-pointer" onclick='window.openEditModal(${transactionData})'>${formatCurrency(item.valor)}</td>
-                            <td class="whitespace-nowrap w-12 px-2 py-3 text-center">
-                                <button onclick="window.deleteItem(${item.id}, null)" title="Excluir item" class="text-gray-400 hover:text-red-600 font-bold text-xl leading-none p-1 rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity">
-                                    &times;
-                                </button>
-                            </td>
-                        </tr>
-                        `}).join('');
-
-                    const revenueTableHTML = `
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h2 class="text-xl font-bold text-gray-800 mb-4">Receitas</h2>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full text-left text-sm font-light">
-                                    <thead class="border-b font-medium dark:border-neutral-500">
-                                        <tr>
-                                            <th scope="col" class="px-6 py-3">Descrição</th>
-                                            <th scope="col" class="px-6 py-3 text-right">Valor</th>
-                                            <th scope="col" class="w-12 px-2 py-3"><span class="sr-only">Ações</span></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${revenueRows}
-                                        <tr class="font-bold bg-gray-50">
-                                            <td class="px-6 py-3">TOTAL</td>
-                                            <td class="px-6 py-3 text-right">${formatCurrency(totalRevenue)}</td>
-                                            <td></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>`;
-                    gastosDetalhadosContainer.innerHTML += revenueTableHTML;
-                }
-                
-                Object.entries(despesas).forEach(([category, items]) => {
-                    if(!items || items.length === 0) return;
-
-                    const totalCategory = items.reduce((sum, i) => sum + i.valor, 0);
-                    const tableRows = items.map(item => {
-                        const transactionData = JSON.stringify({ ...item, category });
-                        const isPaid = item.pago ? 'checked' : '';
-                        const rowClass = item.pago ? 'paid-row' : '';
-                        
-                        return `
-                        <tr class="border-b dark:border-neutral-500 hover:bg-gray-50 group ${rowClass}">
-                            <td class="whitespace-nowrap w-12 px-2 py-3 text-center">
-                                <input type="checkbox" ${isPaid} onchange="window.togglePaidStatus(${item.id}, '${category}')" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
-                            </td>
-                            <td class="whitespace-nowrap px-6 py-3 cursor-pointer" onclick='window.openEditModal(${transactionData})'>${item.descricao}</td>
-                            <td class="whitespace-nowrap px-6 py-3 cursor-pointer" onclick='window.openEditModal(${transactionData})'>${item.parcelas || '—'}</td>
-                            <td class="whitespace-nowrap px-6 py-3 text-right cursor-pointer" onclick='window.openEditModal(${transactionData})'>${formatCurrency(item.valor)}</td>
-                            <td class="whitespace-nowrap w-12 px-2 py-3 text-center">
-                                <button onclick="window.deleteItem(${item.id}, '${category}')" title="Excluir item" class="text-gray-400 hover:text-red-600 font-bold text-xl leading-none p-1 rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity">
-                                    &times;
-                                </button>
-                            </td>
-                        </tr>
-                        `}).join('');
-
-                    const tableHTML = `
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h2 class="text-xl font-bold text-gray-800 mb-4">${category}</h2>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full text-left text-sm font-light">
-                                    <thead class="border-b font-medium dark:border-neutral-500">
-                                        <tr>
-                                            <th scope="col" class="w-12 px-2 py-3"><span class="sr-only">Pago</span></th>
-                                            <th scope="col" class="px-6 py-3">Descrição</th>
-                                            <th scope="col" class="px-6 py-3">Parcelas</th>
-                                            <th scope="col" class="px-6 py-3 text-right">Valor</th>
-                                            <th scope="col" class="w-12 px-2 py-3"><span class="sr-only">Ações</span></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${tableRows}
-                                        <tr class="font-bold bg-gray-50">
-                                            <td class="px-6 py-3" colspan="3">TOTAL</td>
-                                            <td class="px-6 py-3 text-right">${formatCurrency(totalCategory)}</td>
-                                            <td></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>`;
-                    
-                    if (category.toLowerCase().includes('cartão')) {
-                        cartoesGridContainer.innerHTML += tableHTML;
-                    } else {
-                        gastosDetalhadosContainer.innerHTML += tableHTML;
-                    }
-                });
-            };
-            
-            const renderHistoryTable = () => {
+            const renderHistory = () => {
                 const tableBody = document.getElementById('history-table-body');
                 tableBody.innerHTML = '';
                 const sortedMonths = Object.keys(financialData).sort();
+
+                const evolutionLabels = [];
+                const evolutionRevenues = [];
+                const evolutionExpenses = [];
 
                 sortedMonths.forEach(monthKey => {
                     const monthData = financialData[monthKey];
@@ -370,352 +331,393 @@
                     const totalDespesasPagas = Object.values(monthData.despesas || {}).flat().filter(i => i.pago).reduce((sum, item) => sum + item.valor, 0);
                     const saldo = totalReceitas - totalDespesasPagas;
 
-                    const row = `
-                        <tr class="border-b dark:border-neutral-500">
-                            <td class="whitespace-nowrap px-6 py-3 font-medium">${monthKey}</td>
-                            <td class="whitespace-nowrap px-6 py-3 text-right text-green-600">${formatCurrency(totalReceitas)}</td>
-                            <td class="whitespace-nowrap px-6 py-3 text-right text-red-600">${formatCurrency(totalDespesasPagas)}</td>
-                            <td class="whitespace-nowrap px-6 py-3 text-right font-bold ${saldo < 0 ? 'text-red-600' : 'text-gray-800'}">${formatCurrency(saldo)}</td>
-                        </tr>`;
-                    tableBody.innerHTML += row;
+                    tableBody.innerHTML += `<tr class="border-b dark:border-neutral-500">
+                        <td class="whitespace-nowrap px-6 py-3 font-medium">${monthKey}</td>
+                        <td class="whitespace-nowrap px-6 py-3 text-right text-green-600">${formatCurrency(totalReceitas)}</td>
+                        <td class="whitespace-nowrap px-6 py-3 text-right text-red-600">${formatCurrency(totalDespesasPagas)}</td>
+                        <td class="whitespace-nowrap px-6 py-3 text-right font-bold ${saldo < 0 ? 'text-red-600' : 'text-gray-800'}">${formatCurrency(saldo)}</td>
+                    </tr>`;
+
+                    evolutionLabels.push(monthKey);
+                    evolutionRevenues.push(totalReceitas);
+                    evolutionExpenses.push(totalDespesasPagas);
+                });
+
+                renderEvolutionChart(evolutionLabels, evolutionRevenues, evolutionExpenses);
+            };
+
+            const renderEvolutionChart = (labels, revenues, expenses) => {
+                const ctx = document.getElementById('evolutionChart').getContext('2d');
+                if (evolutionChart) evolutionChart.destroy();
+                evolutionChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Receitas',
+                                data: revenues,
+                                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Despesas Pagas',
+                                data: expenses,
+                                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: { scales: { y: { beginAtZero: true } } }
                 });
             };
-            
-            const populateMonthSelector = () => {
-                const sortedMonths = Object.keys(financialData).sort();
-                const currentSelection = monthSelector.value;
-                monthSelector.innerHTML = '';
-                sortedMonths.forEach(monthKey => {
-                    const [year, month] = monthKey.split('-');
-                    const monthName = new Date(year, parseInt(month) - 1, 2).toLocaleString('pt-BR', { month: 'long', timeZone: 'UTC' });
-                    const option = document.createElement('option');
-                    option.value = monthKey;
-                    option.textContent = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} de ${year}`;
-                    monthSelector.appendChild(option);
-                });
-                if (sortedMonths.includes(currentSelection)) {
-                    monthSelector.value = currentSelection;
+
+             const renderTables = (receitas, despesas) => {
+                const gastosDetalhadosContainer = document.getElementById('detalhados');
+                const cartoesGridContainer = document.getElementById('cartoes-grid');
+                gastosDetalhadosContainer.innerHTML = '';
+                cartoesGridContainer.innerHTML = '';
+
+                if (receitas && receitas.length > 0) {
+                    gastosDetalhadosContainer.innerHTML += createTableHTML('Receitas', receitas);
                 }
-            };
-            
-            // --- FUNÇÕES DE DADOS (FIRESTORE) ---
-            async function seedInitialData() {
-                console.log("Seeding initial data to Firestore...");
-                const batch = writeBatch(db);
-                for (const monthKey in initialData) {
-                    const monthData = initialData[monthKey];
-                    const docRef = doc(db, "users", userId, "months", monthKey);
-                    batch.set(docRef, monthData);
-                }
-                await batch.commit();
-            }
-
-            function loadDataWithListener() {
-                const monthsCollection = collection(db, "users", userId, "months");
-                onSnapshot(query(monthsCollection), (snapshot) => {
-                    const remoteData = {};
-                    snapshot.forEach(doc => {
-                        remoteData[doc.id] = doc.data();
-                    });
-                    financialData = remoteData;
-
-                    // Determine which month should be displayed
-                    let monthToDisplay;
-                    if (isInitialLoad) {
-                        const now = new Date();
-                        const year = now.getFullYear();
-                        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-                        const currentRealMonthKey = `${year}-${month}`; // The actual current month
-
-                        // If the current real-world month exists in the data, show it.
-                        if (financialData[currentRealMonthKey]) {
-                            monthToDisplay = currentRealMonthKey;
-                        } else if (Object.keys(financialData).length > 0) {
-                            // Otherwise, if there's any data, show the latest month available.
-                            monthToDisplay = Object.keys(financialData).sort().reverse()[0];
+                
+                Object.entries(despesas).forEach(([category, items]) => {
+                    if (items && items.length > 0) {
+                        const html = createTableHTML(category, items, true);
+                        if (category.toLowerCase().includes('cartão')) {
+                            cartoesGridContainer.innerHTML += html;
                         } else {
-                            // If there's no data at all, prepare to show the current month's empty state.
-                            monthToDisplay = currentRealMonthKey;
+                            gastosDetalhadosContainer.innerHTML += html;
                         }
-                        isInitialLoad = false;
-                    } else {
-                        // For any subsequent updates, just respect the user's current selection.
-                        monthToDisplay = monthSelector.value;
                     }
+                });
+            };
+
+            const createTableHTML = (title, items, isExpense = false) => {
+                const total = items.reduce((sum, i) => sum + i.valor, 0);
+                const rows = items.map(item => {
+                    const transactionData = JSON.stringify({ ...item, category: isExpense ? title : undefined });
+                    const responsavelBadge = item.responsavel && item.responsavel !== 'N/A' 
+                        ? `<span class="text-xs text-gray-500 block">${item.responsavel}</span>` : '';
+
+                    if (isExpense) {
+                        const rowClass = item.pago ? 'paid-row' : '';
+                        return `<tr class="border-b dark:border-neutral-500 hover:bg-gray-50 group ${rowClass}">
+                            <td class="w-12 px-2 py-3 text-center"><input type="checkbox" ${item.pago ? 'checked' : ''} onchange="window.togglePaidStatus(${item.id}, '${title}')" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"></td>
+                            <td class="px-6 py-3 cursor-pointer" onclick='window.openEditModal(${transactionData})'>${item.descricao}${responsavelBadge}</td>
+                            <td class="px-6 py-3 cursor-pointer" onclick='window.openEditModal(${transactionData})'>${item.parcelas || '—'}</td>
+                            <td class="px-6 py-3 text-right cursor-pointer" onclick='window.openEditModal(${transactionData})'>${formatCurrency(item.valor)}</td>
+                            <td class="w-12 px-2 py-3 text-center"><button onclick="window.deleteItem(${item.id}, '${title}')" title="Excluir item" class="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100">&times;</button></td>
+                        </tr>`;
+                    }
+                    return `<tr class="border-b dark:border-neutral-500 hover:bg-gray-50 group">
+                        <td class="px-6 py-3 cursor-pointer" onclick='window.openEditModal(${transactionData})'>${item.descricao}${responsavelBadge}</td>
+                        <td class="px-6 py-3 text-right cursor-pointer" onclick='window.openEditModal(${transactionData})'>${formatCurrency(item.valor)}</td>
+                        <td class="w-12 px-2 py-3 text-center"><button onclick="window.deleteItem(${item.id}, null)" title="Excluir item" class="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100">&times;</button></td>
+                    </tr>`;
+                }).join('');
+
+                const header = isExpense ? `
+                    <th class="w-12 px-2 py-3"><span class="sr-only">Pago</span></th>
+                    <th class="px-6 py-3">Descrição</th>
+                    <th class="px-6 py-3">Parcelas</th>
+                    <th class="px-6 py-3 text-right">Valor</th>` : `
+                    <th class="px-6 py-3">Descrição</th>
+                    <th class="px-6 py-3 text-right">Valor</th>`;
+                
+                const footerCols = isExpense ? 'colspan="3"' : '';
+
+                return `<div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">${title}</h2>
+                    <div class="overflow-x-auto"><table class="min-w-full text-left text-sm font-light">
+                        <thead class="border-b font-medium dark:border-neutral-500"><tr>${header}<th class="w-12 px-2 py-3"><span class="sr-only">Ações</span></th></tr></thead>
+                        <tbody>${rows}<tr class="font-bold bg-gray-50"><td class="px-6 py-3" ${footerCols}>TOTAL</td><td class="px-6 py-3 text-right">${formatCurrency(total)}</td><td></td></tr></tbody>
+                    </table></div></div>`;
+            };
+            
+            // --- LÓGICA DE CONFIGURAÇÕES ---
+            const renderCategories = () => {
+                const categoryList = document.getElementById('category-list');
+                const transactionCategorySelect = document.getElementById('transaction-category');
+                categoryList.innerHTML = '';
+                transactionCategorySelect.innerHTML = '';
+                appConfig.categories.forEach(cat => {
+                    categoryList.innerHTML += `<div class="flex justify-between items-center p-2 border rounded-md"><span>${cat}</span><button data-category="${cat}" class="text-red-500 hover:text-red-700 delete-category-btn">&times;</button></div>`;
+                    transactionCategorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+                });
+            };
+
+            document.getElementById('category-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const input = document.getElementById('new-category-name');
+                const newCategory = input.value.trim();
+                if (newCategory && !appConfig.categories.includes(newCategory)) {
+                    appConfig.categories.push(newCategory);
+                    await setDoc(doc(db, "users", userId, "config", "appConfig"), appConfig);
+                    input.value = '';
+                }
+            });
+
+            document.getElementById('category-list').addEventListener('click', async (e) => {
+                if (e.target.classList.contains('delete-category-btn')) {
+                    const categoryToDelete = e.target.dataset.category;
+                    appConfig.categories = appConfig.categories.filter(c => c !== categoryToDelete);
+                    await setDoc(doc(db, "users", userId, "config", "appConfig"), appConfig);
+                }
+            });
+
+            // --- FUNÇÕES DE DADOS (FIRESTORE) ---
+            async function checkAndCreateRecurringTransactions() {
+                const now = new Date();
+                const currentMonthKey = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+                const prevMonthKey = getPreviousMonthKey(currentMonthKey);
+                
+                const prevMonthData = financialData[prevMonthKey];
+                if (!prevMonthData) return;
+
+                const currentMonthData = financialData[currentMonthKey] || { receitas: [], despesas: {} };
+                const allCurrentExpensesDesc = Object.values(currentMonthData.despesas).flat().map(i => i.descricao);
+                
+                const batch = writeBatch(db);
+                let needsUpdate = false;
+
+                Object.values(prevMonthData.despesas).flat().forEach(expense => {
+                    if (expense.recorrente && !allCurrentExpensesDesc.includes(expense.descricao)) {
+                        console.log(`Creating recurring transaction for: ${expense.descricao}`);
+                        needsUpdate = true;
+                        if (!currentMonthData.despesas[expense.category]) {
+                            currentMonthData.despesas[expense.category] = [];
+                        }
+                        currentMonthData.despesas[expense.category].push({
+                            ...expense,
+                            id: Date.now() + Math.random(),
+                            pago: false,
+                            parcelas: '',
+                            dataGeracao: currentMonthKey
+                        });
+                    }
+                });
+
+                if (needsUpdate) {
+                    await setDoc(doc(db, "users", userId, "months", currentMonthKey), currentMonthData);
+                }
+            }
+            
+            function loadDataAndConfig() {
+                // Listener para configurações (categorias)
+                onSnapshot(doc(db, "users", userId, "config", "appConfig"), (docSnap) => {
+                    if (docSnap.exists()) {
+                        appConfig = docSnap.data();
+                    } else {
+                        // Se não existe, cria com as categorias padrão
+                        setDoc(doc(db, "users", userId, "config", "appConfig"), appConfig);
+                    }
+                    renderCategories();
+                });
+
+                // Listener para dados financeiros
+                onSnapshot(query(collection(db, "users", userId, "months")), (snapshot) => {
+                    snapshot.docChanges().forEach(change => {
+                        if (change.type === "removed") {
+                            delete financialData[change.doc.id];
+                        } else {
+                            financialData[change.doc.id] = change.doc.data();
+                        }
+                    });
+
+                    if (isInitialLoad) {
+                        checkAndCreateRecurringTransactions();
+                    }
+
+                    const now = new Date();
+                    const currentRealMonthKey = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+                    let monthToDisplay = isInitialLoad ? currentRealMonthKey : monthSelector.value;
                     
-                    // If the target month doesn't exist yet (e.g., first launch in a new month),
-                    // create an empty object for it so it appears in the dropdown.
-                    if (!financialData[monthToDisplay] && monthToDisplay) {
+                    if (!financialData[monthToDisplay]) {
                         financialData[monthToDisplay] = { receitas: [], despesas: {} };
                     }
-
-                    // Now, update the UI
-                    populateMonthSelector(); // This will now include the new empty month if it was created
                     
-                    if (monthToDisplay) {
-                        monthSelector.value = monthToDisplay;
-                        renderDashboard(monthToDisplay);
-                    } else {
-                        renderDashboard(null); // Fallback for the rare case of no data at all
-                    }
+                    populateMonthSelector();
+                    monthSelector.value = monthToDisplay;
+                    renderDashboard(monthToDisplay);
+                    isInitialLoad = false;
                 });
             }
-
-            async function initializeUserAndLoadData() {
-                const monthsQuery = query(collection(db, "users", userId, "months"));
-                const querySnapshot = await getDocs(monthsQuery);
-
-                if (querySnapshot.empty) {
-                    console.log("First time setup for this user. Seeding initial data...");
-                    await seedInitialData();
-                } else {
-                    console.log("User already has data.");
-                }
-                loadDataWithListener();
-            }
-
-            // --- MANIPULADORES DE EVENTOS GLOBAIS ---
-            window.togglePaidStatus = async (id, category) => {
-                const monthKey = monthSelector.value;
-                const monthData = JSON.parse(JSON.stringify(financialData[monthKey])); // Deep copy
-                const item = monthData.despesas[category].find(i => i.id === id);
-                if (item) {
-                    item.pago = !item.pago;
-                    const docRef = doc(db, "users", userId, "months", monthKey);
-                    await setDoc(docRef, monthData);
-                }
-            };
-
-            window.deleteItem = async (id, category) => {
-                const monthKey = monthSelector.value;
-                const monthData = JSON.parse(JSON.stringify(financialData[monthKey])); // Deep copy
-                let itemFoundAndRemoved = false;
-
-                if (category) {
-                    if (monthData.despesas && monthData.despesas[category]) {
-                        const initialLength = monthData.despesas[category].length;
-                        monthData.despesas[category] = monthData.despesas[category].filter(item => item.id !== id);
-                        if (monthData.despesas[category].length < initialLength) itemFoundAndRemoved = true;
-                    }
-                } else {
-                    if (monthData.receitas) {
-                        const initialLength = monthData.receitas.length;
-                        monthData.receitas = monthData.receitas.filter(item => item.id !== id);
-                        if (monthData.receitas.length < initialLength) itemFoundAndRemoved = true;
-                    }
-                }
-
-                if(itemFoundAndRemoved) {
-                    const docRef = doc(db, "users", userId, "months", monthKey);
-                    await setDoc(docRef, monthData);
-                }
-            };
             
             // --- LÓGICA DO MODAL ---
             const modal = document.getElementById('transaction-modal');
             const addBtn = document.getElementById('add-transaction-btn');
-            const cancelBtn = document.getElementById('cancel-btn');
-            const deleteBtn = document.getElementById('delete-btn');
             const form = document.getElementById('transaction-form');
-            const typeSelect = document.getElementById('transaction-type');
-            
-            const closeModal = () => {
-                modal.classList.remove('visible');
-                form.reset();
-                document.getElementById('transaction-id').value = '';
-                document.getElementById('modal-title').textContent = 'Adicionar Lançamento';
-                deleteBtn.classList.add('hidden');
+
+            const toggleDespesaFields = (isDespesa) => {
+                document.getElementById('despesa-fields').style.display = isDespesa ? 'block' : 'none';
             };
 
-            window.openEditModal = (transaction) => {
-                form.reset();
-                document.getElementById('modal-title').textContent = 'Editar Lançamento';
-                document.getElementById('transaction-id').value = transaction.id;
-                document.getElementById('transaction-description').value = transaction.descricao;
-                document.getElementById('transaction-amount').value = transaction.valor;
-
-                let transactionMonthKey = '';
-                for (const monthKey in financialData) {
-                    const monthData = financialData[monthKey];
-                    const allItems = [...(monthData.receitas || []), ...Object.values(monthData.despesas || {}).flat()];
-                    if (allItems.some(item => item.id === transaction.id)) {
-                        transactionMonthKey = monthKey;
-                        break;
-                    }
-                }
-                document.getElementById('transaction-date').value = transactionMonthKey ? `${transactionMonthKey}-01` : new Date().toISOString().slice(0, 10);
-
-
-                if (transaction.category) { // É despesa
-                    document.getElementById('transaction-type').value = 'despesa';
-                    document.getElementById('category-wrapper').style.display = 'block';
-                    document.getElementById('installments-wrapper').style.display = 'block';
-                    document.getElementById('transaction-category').value = transaction.category;
-                    document.getElementById('transaction-installments').value = transaction.parcelas || '';
-                } else { // É receita
-                    document.getElementById('transaction-type').value = 'receita';
-                    document.getElementById('category-wrapper').style.display = 'none';
-                    document.getElementById('installments-wrapper').style.display = 'none';
-                }
-                deleteBtn.classList.remove('hidden');
-                modal.classList.add('visible');
-            };
+            document.getElementById('transaction-type').addEventListener('change', (e) => toggleDespesaFields(e.target.value === 'despesa'));
 
             addBtn.addEventListener('click', () => {
                 form.reset();
                 document.getElementById('modal-title').textContent = 'Adicionar Lançamento';
-                typeSelect.value = 'despesa';
-                document.getElementById('category-wrapper').style.display = 'block';
-                document.getElementById('installments-wrapper').style.display = 'block';
+                document.getElementById('delete-btn').classList.add('hidden');
                 document.getElementById('transaction-date').valueAsDate = new Date(); 
+                toggleDespesaFields(true);
                 modal.classList.add('visible');
             });
 
-            cancelBtn.addEventListener('click', closeModal);
+            window.openEditModal = (transaction) => {
+                form.reset();
+                document.getElementById('modal-title').textContent = 'Editar Lançamento';
+                document.getElementById('delete-btn').classList.remove('hidden');
+                
+                let transactionMonthKey = Object.keys(financialData).find(mKey => 
+                    [...(financialData[mKey].receitas || []), ...Object.values(financialData[mKey].despesas || {}).flat()]
+                    .some(item => item.id === transaction.id)
+                );
+
+                form.id.value = transaction.id;
+                form.date.value = transactionMonthKey ? `${transactionMonthKey}-01` : new Date().toISOString().slice(0, 10);
+                form.description.value = transaction.descricao;
+                form.amount.value = transaction.valor;
+                form.responsavel.value = transaction.responsavel || 'N/A';
+
+                const isDespesa = !!transaction.category;
+                form.type.value = isDespesa ? 'despesa' : 'receita';
+                toggleDespesaFields(isDespesa);
+
+                if (isDespesa) {
+                    form.category.value = transaction.category;
+                    form.installments.value = transaction.parcelas || '';
+                    form.recorrente.checked = !!transaction.recorrente;
+                }
+
+                modal.classList.add('visible');
+            };
+
+            const closeModal = () => modal.classList.remove('visible');
+            document.getElementById('cancel-btn').addEventListener('click', closeModal);
             modal.addEventListener('click', (e) => e.target === modal && closeModal());
-            
-            typeSelect.addEventListener('change', (e) => {
-                document.getElementById('category-wrapper').style.display = e.target.value === 'despesa' ? 'block' : 'none';
-                document.getElementById('installments-wrapper').style.display = e.target.value === 'despesa' ? 'block' : 'none';
-            });
-            
+
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const formData = new FormData(form);
-                const data = Object.fromEntries(formData.entries());
+                const data = Object.fromEntries(new FormData(form).entries());
+                const transactionDate = new Date(data.date + 'T12:00:00Z');
                 
-                if (!data.date) {
-                    console.error("Por favor, selecione uma data para o lançamento.");
-                    return;
-                }
-                const transactionDate = new Date(data.date + 'T12:00:00');
-                
-                const installmentPattern = /^(\d{1,2})\/(\d{1,2})$/;
-                const match = data.installments ? data.installments.match(installmentPattern) : null;
-
-                if (data.id) { // This is an edit, remove the old entry first
-                    const idToDelete = parseInt(data.id);
+                // Primeiro, se for uma edição, removemos a entrada antiga de todos os lugares
+                if (data.id) {
+                    const idToDelete = parseFloat(data.id);
                     const batch = writeBatch(db);
+                    let docToUpdate = null;
                     for (const mKey in financialData) {
-                         const monthDataCopy = JSON.parse(JSON.stringify(financialData[mKey]));
-                         let changed = false;
-                         if(monthDataCopy.receitas) {
-                            monthDataCopy.receitas = monthDataCopy.receitas.filter(i => {
+                        const monthDataCopy = JSON.parse(JSON.stringify(financialData[mKey]));
+                        let changed = false;
+                        monthDataCopy.receitas = monthDataCopy.receitas.filter(i => {
+                            if (i.id === idToDelete) { changed = true; return false; }
+                            return true;
+                        });
+                        Object.keys(monthDataCopy.despesas).forEach(cat => {
+                            monthDataCopy.despesas[cat] = monthDataCopy.despesas[cat].filter(i => {
                                 if (i.id === idToDelete) { changed = true; return false; }
                                 return true;
                             });
-                         }
-                         if(monthDataCopy.despesas) {
-                            Object.keys(monthDataCopy.despesas).forEach(cat => {
-                                monthDataCopy.despesas[cat] = monthDataCopy.despesas[cat].filter(i => {
-                                    if (i.id === idToDelete) { changed = true; return false; }
-                                    return true;
-                                });
-                            });
-                         }
-                         if (changed) {
-                             const docRef = doc(db, "users", userId, "months", mKey);
-                             batch.set(docRef, monthDataCopy);
-                         }
+                        });
+                        if (changed) {
+                            batch.set(doc(db, "users", userId, "months", mKey), monthDataCopy);
+                        }
                     }
                     await batch.commit();
                 }
 
-                if (data.type === 'despesa' && match) { 
-                    const currentInstallment = parseInt(match[1]);
-                    const totalInstallments = parseInt(match[2]);
-                    const batch = writeBatch(db);
-                    const baseId = Date.now();
+                const newTransaction = {
+                    id: data.id ? parseFloat(data.id) : Date.now(),
+                    descricao: data.description,
+                    valor: parseFloat(data.amount),
+                    responsavel: data.responsavel
+                };
 
-                    for (let i = 0; i < (totalInstallments - currentInstallment + 1); i++) {
-                        const installmentDate = new Date(transactionDate);
-                        installmentDate.setMonth(transactionDate.getMonth() + i);
-                        
-                        const monthKey = installmentDate.toISOString().slice(0, 7);
-                        const monthData = JSON.parse(JSON.stringify(financialData[monthKey] || { receitas: [], despesas: {} }));
-                        
-                        const id = baseId + i; 
-                        const category = data.category;
-                        if (!monthData.despesas[category]) {
-                            monthData.despesas[category] = [];
+                if (data.type === 'despesa') {
+                    Object.assign(newTransaction, {
+                        category: data.category,
+                        parcelas: data.installments || '',
+                        pago: false,
+                        recorrente: !!data.recorrente
+                    });
+
+                    const installmentPattern = /^(\d+)\/(\d+)$/;
+                    const match = data.installments ? data.installments.match(installmentPattern) : null;
+                    if (match) {
+                        // Lógica de parcelas
+                        const current = parseInt(match[1]);
+                        const total = parseInt(match[2]);
+                        const batch = writeBatch(db);
+                        for (let i = 0; i < (total - current + 1); i++) {
+                            const installmentDate = new Date(transactionDate);
+                            installmentDate.setMonth(transactionDate.getMonth() + i);
+                            const monthKey = `${installmentDate.getFullYear()}-${(installmentDate.getMonth() + 1).toString().padStart(2, '0')}`;
+                            const monthData = JSON.parse(JSON.stringify(financialData[monthKey] || { receitas: [], despesas: {} }));
+                            if (!monthData.despesas[data.category]) monthData.despesas[data.category] = [];
+                            monthData.despesas[data.category].push({
+                                ...newTransaction,
+                                id: newTransaction.id + i,
+                                parcelas: `${current + i}/${total}`
+                            });
+                            batch.set(doc(db, "users", userId, "months", monthKey), monthData);
                         }
-                        
-                        monthData.despesas[category].push({ 
-                            id, 
-                            descricao: data.description, 
-                            valor: parseFloat(data.amount),
-                            parcelas: `${currentInstallment + i}/${totalInstallments}`,
-                            pago: false 
-                        });
-                        const docRef = doc(db, "users", userId, "months", monthKey);
-                        batch.set(docRef, monthData);
+                        await batch.commit();
+                    } else {
+                        // Despesa única
+                        const monthKey = transactionDate.toISOString().slice(0, 7);
+                        const monthData = JSON.parse(JSON.stringify(financialData[monthKey] || { receitas: [], despesas: {} }));
+                        if (!monthData.despesas[data.category]) monthData.despesas[data.category] = [];
+                        monthData.despesas[data.category].push(newTransaction);
+                        await setDoc(doc(db, "users", userId, "months", monthKey), monthData);
                     }
-                    await batch.commit();
-                } else { 
+                } else {
+                    // Receita
                     const monthKey = transactionDate.toISOString().slice(0, 7);
                     const monthData = JSON.parse(JSON.stringify(financialData[monthKey] || { receitas: [], despesas: {} }));
-                    const id = data.id ? parseInt(data.id) : Date.now();
-                    
-                    if(data.type === 'receita') {
-                        if(!monthData.receitas) monthData.receitas = [];
-                        monthData.receitas.push({ id, descricao: data.description, valor: parseFloat(data.amount) });
-                    } else {
-                        const category = data.category;
-                        if(!monthData.despesas) monthData.despesas = {};
-                        if (!monthData.despesas[category]) monthData.despesas[category] = [];
-                        monthData.despesas[category].push({ 
-                            id, 
-                            descricao: data.description, 
-                            valor: parseFloat(data.amount),
-                            parcelas: data.installments || '',
-                            pago: false 
-                        });
-                    }
-                    const docRef = doc(db, "users", userId, "months", monthKey);
-                    await setDoc(docRef, monthData);
+                    monthData.receitas.push(newTransaction);
+                    await setDoc(doc(db, "users", userId, "months", monthKey), monthData);
                 }
-                
                 closeModal();
             });
 
-            deleteBtn.addEventListener('click', async () => {
-                const id = parseInt(document.getElementById('transaction-id').value);
-                if(!id) return;
-                
-                 const batch = writeBatch(db);
-                 for (const mKey in financialData) {
+            document.getElementById('delete-btn').addEventListener('click', async () => {
+                const idToDelete = parseFloat(form.id.value);
+                if (!idToDelete) return;
+                const batch = writeBatch(db);
+                for (const mKey in financialData) {
                     const monthDataCopy = JSON.parse(JSON.stringify(financialData[mKey]));
                     let changed = false;
-                    
-                    if(monthDataCopy.receitas) {
-                        const initialLengthRevenues = monthDataCopy.receitas.length;
-                        monthDataCopy.receitas = monthDataCopy.receitas.filter(i => i.id !== id);
-                        if (monthDataCopy.receitas.length < initialLengthRevenues) changed = true;
-                    }
-                    
-                    if(monthDataCopy.despesas){
-                        Object.keys(monthDataCopy.despesas).forEach(cat => {
-                            const initialLengthExpenses = monthDataCopy.despesas[cat].length;
-                            monthDataCopy.despesas[cat] = monthDataCopy.despesas[cat].filter(i => i.id !== id);
-                            if(monthDataCopy.despesas[cat].length < initialLengthExpenses) changed = true;
-                        });
-                    }
-
+                    monthDataCopy.receitas = monthDataCopy.receitas.filter(i => { if(i.id === idToDelete){changed=true; return false;} return true; });
+                    Object.keys(monthDataCopy.despesas).forEach(cat => {
+                         monthDataCopy.despesas[cat] = monthDataCopy.despesas[cat].filter(i => { if(i.id === idToDelete){changed=true; return false;} return true; });
+                    });
                     if (changed) {
-                        const docRef = doc(db, "users", userId, "months", mKey);
-                        batch.set(docRef, monthDataCopy);
+                        batch.set(doc(db, "users", userId, "months", mKey), monthDataCopy);
                     }
-                 }
-                 await batch.commit();
-                 closeModal();
+                }
+                await batch.commit();
+                closeModal();
             });
+
+             window.togglePaidStatus = async (id, category) => {
+                const monthKey = monthSelector.value;
+                const monthData = JSON.parse(JSON.stringify(financialData[monthKey]));
+                const item = monthData.despesas[category]?.find(i => i.id === id);
+                if (item) {
+                    item.pago = !item.pago;
+                    await setDoc(doc(db, "users", userId, "months", monthKey), monthData);
+                }
+            };
             
             // --- INICIALIZAÇÃO E OUTROS EVENTOS ---
-            const tabsContainer = document.getElementById('tabs');
-            tabsContainer.addEventListener('click', (e) => {
+            document.getElementById('tabs').addEventListener('click', (e) => {
                 const clickedTab = e.target.closest('.tab-btn');
                 if (!clickedTab) return;
-                tabsContainer.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
                 clickedTab.classList.add('active');
                 document.getElementById(clickedTab.dataset.tab).classList.add('active');
@@ -723,18 +725,25 @@
             
             monthSelector.addEventListener('change', () => renderDashboard(monthSelector.value));
             
-            // --- INICIALIZAÇÃO DA APLICAÇÃO ---
-            function init() {
-                // ID Compartilhado para você e sua esposa.
-                userId = "leandro-leidiane-financas-2024"; 
-                console.log("Using shared User ID:", userId);
-                initializeUserAndLoadData();
-            }
+            const populateMonthSelector = () => {
+                const now = new Date();
+                const currentRealMonthKey = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+                if (!financialData[currentRealMonthKey]) {
+                    financialData[currentRealMonthKey] = { receitas: [], despesas: {} };
+                }
+                const sortedMonths = Object.keys(financialData).sort();
+                const currentSelection = monthSelector.value;
+                monthSelector.innerHTML = sortedMonths.map(monthKey => {
+                    const [year, month] = monthKey.split('-');
+                    const monthName = new Date(year, parseInt(month) - 1, 1).toLocaleString('pt-BR', { month: 'long' });
+                    const text = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} de ${year}`;
+                    return `<option value="${monthKey}" ${monthKey === currentSelection ? 'selected' : ''}>${text}</option>`;
+                }).join('');
+            };
             
-            init();
+            loadDataAndConfig();
         });
     </script>
 </body>
 </html>
-
 
