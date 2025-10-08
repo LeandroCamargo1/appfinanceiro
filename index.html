@@ -729,7 +729,9 @@
                 const item = monthData.despesas[category]?.find(i => i.id === id);
                 if (item) {
                     item.pago = !item.pago;
-                    await setDoc(doc(db, "users", userId, "months", monthKey), monthData);
+                    await updateDoc(doc(db, "users", userId, "months", monthKey), {
+                        despesas: monthData.despesas
+                    });
                 }
             },
             
@@ -740,7 +742,9 @@
                 const monthData = JSON.parse(JSON.stringify(financialData[monthKey]));
                 if (monthData.despesas && monthData.despesas[category]) {
                     monthData.despesas[category].forEach(item => item.pago = true);
-                    await setDoc(doc(db, "users", userId, "months", monthKey), monthData);
+                    await updateDoc(doc(db, "users", userId, "months", monthKey), {
+                        despesas: monthData.despesas
+                    });
                 }
                 showLoader(false);
             }
