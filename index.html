@@ -8,9 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- jsPDF for Reports -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf-autotable.min.js"></script>
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -118,20 +115,43 @@
                 document.getElementById('modal-container').innerHTML = ``;
             },
             setupEventListeners() {
-                const tabs = document.getElementById('tabs');
-                if (tabs) {
-                    tabs.replaceWith(tabs.cloneNode(true));
-                    document.getElementById('tabs').addEventListener('click', (e) => {
-                        const btn = e.target.closest('.tab-btn');
-                        if(btn) this.handleTabClick(btn.dataset.tab);
-                    });
-                }
+                document.getElementById('tabs').addEventListener('click', (e) => {
+                    const btn = e.target.closest('.tab-btn');
+                    if(btn) this.handleTabClick(btn.dataset.tab);
+                });
                 document.getElementById('add-transaction-btn')?.addEventListener('click', () => this.renderTransactionModal());
                 document.getElementById('month-selector')?.addEventListener('change', (e) => this.renderAll(e.target.value));
                 document.getElementById('logout-btn').addEventListener('click', () => {
                      if(confirm("Tem a certeza que quer recarregar a aplicação?")) {
                          window.location.reload();
                      }
+                });
+
+                // Listener central para ações dinâmicas
+                document.getElementById('tab-contents').addEventListener('click', (e) => {
+                    const target = e.target;
+                    const action = target.dataset.action;
+                    if(!action) return;
+
+                    const id = parseFloat(target.dataset.id);
+                    const category = target.dataset.category;
+
+                    switch(action) {
+                        case 'toggle-paid':
+                            this.togglePaidStatus(id, category);
+                            break;
+                        case 'delete':
+                            const path = target.dataset.path || '';
+                            this.deleteTransaction(id, category, path);
+                            break;
+                        case 'edit':
+                            const transactionData = JSON.parse(target.dataset.transaction);
+                            this.renderTransactionModal(transactionData);
+                            break;
+                        case 'pay-all':
+                            this.payAllBills(category);
+                            break;
+                    }
                 });
             },
             handleTabClick(tabId) {
@@ -238,6 +258,8 @@
             renderOrcamento(monthKey) {
                 const container = document.getElementById('orcamento');
                 if (!container) return;
+                const newContainer = container.cloneNode(false);
+                container.parentNode.replaceChild(newContainer, container);
 
                 const budget = appConfig.budget || {};
                 const monthData = financialData[monthKey] || { despesas: {} };
@@ -269,16 +291,16 @@
                     `;
                 }).join('');
 
-                container.innerHTML = `
+                newContainer.innerHTML = `
                     <div class="bg-white p-6 rounded-xl shadow-lg">
                         <h2 class="text-2xl font-bold text-gray-800 mb-6">Orçamento Mensal</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${budgetHTML}</div>
                         <button id="save-budget-btn" class="mt-6 py-2 px-6 bg-teal-500 text-gray-800 font-bold rounded-lg hover:bg-teal-400">Salvar Orçamento</button>
                     </div>`;
 
-                container.querySelector('#save-budget-btn').onclick = async (e) => {
+                newContainer.querySelector('#save-budget-btn').onclick = async (e) => {
                     const newBudget = { ...appConfig.budget };
-                    container.querySelectorAll('.budget-input').forEach(input => {
+                    newContainer.querySelectorAll('.budget-input').forEach(input => {
                         newBudget[input.dataset.category] = parseFloat(input.value) || 0;
                     });
                     await updateDoc(doc(db, "users", userId, "config", "appConfig"), { budget: newBudget });
@@ -463,7 +485,7 @@
                 const total = items.reduce((sum, i) => sum + i.valor, 0);
                 let payAllButton = '';
                 if (isExpense && title.toLowerCase().includes('cartão')) {
-                    payAllButton = `<button onclick="mainModule.payAllBills('${title}')" class="ml-4 py-1 px-3 bg-teal-100 text-teal-700 text-xs font-bold rounded-full hover:bg-teal-200">Quitar Fatura</button>`;
+                    payAllButton = `<button data-action="pay-all" data-category="${title}" class="ml-4 py-1 px-3 bg-teal-100 text-teal-700 text-xs font-bold rounded-full hover:bg-teal-200">Quitar Fatura</button>`;
                 }
                 
                 const rows = items.sort((a,b)=>a.descricao.localeCompare(b.descricao)).map(item => {
@@ -474,25 +496,32 @@
 
                     if (isExpense) {
                         const rowClass = item.pago ? 'paid-row' : '';
-                        return `<tr class="border-b border-gray-200 hover:bg-gray-50 group ${rowClass}">
-                            <td class="w-12 px-2 py-4 text-center"><input type="checkbox" ${item.pago ? 'checked' : ''} onchange="mainModule.togglePaidStatus(event, ${item.id}, '${title}')" class="h-5 w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500 cursor-pointer"></td>
-                            <td class="px-6 py-4 cursor-pointer desc-cell" onclick='mainModule.renderTransactionModal(${transactionData})'>${item.descricao} ${attachmentIcon}</td>
-                            <td class="px-6 py-4 cursor-pointer text-center" onclick='mainModule.renderTransactionModal(${transactionData})'>${responsavelBadge}</td>
-                            <td class="px-6 py-4 cursor-pointer text-center" onclick='mainModule.renderTransactionModal(${transactionData})'>${item.parcelas || '—'}</td>
-                            <td class="px-6 py-4 text-right cursor-pointer" onclick='mainModule.renderTransactionModal(${transactionData})'>${formatCurrency(item.valor)}</td>
-                            <td class="w-12 px-2 py-4 text-center"><button onclick="mainModule.deleteTransaction(${item.id}, '${title}', '${item.attachmentPath || ''}')" title="Excluir" class="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 font-bold text-xl">&times;</button></td>
+                        let actionButtonHTML;
+                        if (item.pago) {
+                            actionButtonHTML = `<button data-action="toggle-paid" data-id="${item.id}" data-category="${title}" class="text-xs text-gray-500 hover:underline">Desmarcar</button>`;
+                        } else {
+                            actionButtonHTML = `<button data-action="toggle-paid" data-id="${item.id}" data-category="${title}" class="bg-teal-100 text-teal-700 text-xs font-bold py-1 px-3 rounded-full hover:bg-teal-200 transition-colors">Pagar</button>`;
+                        }
+
+                        return `<tr class="border-b border-gray-200 hover:bg-gray-50 group ${rowClass}" data-action="edit" data-transaction='${transactionData}'>
+                            <td class="w-24 px-2 py-4 text-center">${actionButtonHTML}</td>
+                            <td class="px-6 py-4 cursor-pointer desc-cell">${item.descricao} ${attachmentIcon}</td>
+                            <td class="px-6 py-4 cursor-pointer text-center">${responsavelBadge}</td>
+                            <td class="px-6 py-4 cursor-pointer text-center">${item.parcelas || '—'}</td>
+                            <td class="px-6 py-4 text-right cursor-pointer">${formatCurrency(item.valor)}</td>
+                            <td class="w-12 px-2 py-4 text-center"><button data-action="delete" data-id="${item.id}" data-category="${title}" data-path="${item.attachmentPath || ''}" title="Excluir" class="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 font-bold text-xl">&times;</button></td>
                         </tr>`;
                     }
-                    return `<tr class="border-b border-gray-200 hover:bg-gray-50 group">
-                        <td class="px-6 py-4 cursor-pointer" onclick='mainModule.renderTransactionModal(${transactionData})'>${item.descricao} ${attachmentIcon}</td>
+                    return `<tr class="border-b border-gray-200 hover:bg-gray-50 group" data-action="edit" data-transaction='${transactionData}'>
+                        <td class="px-6 py-4 cursor-pointer">${item.descricao} ${attachmentIcon}</td>
                         <td class="px-6 py-4 cursor-pointer text-center">${responsavelBadge}</td>
-                        <td class="px-6 py-4 text-right cursor-pointer" onclick='mainModule.renderTransactionModal(${transactionData})'>${formatCurrency(item.valor)}</td>
-                        <td class="w-12 px-2 py-4 text-center"><button onclick="mainModule.deleteTransaction(${item.id}, null, '${item.attachmentPath || ''}')" title="Excluir" class="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 font-bold text-xl">&times;</button></td>
+                        <td class="px-6 py-4 text-right cursor-pointer">${formatCurrency(item.valor)}</td>
+                        <td class="w-12 px-2 py-4 text-center"><button data-action="delete" data-id="${item.id}" data-path="${item.attachmentPath || ''}" title="Excluir" class="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 font-bold text-xl">&times;</button></td>
                     </tr>`;
                 }).join('');
 
                 const header = isExpense ? `
-                    <th class="w-12 px-2 py-3"><span class="sr-only">Pago</span></th>
+                    <th class="px-6 py-3 text-center">Ação</th>
                     <th class="px-6 py-3 text-left">Descrição</th>
                     <th class="px-6 py-3 text-center">Responsável</th>
                     <th class="px-6 py-3 text-center">Parcelas</th>
@@ -684,25 +713,21 @@
                 document.getElementById('modal-container').innerHTML = '';
             },
 
-            async togglePaidStatus(event, id, category) {
+            async togglePaidStatus(id, category) {
                 const monthKey = document.getElementById('month-selector').value;
                 const monthData = financialData[monthKey];
-                const item = monthData?.despesas?.[category]?.find(i => i.id === id);
+                if (!monthData || !monthData.despesas || !monthData.despesas[category]) return;
 
+                const monthDataCopy = JSON.parse(JSON.stringify(monthData));
+                const item = monthDataCopy.despesas[category].find(i => i.id === id);
+                
                 if (item) {
-                    // Atualização Otimista
                     item.pago = !item.pago;
-                    this.renderAll(monthKey); // Re-renderiza a UI imediatamente
-
                     try {
-                        // Sincroniza com o Firestore em segundo plano
                         const docRef = doc(db, "users", userId, "months", monthKey);
-                        await updateDoc(docRef, { despesas: monthData.despesas });
+                        await updateDoc(docRef, { despesas: monthDataCopy.despesas });
                     } catch (error) {
                         console.error("Erro ao atualizar o estado de pagamento:", error);
-                        // Reverte a alteração se a gravação falhar
-                        item.pago = !item.pago;
-                        this.renderAll(monthKey);
                         alert("Não foi possível salvar a alteração. Verifique a sua conexão.");
                     }
                 }
@@ -715,19 +740,15 @@
                 const monthData = financialData[monthKey];
 
                 if (monthData?.despesas?.[category]) {
-                    // Atualização Otimista
-                    monthData.despesas[category].forEach(item => item.pago = true);
-                    this.renderAll(monthKey);
-
+                    const monthDataCopy = JSON.parse(JSON.stringify(monthData));
+                    monthDataCopy.despesas[category].forEach(item => item.pago = true);
                     try {
-                        // Sincroniza com o Firestore em segundo plano
                         await updateDoc(doc(db, "users", userId, "months", monthKey), {
-                            despesas: monthData.despesas
+                            despesas: monthDataCopy.despesas
                         });
                     } catch(error) {
                          console.error("Erro ao quitar a fatura:", error);
                          alert("Não foi possível quitar a fatura. Verifique a sua conexão.");
-                         window.location.reload();
                     }
                 }
             }
