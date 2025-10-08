@@ -381,81 +381,42 @@
                 if(!container) return;
 
                 const monthData = financialData[monthKey] || { receitas: [], despesas: {} };
-                let html = '';
+                
+                const uniqueCategories = Object.keys(monthData.despesas || {});
+                const filterHTML = `
+                    <div class="bg-white p-4 rounded-xl shadow-lg mb-8 flex items-center gap-4">
+                        <label for="category-filter" class="font-semibold text-gray-700">Filtrar por Categoria:</label>
+                        <select id="category-filter" class="p-2 border border-gray-300 rounded-lg">
+                            <option value="all">Todas as Categorias</option>
+                            ${uniqueCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
 
-                if (monthData.receitas && monthData.receitas.length > 0) {
-                     html += this.createTableHTML('Receitas', monthData.receitas, false);
+                const currentFilter = container.querySelector('#category-filter')?.value || 'all';
+
+                const filteredDespesas = (currentFilter === 'all')
+                    ? monthData.despesas
+                    : { [currentFilter]: monthData.despesas[currentFilter] };
+
+                let tableHTML = '';
+                if (monthData.receitas && monthData.receitas.length > 0 && currentFilter === 'all') {
+                     tableHTML += this.createTableHTML('Receitas', monthData.receitas, false);
                 }
                 
-                Object.entries(monthData.despesas || {}).sort((a,b) => a[0].localeCompare(b[0])).forEach(([category, items]) => {
+                Object.entries(filteredDespesas || {}).sort((a,b) => a[0].localeCompare(b[0])).forEach(([category, items]) => {
                     if (items && items.length > 0) {
-                        html += this.createTableHTML(category, items, true);
+                        tableHTML += this.createTableHTML(category, items, true);
                     }
                 });
                 
-                container.innerHTML = `<div class="space-y-8">${html || '<div class="bg-white p-6 rounded-xl shadow-lg text-center text-gray-500"><p>Nenhum lançamento este mês.</p></div>'}</div>`;
-            },
-
-            renderRelatorios(monthKey) {
-                const container = document.getElementById('relatorios');
-                if(!container) return;
+                container.innerHTML = filterHTML + `<div class="space-y-8">${tableHTML || '<div class="bg-white p-6 rounded-xl shadow-lg text-center text-gray-500"><p>Nenhum lançamento para a categoria selecionada.</p></div>'}</div>`;
                 
-                const newContainer = container.cloneNode(false);
-                container.parentNode.replaceChild(newContainer, container);
-
-                newContainer.innerHTML = `
-                    <div class="bg-white p-6 rounded-xl shadow-lg max-w-lg mx-auto">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Gerar Relatório em PDF</h2>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="report-month" class="block text-sm font-medium text-gray-700">Mês do Relatório</label>
-                                <select id="report-month" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></select>
-                            </div>
-                            <button id="generate-pdf-btn" class="w-full py-3 bg-teal-500 text-gray-800 font-bold rounded-lg hover:bg-teal-400">Gerar PDF</button>
-                        </div>
-                    </div>`;
-
-                const monthSelect = document.getElementById('report-month');
-                monthSelect.innerHTML = document.getElementById('month-selector').innerHTML;
-                monthSelect.value = monthKey;
-                
-                newContainer.querySelector('#generate-pdf-btn').onclick = () => {
-                    try {
-                        const selectedMonth = monthSelect.value;
-                        const doc = new jspdf.jsPDF();
-                        
-                        const monthData = financialData[selectedMonth] || { receitas: [], despesas: {} };
-                        let finalY = 25;
-
-                        doc.setFontSize(18);
-                        doc.text(`Relatório Financeiro - ${selectedMonth}`, 14, 20);
-
-                        if (monthData.receitas && monthData.receitas.length > 0) {
-                             doc.autoTable({
-                                startY: finalY,
-                                head: [['Receitas', 'Responsável', 'Valor']],
-                                body: monthData.receitas.map(r => [r.descricao, r.responsavel || 'N/A', formatCurrency(r.valor)]),
-                            });
-                            finalY = doc.lastAutoTable.finalY + 10;
-                        }
-
-                        const allExpenses = Object.entries(monthData.despesas || {}).flatMap(([cat, items]) => items.map(i => ({...i, category: cat})));
-                        if (allExpenses.length > 0) {
-                             doc.autoTable({
-                                startY: finalY,
-                                head: [['Despesas', 'Categoria', 'Responsável', 'Valor']],
-                                body: allExpenses.map(e => [e.descricao, e.category, e.responsavel || 'N/A', formatCurrency(e.valor)]),
-                            });
-                        }
-                       
-                        doc.save(`relatorio-${selectedMonth}.pdf`);
-                    } catch (error) {
-                        console.error("Erro ao gerar PDF:", error);
-                        alert("Ocorreu um erro inesperado ao gerar o relatório PDF. Verifique a consola para mais detalhes.");
-                    }
-                };
+                const filterSelect = container.querySelector('#category-filter');
+                filterSelect.value = currentFilter;
+                filterSelect.onchange = () => this.renderDetalhados(monthKey);
             },
-
+            
             renderConfiguracoes() {
                 const container = document.getElementById('configuracoes');
                 if(!container) return;
@@ -514,7 +475,7 @@
                     if (isExpense) {
                         const rowClass = item.pago ? 'paid-row' : '';
                         return `<tr class="border-b border-gray-200 hover:bg-gray-50 group ${rowClass}">
-                            <td class="w-12 px-2 py-4 text-center"><input type="checkbox" ${item.pago ? 'checked' : ''} onchange="mainModule.togglePaidStatus(${item.id}, '${title}')" class="h-5 w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500 cursor-pointer"></td>
+                            <td class="w-12 px-2 py-4 text-center"><input type="checkbox" ${item.pago ? 'checked' : ''} onchange="mainModule.togglePaidStatus(event, ${item.id}, '${title}')" class="h-5 w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500 cursor-pointer"></td>
                             <td class="px-6 py-4 cursor-pointer desc-cell" onclick='mainModule.renderTransactionModal(${transactionData})'>${item.descricao} ${attachmentIcon}</td>
                             <td class="px-6 py-4 cursor-pointer text-center" onclick='mainModule.renderTransactionModal(${transactionData})'>${responsavelBadge}</td>
                             <td class="px-6 py-4 cursor-pointer text-center" onclick='mainModule.renderTransactionModal(${transactionData})'>${item.parcelas || '—'}</td>
@@ -723,30 +684,52 @@
                 document.getElementById('modal-container').innerHTML = '';
             },
 
-            async togglePaidStatus(id, category) {
+            async togglePaidStatus(event, id, category) {
                 const monthKey = document.getElementById('month-selector').value;
-                const monthData = JSON.parse(JSON.stringify(financialData[monthKey]));
-                const item = monthData.despesas[category]?.find(i => i.id === id);
+                const monthData = financialData[monthKey];
+                const item = monthData?.despesas?.[category]?.find(i => i.id === id);
+
                 if (item) {
+                    // Atualização Otimista
                     item.pago = !item.pago;
-                    await updateDoc(doc(db, "users", userId, "months", monthKey), {
-                        despesas: monthData.despesas
-                    });
+                    this.renderAll(monthKey); // Re-renderiza a UI imediatamente
+
+                    try {
+                        // Sincroniza com o Firestore em segundo plano
+                        const docRef = doc(db, "users", userId, "months", monthKey);
+                        await updateDoc(docRef, { despesas: monthData.despesas });
+                    } catch (error) {
+                        console.error("Erro ao atualizar o estado de pagamento:", error);
+                        // Reverte a alteração se a gravação falhar
+                        item.pago = !item.pago;
+                        this.renderAll(monthKey);
+                        alert("Não foi possível salvar a alteração. Verifique a sua conexão.");
+                    }
                 }
             },
             
             async payAllBills(category) {
                 if (!confirm(`Tem a certeza que quer quitar toda a fatura "${category}"?`)) return;
-                showLoader(true);
+                
                 const monthKey = document.getElementById('month-selector').value;
-                const monthData = JSON.parse(JSON.stringify(financialData[monthKey]));
-                if (monthData.despesas && monthData.despesas[category]) {
+                const monthData = financialData[monthKey];
+
+                if (monthData?.despesas?.[category]) {
+                    // Atualização Otimista
                     monthData.despesas[category].forEach(item => item.pago = true);
-                    await updateDoc(doc(db, "users", userId, "months", monthKey), {
-                        despesas: monthData.despesas
-                    });
+                    this.renderAll(monthKey);
+
+                    try {
+                        // Sincroniza com o Firestore em segundo plano
+                        await updateDoc(doc(db, "users", userId, "months", monthKey), {
+                            despesas: monthData.despesas
+                        });
+                    } catch(error) {
+                         console.error("Erro ao quitar a fatura:", error);
+                         alert("Não foi possível quitar a fatura. Verifique a sua conexão.");
+                         window.location.reload();
+                    }
                 }
-                showLoader(false);
             }
         };
 
