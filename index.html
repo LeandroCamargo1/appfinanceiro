@@ -3,671 +3,685 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controle Financeiro PRO</title>
+    <title>Nós na Conta PRO | Gestão Financeira Completa</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .tab-btn { transition: all 0.3s ease; }
-        .tab-btn.active { border-color: #3b82f6; background-color: #3b82f6; color: white; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
-        .modal-overlay.visible { opacity: 1; visibility: visible; }
-        .modal-content { background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 500px; transform: translateY(-20px); transition: transform 0.3s ease; }
-        .modal-overlay.visible .modal-content { transform: translateY(0); }
-        .paid-row { opacity: 0.5; text-decoration: line-through; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .tab-btn.active { border-bottom-color: #14b8a6; color: #0f766e; font-weight: 600; }
+        .progress-bar-bg { background-color: #e2e8f0; }
+        .progress-bar-fill { transition: width 0.5s ease-in-out; }
+        .paid-row { opacity: 0.6; }
+        .paid-row .desc-cell { text-decoration: line-through; }
+        .hidden { display: none; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #14b8a6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="p-4 sm:p-6 md:p-8">
+<body class="bg-slate-100">
 
-    <div class="max-w-7xl mx-auto">
-        <!-- Cabeçalho -->
-        <header class="mb-8">
-            <div class="flex flex-wrap justify-between items-center gap-4">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-800">Painel de Controle Financeiro</h1>
-                    <p class="text-gray-500 mt-1">LEANDRO & LEIDIANE</p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <select id="month-selector" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></select>
-                    <button id="add-transaction-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-full shadow-lg transition-transform transform hover:scale-105" title="Adicionar Lançamento">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                    </button>
+    <!-- Conteúdo Principal do App -->
+    <div id="app-container">
+        <header class="bg-gray-800 text-white shadow-lg sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    <div class="flex items-center space-x-3"><div class="bg-teal-400 p-2 rounded-full"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></div><h1 class="text-2xl font-extrabold tracking-tight">Nós na Conta</h1></div>
+                    <div class="flex items-center gap-2 sm:gap-4">
+                        <select id="month-selector" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"></select>
+                        <button id="add-transaction-btn" class="bg-teal-500 hover:bg-teal-400 text-gray-800 font-bold p-3 rounded-full shadow-lg transition-transform transform hover:scale-105" title="Adicionar Lançamento"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg></button>
+                        <button id="logout-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold p-3 rounded-full shadow-lg transition-transform transform hover:scale-105" title="Recarregar"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M4 4l1.5 1.5A9 9 0 0120.5 12M20 20l-1.5-1.5A9 9 0 003.5 12"></path></svg></button>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <!-- Navegação por Abas -->
-        <div class="mb-6 border-b border-gray-200">
-            <nav class="flex space-x-2 overflow-x-auto pb-2" id="tabs">
-                <button data-tab="resumo" class="tab-btn active text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800 whitespace-nowrap">Resumo Mensal</button>
-                <button data-tab="detalhados" class="tab-btn text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800 whitespace-nowrap">Lançamentos</button>
-                <button data-tab="cartoes" class="tab-btn text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800 whitespace-nowrap">Cartões</button>
-                <button data-tab="historico" class="tab-btn text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800 whitespace-nowrap">Histórico Anual</button>
-                <button data-tab="configuracoes" class="tab-btn text-gray-600 py-2 px-4 rounded-t-lg font-medium border-b-2 border-transparent hover:border-gray-300 hover:text-gray-800 whitespace-nowrap">Configurações</button>
-            </nav>
-        </div>
+        <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+            <div class="mb-6 bg-white rounded-lg shadow-sm"><nav class="flex space-x-2 sm:space-x-4 overflow-x-auto p-2" id="tabs"><button data-tab="resumo" class="tab-btn active text-gray-500 hover:text-gray-800 py-3 px-4 rounded-t-lg font-medium whitespace-nowrap">Resumo</button><button data-tab="orcamento" class="tab-btn text-gray-500 hover:text-gray-800 py-3 px-4 rounded-t-lg font-medium whitespace-nowrap">Orçamento</button><button data-tab="metas" class="tab-btn text-gray-500 hover:text-gray-800 py-3 px-4 rounded-t-lg font-medium whitespace-nowrap">Metas</button><button data-tab="detalhados" class="tab-btn text-gray-500 hover:text-gray-800 py-3 px-4 rounded-t-lg font-medium whitespace-nowrap">Lançamentos</button><button data-tab="configuracoes" class="tab-btn text-gray-500 hover:text-gray-800 py-3 px-4 rounded-t-lg font-medium whitespace-nowrap">Configurações</button></nav></div>
 
-        <!-- Conteúdo das Abas -->
-        <main id="tab-contents">
-            <!-- Aba de Resumo -->
-            <div id="resumo" class="tab-content active space-y-8">
-                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                     <div class="card bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500"><h2 class="text-lg font-semibold text-gray-600">Receitas</h2><p id="total-receitas" class="text-3xl font-bold text-gray-800 mt-2">R$ 0,00</p></div>
-                     <div class="card bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500"><h2 class="text-lg font-semibold text-gray-600">Despesas Pagas</h2><p id="total-despesas" class="text-3xl font-bold text-gray-800 mt-2">R$ 0,00</p></div>
-                     <div class="card bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500"><h2 class="text-lg font-semibold text-gray-600">Contas a Pagar</h2><p id="total-a-pagar" class="text-3xl font-bold text-gray-800 mt-2">R$ 0,00</p></div>
-                     <div class="card bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500"><h2 class="text-lg font-semibold text-gray-600">Saldo Final</h2><p id="saldo-final" class="text-3xl font-bold text-gray-800 mt-2">R$ 0,00</p></div>
-                 </div>
-                 <!-- Painel de Fechamento do Mês -->
-                 <div id="insights-panel" class="bg-white p-6 rounded-lg shadow-md">
-                     <h2 class="text-xl font-bold text-gray-800 mb-4">Insights do Mês</h2>
-                     <div id="insights-content" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-gray-700">
-                        <!-- Conteúdo injetado pelo JS -->
-                     </div>
-                 </div>
-                 <div class="bg-white p-6 rounded-lg shadow-md"><h2 class="text-xl font-bold text-gray-800 mb-4">Distribuição de Despesas</h2><div class="max-w-md mx-auto"><canvas id="expensesChart"></canvas></div></div>
-            </div>
-
-            <!-- Aba de Lançamentos Detalhados -->
-            <div id="detalhados" class="tab-content space-y-8"></div>
-
-            <!-- Aba de Cartões de Crédito -->
-            <div id="cartoes" class="tab-content">
-                 <div id="cartoes-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-8"></div>
-            </div>
-            
-            <!-- Aba de Histórico Anual -->
-            <div id="historico" class="tab-content space-y-8">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Evolução Mensal (Receitas vs Despesas)</h2>
-                    <canvas id="evolutionChart"></canvas>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Resumo Comparativo Anual</h2>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-left text-sm font-light">
-                            <thead class="border-b font-medium dark:border-neutral-500">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3">Mês</th>
-                                    <th scope="col" class="px-6 py-3 text-right">Receitas</th>
-                                    <th scope="col" class="px-6 py-3 text-right">Despesas Pagas</th>
-                                    <th scope="col" class="px-6 py-3 text-right">Saldo</th>
-                                </tr>
-                            </thead>
-                            <tbody id="history-table-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Aba de Configurações -->
-            <div id="configuracoes" class="tab-content">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Gerenciar Categorias de Despesa</h2>
-                    <div class="max-w-md">
-                        <form id="category-form" class="flex items-center gap-4 mb-6">
-                            <input type="text" id="new-category-name" placeholder="Nome da nova categoria" class="flex-grow p-2 border border-gray-300 rounded-md" required>
-                            <button type="submit" class="py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700">Adicionar</button>
-                        </form>
-                        <div id="category-list" class="space-y-2">
-                            <!-- Lista de categorias injetada pelo JS -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Modal para Adicionar Transação -->
-    <div id="transaction-modal" class="modal-overlay">
-        <div class="modal-content">
-            <h2 class="text-2xl font-bold mb-4" id="modal-title">Adicionar Lançamento</h2>
-            <form id="transaction-form">
-                <input type="hidden" id="transaction-id" name="id">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                     <div>
-                        <label for="transaction-date" class="block text-sm font-medium text-gray-700">Data</label>
-                        <input type="date" id="transaction-date" name="date" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
-                    </div>
-                     <div>
-                        <label for="transaction-type" class="block text-sm font-medium text-gray-700">Tipo</label>
-                        <select id="transaction-type" name="type" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                            <option value="despesa">Despesa</option>
-                            <option value="receita">Receita</option>
-                        </select>
-                    </div>
-                </div>
-                 <div class="mt-4">
-                    <label for="transaction-description" class="block text-sm font-medium text-gray-700">Descrição</label>
-                    <input type="text" id="transaction-description" name="description" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
-                </div>
-                 <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                     <div>
-                        <label for="transaction-amount" class="block text-sm font-medium text-gray-700">Valor</label>
-                        <input type="number" id="transaction-amount" name="amount" step="0.01" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
-                    </div>
-                    <div>
-                        <label for="transaction-responsavel" class="block text-sm font-medium text-gray-700">Responsável</label>
-                        <select id="transaction-responsavel" name="responsavel" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                            <option value="N/A">N/A</option>
-                            <option value="Leandro">Leandro</option>
-                            <option value="Leidiane">Leidiane</option>
-                        </select>
-                    </div>
-                 </div>
-                 <div id="despesa-fields">
-                     <div class="mt-4">
-                        <label for="transaction-category" class="block text-sm font-medium text-gray-700">Categoria</label>
-                        <select id="transaction-category" name="category" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></select>
-                    </div>
-                     <div class="mt-4">
-                        <label for="transaction-installments" class="block text-sm font-medium text-gray-700">Parcelas (ex: 01/10)</label>
-                        <input type="text" id="transaction-installments" name="installments" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                    </div>
-                    <div class="mt-4 flex items-center">
-                        <input type="checkbox" id="transaction-recorrente" name="recorrente" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
-                        <label for="transaction-recorrente" class="ml-2 block text-sm text-gray-900">Despesa Recorrente (será repetida no próximo mês)</label>
-                    </div>
-                 </div>
-                <div class="flex justify-end gap-4 mt-6">
-                    <button type="button" id="delete-btn" class="py-2 px-4 bg-red-600 text-white rounded-md hover:bg-red-700 hidden">Excluir</button>
-                    <button type="button" id="cancel-btn" class="py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancelar</button>
-                    <button type="submit" class="py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700">Salvar</button>
-                </div>
-            </form>
+            <main id="tab-contents">
+                <!-- Abas (conteúdo injetado pelo JS) -->
+            </main>
         </div>
     </div>
     
+    <!-- Modais -->
+    <div id="modal-container"></div>
+    <!-- Loader Global -->
+    <div id="global-loader" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="loader"></div></div>
+
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, query, writeBatch, getDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, query, writeBatch, getDoc, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const firebaseConfig = {
-                apiKey: "AIzaSyABSS2JHDfaglvW7h7osKBTW7I4sgU5GHU",
-                authDomain: "meu-painel-financeiro-bae07.firebaseapp.com",
-                projectId: "meu-painel-financeiro-bae07",
-                storageBucket: "meu-painel-financeiro-bae07.appspot.com",
-                messagingSenderId: "445618493671",
-                appId: "1:445618493671:web:ea1ec2626ec433fe102a42"
-            };
+        // --- Configuração Firebase ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyABSS2JHDfaglvW7h7osKBTW7I4sgU5GHU",
+            authDomain: "meu-painel-financeiro-bae07.firebaseapp.com",
+            projectId: "meu-painel-financeiro-bae07",
+            storageBucket: "meu-painel-financeiro-bae07.appspot.com",
+            messagingSenderId: "445618493671",
+            appId: "1:445618493671:web:ea1ec2626ec433fe102a42"
+        };
+        
+        // --- Inicialização de Serviços ---
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        
+        // --- Variáveis Globais de Estado ---
+        let userId = null;
+        let appConfig = { categories: [], budget: {}, goals: [] };
+        let financialData = {};
+        let activeCharts = {};
+        let isInitialLoad = true;
+        let unsubscribeConfig;
+        let unsubscribeFinancialData;
 
-            const app = initializeApp(firebaseConfig);
-            const db = getFirestore(app);
-            
-            let userId = "leandro-leidiane-financas-2024";
-            let financialData = {};
-            let appConfig = {
-                categories: [
-                    "Gastos Casa", "Gastos Leandro", "Gastos Leidiane", 
-                    "Cartão BB (Fixos)", "Cartão BB (Extras)", 
-                    "Cartão Nubank (Fixos)", "Cartão Nubank (Extras)", "Outras Despesas"
-                ]
-            };
-            let expensesChart = null;
-            let evolutionChart = null;
-            const monthSelector = document.getElementById('month-selector');
-            let isInitialLoad = true;
-            
-            // --- FUNÇÕES AUXILIARES ---
-            const formatCurrency = (value) => (typeof value === 'number' ? value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00');
-            const getPreviousMonthKey = (monthKey) => {
-                const [year, month] = monthKey.split('-').map(Number);
-                const date = new Date(year, month - 1, 1);
-                date.setMonth(date.getMonth() - 1);
-                return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-            };
+        // --- Elementos DOM ---
+        const appContainer = document.getElementById('app-container');
+        const globalLoader = document.getElementById('global-loader');
+        
+        // --- FUNÇÕES DE UTILIDADE ---
+        const formatCurrency = (value) => (typeof value === 'number' ? value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00');
+        const showLoader = (show) => globalLoader.classList.toggle('hidden', !show);
+        const getCurrentMonthKey = () => {
+            const now = new Date();
+            return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+        };
 
-            // --- FUNÇÕES DE RENDERIZAÇÃO ---
-            const renderDashboard = (monthKey) => {
-                const monthData = financialData[monthKey] || { receitas: [], despesas: {} };
-                
-                const allExpenses = Object.values(monthData.despesas).flat();
-                const paidExpenses = allExpenses.filter(item => item.pago);
-                const unpaidExpenses = allExpenses.filter(item => !item.pago);
-
-                const totalReceitas = monthData.receitas.reduce((sum, item) => sum + item.valor, 0);
-                const totalDespesasPagas = paidExpenses.reduce((sum, item) => sum + item.valor, 0);
-                const totalAPagar = unpaidExpenses.reduce((sum, item) => sum + item.valor, 0);
-                const saldoFinal = totalReceitas - totalDespesasPagas;
-                
-                document.getElementById('total-receitas').textContent = formatCurrency(totalReceitas);
-                document.getElementById('total-despesas').textContent = formatCurrency(totalDespesasPagas);
-                document.getElementById('total-a-pagar').textContent = formatCurrency(totalAPagar);
-                const saldoEl = document.getElementById('saldo-final');
-                saldoEl.textContent = formatCurrency(saldoFinal);
-                saldoEl.classList.toggle('text-red-500', saldoFinal < 0);
-                saldoEl.classList.toggle('text-gray-800', saldoFinal >= 0);
-
-                renderExpensesChart(monthData.despesas);
-                renderTables(monthData.receitas, monthData.despesas);
-                renderHistory();
-                renderInsights(monthKey);
-            };
-
-            const renderInsights = (monthKey) => {
-                const insightsContent = document.getElementById('insights-content');
-                const monthData = financialData[monthKey] || { receitas: [], despesas: {} };
-                const totalReceitas = monthData.receitas.reduce((sum, item) => sum + item.valor, 0);
-                const allExpenses = Object.values(monthData.despesas).flat();
-                const totalDespesas = allExpenses.reduce((sum, item) => sum + item.valor, 0);
-
-                let insightsHTML = '';
-
-                // 1. Categoria com maior gasto
-                const categoryTotals = Object.entries(monthData.despesas).map(([category, items]) => ({
-                    category,
-                    total: items.reduce((sum, item) => sum + item.valor, 0)
-                }));
-
-                if (categoryTotals.length > 0) {
-                    const topCategory = categoryTotals.sort((a, b) => b.total - a.total)[0];
-                    insightsHTML += `<div><h3 class="font-bold text-gray-800">Top Categoria</h3><p>${topCategory.category} (${formatCurrency(topCategory.total)})</p></div>`;
+        // --- MÓDULO PRINCIPAL DA APLICAÇÃO ---
+        const mainModule = {
+            init() {
+                this.renderInitialHTML();
+                this.loadConfigAndData();
+                this.setupEventListeners();
+                this.handleTabClick('resumo');
+            },
+            renderInitialHTML() {
+                document.getElementById('tab-contents').innerHTML = `
+                    <div id="resumo" class="tab-content"></div>
+                    <div id="orcamento" class="tab-content"></div>
+                    <div id="metas" class="tab-content"></div>
+                    <div id="detalhados" class="tab-content"></div>
+                    <div id="configuracoes" class="tab-content"></div>`;
+                document.getElementById('modal-container').innerHTML = ``;
+            },
+            setupEventListeners() {
+                const tabs = document.getElementById('tabs');
+                if (tabs) {
+                    tabs.replaceWith(tabs.cloneNode(true));
+                    document.getElementById('tabs').addEventListener('click', (e) => {
+                        const btn = e.target.closest('.tab-btn');
+                        if(btn) this.handleTabClick(btn.dataset.tab);
+                    });
                 }
-
-                // 2. Percentual da receita gasto
-                if (totalReceitas > 0) {
-                    const percentSpent = (totalDespesas / totalReceitas) * 100;
-                    insightsHTML += `<div><h3 class="font-bold text-gray-800">% da Receita Gasto</h3><p>${percentSpent.toFixed(1)}%</p></div>`;
-                }
-
-                // 3. Comparação com mês anterior
-                const prevMonthKey = getPreviousMonthKey(monthKey);
-                const prevMonthData = financialData[prevMonthKey];
-                if (prevMonthData) {
-                    const prevTotalExpenses = Object.values(prevMonthData.despesas).flat().reduce((sum, item) => sum + item.valor, 0);
-                    const diff = totalDespesas - prevTotalExpenses;
-                    const diffText = diff > 0 ? `${formatCurrency(diff)} a mais` : `${formatCurrency(Math.abs(diff))} a menos`;
-                    const colorClass = diff > 0 ? 'text-red-500' : 'text-green-600';
-                    insightsHTML += `<div><h3 class="font-bold text-gray-800">vs Mês Anterior</h3><p class="${colorClass}">${diffText}</p></div>`;
-                }
-                 insightsContent.innerHTML = insightsHTML || '<p class="text-gray-500 col-span-full">Ainda não há dados suficientes para insights.</p>';
-            };
-            
-            const renderExpensesChart = (despesas) => {
-                const ctx = document.getElementById('expensesChart').getContext('2d');
-                const categoryTotals = Object.keys(despesas).map(cat => ({
-                    category: cat,
-                    total: despesas[cat].reduce((sum, item) => sum + item.valor, 0)
-                })).filter(c => c.total > 0);
-
-                if (expensesChart) expensesChart.destroy();
-                expensesChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: categoryTotals.map(d => d.category),
-                        datasets: [{
-                            data: categoryTotals.map(d => d.total),
-                            backgroundColor: ['#ef4444', '#3b82f6', '#10b981', '#f97316', '#8b5cf6', '#ec4899', '#f59e0b', '#6b7280', '#14b8a6', '#84cc16'],
-                            hoverOffset: 4,
-                            borderColor: '#f3f4f6'
-                        }]
-                    },
-                    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+                document.getElementById('add-transaction-btn')?.addEventListener('click', () => this.renderTransactionModal());
+                document.getElementById('month-selector')?.addEventListener('change', (e) => this.renderAll(e.target.value));
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                     if(confirm("Tem a certeza que quer recarregar a aplicação?")) {
+                         window.location.reload();
+                     }
                 });
-            };
+            },
+            handleTabClick(tabId) {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
+                if(activeBtn) activeBtn.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+                const activeContent = document.getElementById(tabId);
+                if(activeContent) activeContent.style.display = 'block';
 
-            const renderHistory = () => {
-                const tableBody = document.getElementById('history-table-body');
-                tableBody.innerHTML = '';
-                const sortedMonths = Object.keys(financialData).sort();
-
-                const evolutionLabels = [];
-                const evolutionRevenues = [];
-                const evolutionExpenses = [];
-
-                sortedMonths.forEach(monthKey => {
-                    const monthData = financialData[monthKey];
-                    const totalReceitas = (monthData.receitas || []).reduce((sum, item) => sum + item.valor, 0);
-                    const totalDespesasPagas = Object.values(monthData.despesas || {}).flat().filter(i => i.pago).reduce((sum, item) => sum + item.valor, 0);
-                    const saldo = totalReceitas - totalDespesasPagas;
-
-                    tableBody.innerHTML += `<tr class="border-b dark:border-neutral-500">
-                        <td class="whitespace-nowrap px-6 py-3 font-medium">${monthKey}</td>
-                        <td class="whitespace-nowrap px-6 py-3 text-right text-green-600">${formatCurrency(totalReceitas)}</td>
-                        <td class="whitespace-nowrap px-6 py-3 text-right text-red-600">${formatCurrency(totalDespesasPagas)}</td>
-                        <td class="whitespace-nowrap px-6 py-3 text-right font-bold ${saldo < 0 ? 'text-red-600' : 'text-gray-800'}">${formatCurrency(saldo)}</td>
-                    </tr>`;
-
-                    evolutionLabels.push(monthKey);
-                    evolutionRevenues.push(totalReceitas);
-                    evolutionExpenses.push(totalDespesasPagas);
+                const monthKey = document.getElementById('month-selector').value;
+                this.renderAll(monthKey);
+            },
+            loadConfigAndData() {
+                if (!userId) return;
+                if(unsubscribeConfig) unsubscribeConfig();
+                unsubscribeConfig = onSnapshot(doc(db, "users", userId, "config", "appConfig"), (docSnap) => {
+                    if (docSnap.exists()) {
+                        appConfig = { ...{ categories: [], budget: {}, goals: [] }, ...docSnap.data() };
+                    }
+                    const monthKey = document.getElementById('month-selector')?.value || getCurrentMonthKey();
+                    this.renderAll(monthKey);
                 });
 
-                renderEvolutionChart(evolutionLabels, evolutionRevenues, evolutionExpenses);
-            };
-
-            const renderEvolutionChart = (labels, revenues, expenses) => {
-                const ctx = document.getElementById('evolutionChart').getContext('2d');
-                if (evolutionChart) evolutionChart.destroy();
-                evolutionChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Receitas',
-                                data: revenues,
-                                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Despesas Pagas',
-                                data: expenses,
-                                backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: { scales: { y: { beginAtZero: true } } }
-                });
-            };
-
-             const renderTables = (receitas, despesas) => {
-                const gastosDetalhadosContainer = document.getElementById('detalhados');
-                const cartoesGridContainer = document.getElementById('cartoes-grid');
-                gastosDetalhadosContainer.innerHTML = '';
-                cartoesGridContainer.innerHTML = '';
-
-                if (receitas && receitas.length > 0) {
-                    gastosDetalhadosContainer.innerHTML += createTableHTML('Receitas', receitas);
-                }
-                
-                Object.entries(despesas).forEach(([category, items]) => {
-                    if (items && items.length > 0) {
-                        const html = createTableHTML(category, items, true);
-                        if (category.toLowerCase().includes('cartão')) {
-                            cartoesGridContainer.innerHTML += html;
-                        } else {
-                            gastosDetalhadosContainer.innerHTML += html;
-                        }
+                if(unsubscribeFinancialData) unsubscribeFinancialData();
+                unsubscribeFinancialData = onSnapshot(collection(db, "users", userId, "months"), (snapshot) => {
+                    let dataChanged = false;
+                    snapshot.docChanges().forEach(change => {
+                        dataChanged = true;
+                         if (change.type === "removed") delete financialData[change.doc.id];
+                         else financialData[change.doc.id] = change.doc.data();
+                    });
+                    
+                    if(dataChanged) {
+                        if(isInitialLoad) {
+                            const currentMonth = getCurrentMonthKey();
+                             if (!financialData[currentMonth]) financialData[currentMonth] = { receitas: [], despesas: {} };
+                            this.populateMonthSelector();
+                            document.getElementById('month-selector').value = currentMonth;
+                            isInitialLoad = false;
+                        } else { this.populateMonthSelector(); }
+                        
+                        this.renderAll(document.getElementById('month-selector').value);
                     }
                 });
-            };
+            },
+            populateMonthSelector() {
+                const selector = document.getElementById('month-selector');
+                const currentSelection = selector.value;
+                let sortedMonths = Object.keys(financialData).sort();
+                if(sortedMonths.length === 0) {
+                    const currentMonth = getCurrentMonthKey();
+                    if(!sortedMonths.includes(currentMonth)) sortedMonths.push(currentMonth);
+                }
+                selector.innerHTML = sortedMonths.map(monthKey => {
+                    const [year, month] = monthKey.split('-');
+                    const monthName = new Date(year, parseInt(month) - 1, 1).toLocaleString('pt-BR', { month: 'long' });
+                    return `<option value="${monthKey}">${monthName.charAt(0).toUpperCase() + monthName.slice(1)} de ${year}</option>`;
+                }).join('');
+                if (sortedMonths.includes(currentSelection)) selector.value = currentSelection;
+            },
+            renderAll(monthKey) {
+                if(!userId || !monthKey) return;
+                const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab || 'resumo';
+                switch(activeTab) {
+                    case 'resumo': this.renderResumo(monthKey); break;
+                    case 'orcamento': this.renderOrcamento(monthKey); break;
+                    case 'metas': this.renderMetas(); break;
+                    case 'detalhados': this.renderDetalhados(monthKey); break;
+                    case 'configuracoes': this.renderConfiguracoes(); break;
+                }
+            },
+            
+            // --- Funções de Renderização das Abas (completas) ---
+            renderResumo(monthKey) {
+                const container = document.getElementById('resumo');
+                if (!container) return;
+                const monthData = financialData[monthKey] || { receitas: [], despesas: {} };
+                
+                const allExpenses = Object.entries(monthData.despesas || {}).flatMap(([category, items]) => 
+                    items.map(item => ({ ...item, category }))
+                );
 
-            const createTableHTML = (title, items, isExpense = false) => {
+                const totalReceitas = (monthData.receitas || []).reduce((sum, item) => sum + item.valor, 0);
+                const totalDespesasPagas = allExpenses.filter(item => item.pago).reduce((sum, item) => sum + item.valor, 0);
+                const totalAPagar = allExpenses.filter(item => !item.pago).reduce((sum, item) => sum + item.valor, 0);
+                const saldoFinal = totalReceitas - totalDespesasPagas;
+
+                container.innerHTML = `
+                    <div class="space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-teal-400 flex items-center space-x-4"><div class="bg-teal-100 p-3 rounded-full"><svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></div><div><h2 class="text-lg font-semibold text-gray-600">Receitas</h2><p class="text-3xl font-bold text-gray-800">${formatCurrency(totalReceitas)}</p></div></div>
+                            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-red-400 flex items-center space-x-4"><div class="bg-red-100 p-3 rounded-full"><svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><div><h2 class="text-lg font-semibold text-gray-600">Despesas Pagas</h2><p class="text-3xl font-bold text-gray-800">${formatCurrency(totalDespesasPagas)}</p></div></div>
+                            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-400 flex items-center space-x-4"><div class="bg-yellow-100 p-3 rounded-full"><svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div><div><h2 class="text-lg font-semibold text-gray-600">A Pagar</h2><p class="text-3xl font-bold text-gray-800">${formatCurrency(totalAPagar)}</p></div></div>
+                            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-400 flex items-center space-x-4"><div class="bg-blue-100 p-3 rounded-full"><svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg></div><div><h2 class="text-lg font-semibold text-gray-600">Saldo Final</h2><p class="text-3xl font-bold text-gray-800 ${saldoFinal < 0 ? 'text-red-500' : ''}">${formatCurrency(saldoFinal)}</p></div></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg"><h2 class="text-xl font-bold text-gray-800 mb-4">Distribuição de Despesas</h2><div class="max-w-md mx-auto"><canvas id="expensesChart"></canvas></div></div>
+                    </div>
+                `;
+                this.renderChart('expensesChart', allExpenses, 'doughnut');
+            },
+            
+            renderOrcamento(monthKey) {
+                const container = document.getElementById('orcamento');
+                if (!container) return;
+
+                const budget = appConfig.budget || {};
+                const monthData = financialData[monthKey] || { despesas: {} };
+                const allExpenses = Object.entries(monthData.despesas).flatMap(([category, items]) => 
+                    items.map(item => ({ ...item, category }))
+                );
+
+                const budgetHTML = (appConfig.categories || []).map(cat => {
+                    const budgetValue = budget[cat] || 0;
+                    const spentValue = allExpenses.filter(e => e.category === cat).reduce((sum, e) => sum + e.valor, 0);
+                    const percentage = budgetValue > 0 ? (spentValue / budgetValue) * 100 : 0;
+                    let barColor = 'bg-teal-500';
+                    if (percentage > 75) barColor = 'bg-yellow-500';
+                    if (percentage > 90) barColor = 'bg-red-500';
+                    
+                    return `
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-gray-700">${cat}</span>
+                                <span class="text-sm">${formatCurrency(spentValue)} / ${formatCurrency(budgetValue)}</span>
+                            </div>
+                            <div class="progress-bar-bg rounded-full h-4 w-full">
+                                <div class="progress-bar-fill rounded-full h-4 ${barColor}" style="width: ${Math.min(percentage, 100)}%;"></div>
+                            </div>
+                            <div class="mt-2 text-right">
+                                <input type="number" step="0.01" data-category="${cat}" value="${budgetValue || ''}" placeholder="Definir orçamento" class="budget-input text-right p-1 border rounded w-40">
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Orçamento Mensal</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${budgetHTML}</div>
+                        <button id="save-budget-btn" class="mt-6 py-2 px-6 bg-teal-500 text-gray-800 font-bold rounded-lg hover:bg-teal-400">Salvar Orçamento</button>
+                    </div>`;
+
+                container.querySelector('#save-budget-btn').onclick = async (e) => {
+                    const newBudget = { ...appConfig.budget };
+                    container.querySelectorAll('.budget-input').forEach(input => {
+                        newBudget[input.dataset.category] = parseFloat(input.value) || 0;
+                    });
+                    await updateDoc(doc(db, "users", userId, "config", "appConfig"), { budget: newBudget });
+                    alert('Orçamento salvo!');
+                };
+            },
+            
+            renderMetas() {
+                const container = document.getElementById('metas');
+                if(!container) return;
+                
+                const newContainer = container.cloneNode(false);
+                container.parentNode.replaceChild(newContainer, container);
+
+                const goalsHTML = (appConfig.goals || []).map((goal, index) => {
+                     const percentage = goal.target > 0 ? (goal.current / goal.target) * 100 : 0;
+                     return `
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-800">${goal.name}</h3>
+                                    <p class="text-gray-500">Meta: ${formatCurrency(goal.target)}</p>
+                                </div>
+                                <button data-index="${index}" class="delete-goal-btn text-red-500 hover:text-red-700 font-bold text-2xl">&times;</button>
+                            </div>
+                            <div class="mt-4">
+                                <div class="progress-bar-bg rounded-full h-6 w-full relative">
+                                    <div class="progress-bar-fill rounded-full h-6 bg-teal-500 flex items-center justify-center text-white font-bold" style="width: ${percentage.toFixed(2)}%;">${percentage.toFixed(0)}%</div>
+                                </div>
+                                <p class="text-center mt-2 font-semibold">${formatCurrency(goal.current)}</p>
+                            </div>
+                            <div class="mt-4 flex gap-2">
+                                <input type="number" step="0.01" id="deposit-${index}" class="flex-grow p-2 border rounded" placeholder="Depositar/Retirar valor">
+                                <button data-index="${index}" class="deposit-btn py-2 px-4 bg-teal-500 text-gray-800 font-semibold rounded-md hover:bg-teal-400">+</button>
+                                <button data-index="${index}" class="withdraw-btn py-2 px-4 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400">-</button>
+                            </div>
+                        </div>
+                     `;
+                }).join('');
+
+                newContainer.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${goalsHTML}
+                         <div class="bg-white p-6 rounded-xl shadow-lg border-2 border-dashed border-gray-300">
+                             <h3 class="text-xl font-bold text-gray-800 mb-4">Nova Meta</h3>
+                             <form id="new-goal-form" class="space-y-4">
+                                <input type="text" id="new-goal-name" placeholder="Nome da Meta (ex: Viagem)" class="w-full p-2 border rounded" required>
+                                <input type="number" step="0.01" id="new-goal-target" placeholder="Valor da Meta" class="w-full p-2 border rounded" required>
+                                <button type="submit" class="w-full py-2 bg-teal-500 text-gray-800 font-bold rounded-lg hover:bg-teal-400">Criar Meta</button>
+                             </form>
+                         </div>
+                    </div>
+                `;
+                
+                newContainer.addEventListener('click', async (e) => {
+                    const indexStr = e.target.dataset.index;
+                    if (indexStr === undefined) return;
+                    const index = parseInt(indexStr);
+
+                    const newGoals = JSON.parse(JSON.stringify(appConfig.goals || []));
+                    
+                    if (e.target.classList.contains('delete-goal-btn')) {
+                        if(confirm('Tem a certeza que quer apagar esta meta?')) {
+                            newGoals.splice(index, 1);
+                             await updateDoc(doc(db, "users", userId, "config", "appConfig"), { goals: newGoals });
+                        }
+                        return;
+                    }
+
+                    const amountInput = document.getElementById(`deposit-${index}`);
+                    const amount = parseFloat(amountInput.value) || 0;
+                    if (amount <= 0) return;
+
+                    if (e.target.classList.contains('deposit-btn')) {
+                        newGoals[index].current = (newGoals[index].current || 0) + amount;
+                        if (newGoals[index].current > newGoals[index].target) newGoals[index].current = newGoals[index].target;
+                    } else if (e.target.classList.contains('withdraw-btn')) {
+                        newGoals[index].current = (newGoals[index].current || 0) - amount;
+                        if (newGoals[index].current < 0) newGoals[index].current = 0;
+                    }
+
+                    await updateDoc(doc(db, "users", userId, "config", "appConfig"), { goals: newGoals });
+                    if(amountInput) amountInput.value = '';
+                });
+
+                document.getElementById('new-goal-form').onsubmit = async (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('new-goal-name').value;
+                    const target = parseFloat(document.getElementById('new-goal-target').value);
+                    if (name && target > 0) {
+                        const newGoals = [...(appConfig.goals || []), { id: Date.now(), name, target, current: 0 }];
+                        await updateDoc(doc(db, "users", userId, "config", "appConfig"), { goals: newGoals });
+                        e.target.reset();
+                    }
+                };
+            },
+            
+            renderDetalhados(monthKey) {
+                const container = document.getElementById('detalhados');
+                if(!container) return;
+
+                const monthData = financialData[monthKey] || { receitas: [], despesas: {} };
+                let html = '';
+
+                if (monthData.receitas && monthData.receitas.length > 0) {
+                     html += this.createTableHTML('Receitas', monthData.receitas, false);
+                }
+                
+                Object.entries(monthData.despesas || {}).sort((a,b) => a[0].localeCompare(b[0])).forEach(([category, items]) => {
+                    if (items && items.length > 0) {
+                        html += this.createTableHTML(category, items, true);
+                    }
+                });
+                
+                container.innerHTML = `<div class="space-y-8">${html || '<div class="bg-white p-6 rounded-xl shadow-lg text-center text-gray-500"><p>Nenhum lançamento este mês.</p></div>'}</div>`;
+            },
+
+            renderRelatorios(monthKey) {
+                const container = document.getElementById('relatorios');
+                if(!container) return;
+                
+                const newContainer = container.cloneNode(false);
+                container.parentNode.replaceChild(newContainer, container);
+
+                newContainer.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl shadow-lg max-w-lg mx-auto">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Gerar Relatório em PDF</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="report-month" class="block text-sm font-medium text-gray-700">Mês do Relatório</label>
+                                <select id="report-month" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></select>
+                            </div>
+                            <button id="generate-pdf-btn" class="w-full py-3 bg-teal-500 text-gray-800 font-bold rounded-lg hover:bg-teal-400">Gerar PDF</button>
+                        </div>
+                    </div>`;
+
+                const monthSelect = document.getElementById('report-month');
+                monthSelect.innerHTML = document.getElementById('month-selector').innerHTML;
+                monthSelect.value = monthKey;
+                
+                newContainer.querySelector('#generate-pdf-btn').onclick = () => {
+                    try {
+                        const selectedMonth = monthSelect.value;
+                        const doc = new jspdf.jsPDF();
+                        
+                        const monthData = financialData[selectedMonth] || { receitas: [], despesas: {} };
+                        let finalY = 25;
+
+                        doc.setFontSize(18);
+                        doc.text(`Relatório Financeiro - ${selectedMonth}`, 14, 20);
+
+                        if (monthData.receitas && monthData.receitas.length > 0) {
+                             doc.autoTable({
+                                startY: finalY,
+                                head: [['Receitas', 'Responsável', 'Valor']],
+                                body: monthData.receitas.map(r => [r.descricao, r.responsavel || 'N/A', formatCurrency(r.valor)]),
+                            });
+                            finalY = doc.lastAutoTable.finalY + 10;
+                        }
+
+                        const allExpenses = Object.entries(monthData.despesas || {}).flatMap(([cat, items]) => items.map(i => ({...i, category: cat})));
+                        if (allExpenses.length > 0) {
+                             doc.autoTable({
+                                startY: finalY,
+                                head: [['Despesas', 'Categoria', 'Responsável', 'Valor']],
+                                body: allExpenses.map(e => [e.descricao, e.category, e.responsavel || 'N/A', formatCurrency(e.valor)]),
+                            });
+                        }
+                       
+                        doc.save(`relatorio-${selectedMonth}.pdf`);
+                    } catch (error) {
+                        console.error("Erro ao gerar PDF:", error);
+                        alert("Ocorreu um erro inesperado ao gerar o relatório PDF. Verifique a consola para mais detalhes.");
+                    }
+                };
+            },
+
+            renderConfiguracoes() {
+                const container = document.getElementById('configuracoes');
+                if(!container) return;
+
+                const categoriesHTML = (appConfig.categories || []).sort().map(cat => `
+                    <div class="flex justify-between items-center p-3 border rounded-lg bg-gray-50">
+                        <span class="text-gray-700">${cat}</span>
+                        <button data-category="${cat}" class="delete-category-btn text-red-500 hover:text-red-700 font-bold text-xl">&times;</button>
+                    </div>`).join('');
+
+                container.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl shadow-lg max-w-lg mx-auto">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Gerir Categorias</h2>
+                        <div id="category-list" class="space-y-2 mb-6">${categoriesHTML}</div>
+                        <form id="category-form" class="flex items-center gap-4">
+                            <input type="text" id="new-category-name" placeholder="Nova categoria" class="flex-grow p-2 border rounded" required>
+                            <button type="submit" class="py-2 px-4 bg-teal-500 text-gray-800 font-semibold rounded-md hover:bg-teal-400">Adicionar</button>
+                        </form>
+                    </div>`;
+
+                document.getElementById('category-form').onsubmit = async (e) => {
+                    e.preventDefault();
+                    const input = document.getElementById('new-category-name');
+                    const newCategory = input.value.trim();
+                    if(newCategory && !(appConfig.categories || []).includes(newCategory)) {
+                        const newCategories = [...(appConfig.categories || []), newCategory];
+                        await updateDoc(doc(db, "users", userId, "config", "appConfig"), { categories: newCategories });
+                        input.value = '';
+                    }
+                };
+                
+                document.getElementById('category-list').onclick = async (e) => {
+                    if(e.target.classList.contains('delete-category-btn')) {
+                         const categoryToDelete = e.target.dataset.category;
+                         if (confirm(`Tem a certeza que quer apagar a categoria "${categoryToDelete}"?`)) {
+                            const newCategories = (appConfig.categories || []).filter(c => c !== categoryToDelete);
+                            await updateDoc(doc(db, "users", userId, "config", "appConfig"), { categories: newCategories });
+                         }
+                    }
+                };
+            },
+            
+            createTableHTML(title, items, isExpense = false) {
                 const total = items.reduce((sum, i) => sum + i.valor, 0);
-                const rows = items.map(item => {
+                let payAllButton = '';
+                if (isExpense && title.toLowerCase().includes('cartão')) {
+                    payAllButton = `<button onclick="mainModule.payAllBills('${title}')" class="ml-4 py-1 px-3 bg-teal-100 text-teal-700 text-xs font-bold rounded-full hover:bg-teal-200">Quitar Fatura</button>`;
+                }
+                
+                const rows = items.sort((a,b)=>a.descricao.localeCompare(b.descricao)).map(item => {
                     const transactionData = JSON.stringify({ ...item, category: isExpense ? title : undefined });
                     const responsavelBadge = item.responsavel && item.responsavel !== 'N/A' 
-                        ? `<span class="text-xs text-gray-500 block">${item.responsavel}</span>` : '';
+                        ? `<span class="text-xs font-medium bg-gray-200 text-gray-600 px-2 py-1 rounded-full">${item.responsavel}</span>` : '';
+                    const attachmentIcon = item.attachmentURL ? `<a href="${item.attachmentURL}" target="_blank" class="ml-2 text-teal-500 hover:text-teal-700">📎</a>` : '';
 
                     if (isExpense) {
                         const rowClass = item.pago ? 'paid-row' : '';
-                        return `<tr class="border-b dark:border-neutral-500 hover:bg-gray-50 group ${rowClass}">
-                            <td class="w-12 px-2 py-3 text-center"><input type="checkbox" ${item.pago ? 'checked' : ''} onchange="window.togglePaidStatus(${item.id}, '${title}')" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"></td>
-                            <td class="px-6 py-3 cursor-pointer" onclick='window.openEditModal(${transactionData})'>${item.descricao}${responsavelBadge}</td>
-                            <td class="px-6 py-3 cursor-pointer" onclick='window.openEditModal(${transactionData})'>${item.parcelas || '—'}</td>
-                            <td class="px-6 py-3 text-right cursor-pointer" onclick='window.openEditModal(${transactionData})'>${formatCurrency(item.valor)}</td>
-                            <td class="w-12 px-2 py-3 text-center"><button onclick="window.deleteItem(${item.id}, '${title}')" title="Excluir item" class="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100">&times;</button></td>
+                        return `<tr class="border-b border-gray-200 hover:bg-gray-50 group ${rowClass}">
+                            <td class="w-12 px-2 py-4 text-center"><input type="checkbox" ${item.pago ? 'checked' : ''} onchange="mainModule.togglePaidStatus(${item.id}, '${title}')" class="h-5 w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500 cursor-pointer"></td>
+                            <td class="px-6 py-4 cursor-pointer desc-cell" onclick='mainModule.renderTransactionModal(${transactionData})'>${item.descricao} ${attachmentIcon}</td>
+                            <td class="px-6 py-4 cursor-pointer text-center" onclick='mainModule.renderTransactionModal(${transactionData})'>${responsavelBadge}</td>
+                            <td class="px-6 py-4 cursor-pointer text-center" onclick='mainModule.renderTransactionModal(${transactionData})'>${item.parcelas || '—'}</td>
+                            <td class="px-6 py-4 text-right cursor-pointer" onclick='mainModule.renderTransactionModal(${transactionData})'>${formatCurrency(item.valor)}</td>
+                            <td class="w-12 px-2 py-4 text-center"><button onclick="mainModule.deleteTransaction(${item.id}, '${title}', '${item.attachmentPath || ''}')" title="Excluir" class="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 font-bold text-xl">&times;</button></td>
                         </tr>`;
                     }
-                    return `<tr class="border-b dark:border-neutral-500 hover:bg-gray-50 group">
-                        <td class="px-6 py-3 cursor-pointer" onclick='window.openEditModal(${transactionData})'>${item.descricao}${responsavelBadge}</td>
-                        <td class="px-6 py-3 text-right cursor-pointer" onclick='window.openEditModal(${transactionData})'>${formatCurrency(item.valor)}</td>
-                        <td class="w-12 px-2 py-3 text-center"><button onclick="window.deleteItem(${item.id}, null)" title="Excluir item" class="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100">&times;</button></td>
+                    return `<tr class="border-b border-gray-200 hover:bg-gray-50 group">
+                        <td class="px-6 py-4 cursor-pointer" onclick='mainModule.renderTransactionModal(${transactionData})'>${item.descricao} ${attachmentIcon}</td>
+                        <td class="px-6 py-4 cursor-pointer text-center">${responsavelBadge}</td>
+                        <td class="px-6 py-4 text-right cursor-pointer" onclick='mainModule.renderTransactionModal(${transactionData})'>${formatCurrency(item.valor)}</td>
+                        <td class="w-12 px-2 py-4 text-center"><button onclick="mainModule.deleteTransaction(${item.id}, null, '${item.attachmentPath || ''}')" title="Excluir" class="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 font-bold text-xl">&times;</button></td>
                     </tr>`;
                 }).join('');
 
                 const header = isExpense ? `
                     <th class="w-12 px-2 py-3"><span class="sr-only">Pago</span></th>
-                    <th class="px-6 py-3">Descrição</th>
-                    <th class="px-6 py-3">Parcelas</th>
+                    <th class="px-6 py-3 text-left">Descrição</th>
+                    <th class="px-6 py-3 text-center">Responsável</th>
+                    <th class="px-6 py-3 text-center">Parcelas</th>
                     <th class="px-6 py-3 text-right">Valor</th>` : `
-                    <th class="px-6 py-3">Descrição</th>
+                    <th class="px-6 py-3 text-left">Descrição</th>
+                    <th class="px-6 py-3 text-center">Responsável</th>
                     <th class="px-6 py-3 text-right">Valor</th>`;
                 
-                const footerCols = isExpense ? 'colspan="3"' : '';
+                const footerCols = isExpense ? 'colspan="4"' : 'colspan="2"';
 
-                return `<div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">${title}</h2>
-                    <div class="overflow-x-auto"><table class="min-w-full text-left text-sm font-light">
-                        <thead class="border-b font-medium dark:border-neutral-500"><tr>${header}<th class="w-12 px-2 py-3"><span class="sr-only">Ações</span></th></tr></thead>
-                        <tbody>${rows}<tr class="font-bold bg-gray-50"><td class="px-6 py-3" ${footerCols}>TOTAL</td><td class="px-6 py-3 text-right">${formatCurrency(total)}</td><td></td></tr></tbody>
+                return `<div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex items-center mb-4"><h2 class="text-xl font-bold text-gray-800">${title}</h2>${payAllButton}</div>
+                    <div class="overflow-x-auto"><table class="min-w-full text-sm">
+                        <thead class="bg-gray-50 text-gray-500 uppercase text-xs"><tr>${header}<th class="w-12 px-2 py-3"><span class="sr-only">Ações</span></th></tr></thead>
+                        <tbody class="text-gray-700">${rows}<tr class="font-bold bg-gray-50"><td class="px-6 py-3" ${footerCols}>TOTAL</td><td class="px-6 py-3 text-right">${formatCurrency(total)}</td><td></td></tr></tbody>
                     </table></div></div>`;
-            };
+            },
             
-            // --- LÓGICA DE CONFIGURAÇÕES ---
-            const renderCategories = () => {
-                const categoryList = document.getElementById('category-list');
-                const transactionCategorySelect = document.getElementById('transaction-category');
-                categoryList.innerHTML = '';
-                transactionCategorySelect.innerHTML = '';
-                appConfig.categories.forEach(cat => {
-                    categoryList.innerHTML += `<div class="flex justify-between items-center p-2 border rounded-md"><span>${cat}</span><button data-category="${cat}" class="text-red-500 hover:text-red-700 delete-category-btn">&times;</button></div>`;
-                    transactionCategorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
-                });
-            };
-
-            document.getElementById('category-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const input = document.getElementById('new-category-name');
-                const newCategory = input.value.trim();
-                if (newCategory && !appConfig.categories.includes(newCategory)) {
-                    appConfig.categories.push(newCategory);
-                    await setDoc(doc(db, "users", userId, "config", "appConfig"), appConfig);
-                    input.value = '';
-                }
-            });
-
-            document.getElementById('category-list').addEventListener('click', async (e) => {
-                if (e.target.classList.contains('delete-category-btn')) {
-                    const categoryToDelete = e.target.dataset.category;
-                    appConfig.categories = appConfig.categories.filter(c => c !== categoryToDelete);
-                    await setDoc(doc(db, "users", userId, "config", "appConfig"), appConfig);
-                }
-            });
-
-            // --- FUNÇÕES DE DADOS (FIRESTORE) ---
-            async function checkAndCreateRecurringTransactions() {
-                const now = new Date();
-                const currentMonthKey = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-                const prevMonthKey = getPreviousMonthKey(currentMonthKey);
+            renderChart(canvasId, expenses, type) {
+                const container = document.getElementById(canvasId);
+                if (!container) return;
+                const ctx = container.getContext('2d');
                 
-                const prevMonthData = financialData[prevMonthKey];
-                if (!prevMonthData) return;
-
-                const currentMonthData = financialData[currentMonthKey] || { receitas: [], despesas: {} };
-                const allCurrentExpensesDesc = Object.values(currentMonthData.despesas).flat().map(i => i.descricao);
-                
-                const batch = writeBatch(db);
-                let needsUpdate = false;
-
-                Object.values(prevMonthData.despesas).flat().forEach(expense => {
-                    if (expense.recorrente && !allCurrentExpensesDesc.includes(expense.descricao)) {
-                        console.log(`Creating recurring transaction for: ${expense.descricao}`);
-                        needsUpdate = true;
-                        if (!currentMonthData.despesas[expense.category]) {
-                            currentMonthData.despesas[expense.category] = [];
+                const totals = (expenses || []).reduce((acc, expense) => {
+                    const { category, valor } = expense;
+                    if (category) {
+                        if (!acc[category]) {
+                            acc[category] = 0;
                         }
-                        currentMonthData.despesas[expense.category].push({
-                            ...expense,
-                            id: Date.now() + Math.random(),
-                            pago: false,
-                            parcelas: '',
-                            dataGeracao: currentMonthKey
-                        });
+                        acc[category] += valor;
                     }
-                });
+                    return acc;
+                }, {});
 
-                if (needsUpdate) {
-                    await setDoc(doc(db, "users", userId, "months", currentMonthKey), currentMonthData);
-                }
-            }
+                const categoryTotals = Object.entries(totals).map(([category, total]) => ({
+                    category,
+                    total
+                })).filter(c => c.total > 0);
+
+                if (activeCharts[canvasId]) activeCharts[canvasId].destroy();
+                activeCharts[canvasId] = new Chart(ctx, {
+                    type: type,
+                    data: {
+                        labels: categoryTotals.map(d => d.category),
+                        datasets: [{ data: categoryTotals.map(d => d.total), backgroundColor: ['#2dd4bf', '#fb7185', '#facc15', '#60a5fa', '#a78bfa', '#f472b6', '#fb923c', '#9ca3af', '#34d399', '#f87171'], hoverOffset: 4, borderColor: '#ffffff', borderWidth: 4, }]
+                    },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { padding: 20 } } } }
+                });
+            },
             
-            function loadDataAndConfig() {
-                // Listener para configurações (categorias)
-                onSnapshot(doc(db, "users", userId, "config", "appConfig"), (docSnap) => {
-                    if (docSnap.exists()) {
-                        appConfig = docSnap.data();
-                    } else {
-                        // Se não existe, cria com as categorias padrão
-                        setDoc(doc(db, "users", userId, "config", "appConfig"), appConfig);
-                    }
-                    renderCategories();
-                });
-
-                // Listener para dados financeiros
-                onSnapshot(query(collection(db, "users", userId, "months")), (snapshot) => {
-                    snapshot.docChanges().forEach(change => {
-                        if (change.type === "removed") {
-                            delete financialData[change.doc.id];
-                        } else {
-                            financialData[change.doc.id] = change.doc.data();
-                        }
-                    });
-
-                    if (isInitialLoad) {
-                        checkAndCreateRecurringTransactions();
-                    }
-
-                    const now = new Date();
-                    const currentRealMonthKey = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-                    let monthToDisplay = isInitialLoad ? currentRealMonthKey : monthSelector.value;
-                    
-                    if (!financialData[monthToDisplay]) {
-                        financialData[monthToDisplay] = { receitas: [], despesas: {} };
-                    }
-                    
-                    populateMonthSelector();
-                    monthSelector.value = monthToDisplay;
-                    renderDashboard(monthToDisplay);
-                    isInitialLoad = false;
-                });
-            }
-            
-            // --- LÓGICA DO MODAL ---
-            const modal = document.getElementById('transaction-modal');
-            const addBtn = document.getElementById('add-transaction-btn');
-            const form = document.getElementById('transaction-form');
-
-            const toggleDespesaFields = (isDespesa) => {
-                document.getElementById('despesa-fields').style.display = isDespesa ? 'block' : 'none';
-            };
-
-            document.getElementById('transaction-type').addEventListener('change', (e) => toggleDespesaFields(e.target.value === 'despesa'));
-
-            addBtn.addEventListener('click', () => {
-                form.reset();
-                document.getElementById('modal-title').textContent = 'Adicionar Lançamento';
-                document.getElementById('delete-btn').classList.add('hidden');
-                document.getElementById('transaction-date').valueAsDate = new Date(); 
-                toggleDespesaFields(true);
-                modal.classList.add('visible');
-            });
-
-            window.openEditModal = (transaction) => {
-                form.reset();
-                document.getElementById('modal-title').textContent = 'Editar Lançamento';
-                document.getElementById('delete-btn').classList.remove('hidden');
+            renderTransactionModal(t = null) {
+                const modalContainer = document.getElementById('modal-container');
+                const options = (appConfig.categories || []).sort().map(c => `<option value="${c}" ${t?.category === c ? 'selected' : ''}>${c}</option>`).join('');
+                modalContainer.innerHTML = `
+                <div id="transaction-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+                    <div class="modal-content bg-white p-8 rounded-2xl shadow-2xl w-full max-w-lg">
+                        <h2 class="text-2xl font-bold mb-6" id="modal-title">${t ? 'Editar' : 'Adicionar'} Lançamento</h2>
+                        <form id="transaction-form" class="space-y-4">
+                            <input type="hidden" name="id" value="${t?.id || ''}">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div><label for="date" class="block text-sm font-medium text-gray-700">Data</label><input type="date" name="date" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg" required></div>
+                                <div><label for="type" class="block text-sm font-medium text-gray-700">Tipo</label><select name="type" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg"><option value="despesa" ${t && !t.category ? '' : 'selected'}>Despesa</option><option value="receita" ${!t || t.category ? '' : 'selected'}>Receita</option></select></div>
+                            </div>
+                            <div><label for="description" class="block text-sm font-medium text-gray-700">Descrição</label><input type="text" name="description" value="${t?.descricao || ''}" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg" required></div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div><label for="amount" class="block text-sm font-medium text-gray-700">Valor</label><input type="number" name="amount" step="0.01" value="${t?.valor || ''}" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg" required></div>
+                                <div><label for="responsavel" class="block text-sm font-medium text-gray-700">Responsável</label><select name="responsavel" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg"><option value="N/A">Nenhum</option><option value="Leandro" ${t?.responsavel === 'Leandro' ? 'selected' : ''}>Leandro</option><option value="Leidiane" ${t?.responsavel === 'Leidiane' ? 'selected' : ''}>Leidiane</option></select></div>
+                            </div>
+                            <div id="despesa-fields" class="space-y-4 ${!t || t.category ? '' : 'hidden'}">
+                                <div><label for="category" class="block text-sm font-medium text-gray-700">Categoria</label><select name="category" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg">${options}</select></div>
+                                <div><label for="installments" class="block text-sm font-medium text-gray-700">Parcelas (ex: 1/10)</label><input type="text" name="installments" value="${t?.parcelas || ''}" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg"></div>
+                                <div><label for="attachment" class="block text-sm font-medium text-gray-700">Anexo</label><input type="file" name="attachment" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"></div>
+                                <div class="flex items-center"><input type="checkbox" name="recorrente" class="h-4 w-4 text-teal-600 rounded" ${t?.recorrente ? 'checked' : ''}><label for="recorrente" class="ml-2 block text-sm text-gray-900">Despesa recorrente</label></div>
+                            </div>
+                            <div class="flex justify-end gap-4 pt-4">
+                                ${t ? `<button type="button" id="delete-btn" class="py-2 px-4 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700">Excluir</button>` : ''}
+                                <button type="button" id="cancel-btn" class="py-2 px-4 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300">Cancelar</button>
+                                <button type="submit" class="py-2 px-4 bg-teal-500 text-gray-800 font-semibold rounded-md hover:bg-teal-400">Salvar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>`;
                 
-                let transactionMonthKey = Object.keys(financialData).find(mKey => 
-                    [...(financialData[mKey].receitas || []), ...Object.values(financialData[mKey].despesas || {}).flat()]
-                    .some(item => item.id === transaction.id)
-                );
+                const form = document.getElementById('transaction-form');
+                const typeSelect = form.querySelector('[name="type"]');
+                const despesaFields = document.getElementById('despesa-fields');
+                const closeModal = () => modalContainer.innerHTML = '';
 
-                form.id.value = transaction.id;
-                form.date.value = transactionMonthKey ? `${transactionMonthKey}-01` : new Date().toISOString().slice(0, 10);
-                form.description.value = transaction.descricao;
-                form.amount.value = transaction.valor;
-                form.responsavel.value = transaction.responsavel || 'N/A';
-
-                const isDespesa = !!transaction.category;
-                form.type.value = isDespesa ? 'despesa' : 'receita';
-                toggleDespesaFields(isDespesa);
-
-                if (isDespesa) {
-                    form.category.value = transaction.category;
-                    form.installments.value = transaction.parcelas || '';
-                    form.recorrente.checked = !!transaction.recorrente;
+                if (t) {
+                    const monthKeyOfItem = Object.keys(financialData).find(mKey => [...(financialData[mKey].receitas || []), ...Object.values(financialData[mKey].despesas || {}).flat()].some(i => i.id === t.id));
+                    form.date.value = monthKeyOfItem ? `${monthKeyOfItem}-15` : getCurrentMonthKey() + '-15';
+                } else {
+                     form.date.valueAsDate = new Date();
                 }
 
-                modal.classList.add('visible');
-            };
-
-            const closeModal = () => modal.classList.remove('visible');
-            document.getElementById('cancel-btn').addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => e.target === modal && closeModal());
-
-            form.addEventListener('submit', async (e) => {
+                typeSelect.onchange = () => despesaFields.classList.toggle('hidden', typeSelect.value !== 'despesa');
+                form.onsubmit = (e) => this.saveTransaction(e);
+                document.getElementById('cancel-btn').onclick = closeModal;
+                if(t) document.getElementById('delete-btn').onclick = () => this.deleteTransaction(t.id, t.category, t.attachmentPath);
+            },
+            
+            async saveTransaction(e) {
                 e.preventDefault();
+                showLoader(true);
+                const form = e.target;
                 const data = Object.fromEntries(new FormData(form).entries());
                 const transactionDate = new Date(data.date + 'T12:00:00Z');
                 
-                // Primeiro, se for uma edição, removemos a entrada antiga de todos os lugares
-                if (data.id) {
-                    const idToDelete = parseFloat(data.id);
-                    const batch = writeBatch(db);
-                    let docToUpdate = null;
-                    for (const mKey in financialData) {
-                        const monthDataCopy = JSON.parse(JSON.stringify(financialData[mKey]));
-                        let changed = false;
-                        monthDataCopy.receitas = monthDataCopy.receitas.filter(i => {
-                            if (i.id === idToDelete) { changed = true; return false; }
-                            return true;
-                        });
-                        Object.keys(monthDataCopy.despesas).forEach(cat => {
-                            monthDataCopy.despesas[cat] = monthDataCopy.despesas[cat].filter(i => {
-                                if (i.id === idToDelete) { changed = true; return false; }
-                                return true;
-                            });
-                        });
-                        if (changed) {
-                            batch.set(doc(db, "users", userId, "months", mKey), monthDataCopy);
-                        }
-                    }
-                    await batch.commit();
+                let attachmentURL = null;
+                let attachmentPath = null;
+                const attachmentFile = form.attachment.files[0];
+                if (attachmentFile) {
+                    attachmentPath = `attachments/${userId}/${Date.now()}_${attachmentFile.name}`;
+                    const storageRef = ref(storage, attachmentPath);
+                    await uploadBytes(storageRef, attachmentFile);
+                    attachmentURL = await getDownloadURL(storageRef);
                 }
 
-                const newTransaction = {
-                    id: data.id ? parseFloat(data.id) : Date.now(),
-                    descricao: data.description,
-                    valor: parseFloat(data.amount),
-                    responsavel: data.responsavel
-                };
+                if (data.id) { // Edição
+                    const idToUpdate = parseFloat(data.id);
+                    const monthKeyOfItem = Object.keys(financialData).find(mKey => [...(financialData[mKey].receitas || []), ...Object.values(financialData[mKey].despesas || {}).flat()].some(i => i.id === idToUpdate));
+                    if (monthKeyOfItem) {
+                        const monthDataCopy = JSON.parse(JSON.stringify(financialData[monthKeyOfItem]));
+                        let itemFound = false;
+                        monthDataCopy.receitas = (monthDataCopy.receitas || []).filter(i => { if (i.id === idToUpdate){ itemFound = true; return false;} return true; });
+                        if(!itemFound) {
+                             Object.keys(monthDataCopy.despesas).forEach(cat => {
+                                monthDataCopy.despesas[cat] = (monthDataCopy.despesas[cat] || []).filter(i => { if (i.id === idToUpdate){ itemFound = true; return false;} return true; });
+                             });
+                        }
+                        await setDoc(doc(db, "users", userId, "months", monthKeyOfItem), monthDataCopy);
+                    }
+                }
+                
+                const newTransaction = { id: data.id ? parseFloat(data.id) : Date.now(), descricao: data.description, valor: parseFloat(data.amount), responsavel: data.responsavel, attachmentURL, attachmentPath };
 
                 if (data.type === 'despesa') {
-                    Object.assign(newTransaction, {
-                        category: data.category,
-                        parcelas: data.installments || '',
-                        pago: false,
-                        recorrente: !!data.recorrente
-                    });
-
-                    const installmentPattern = /^(\d+)\/(\d+)$/;
-                    const match = data.installments ? data.installments.match(installmentPattern) : null;
-                    if (match) {
-                        // Lógica de parcelas
-                        const current = parseInt(match[1]);
-                        const total = parseInt(match[2]);
+                    Object.assign(newTransaction, { category: data.category, parcelas: data.installments || '', pago: false, recorrente: !!data.recorrente });
+                    const match = data.installments && !data.id ? data.installments.match(/^(\d+)\/(\d+)$/) : null;
+                    if (match) { // Parcelas só para novos lançamentos
+                        const current = parseInt(match[1]), total = parseInt(match[2]);
                         const batch = writeBatch(db);
                         for (let i = 0; i < (total - current + 1); i++) {
-                            const installmentDate = new Date(transactionDate);
-                            installmentDate.setMonth(transactionDate.getMonth() + i);
-                            const monthKey = `${installmentDate.getFullYear()}-${(installmentDate.getMonth() + 1).toString().padStart(2, '0')}`;
-                            const monthData = JSON.parse(JSON.stringify(financialData[monthKey] || { receitas: [], despesas: {} }));
-                            if (!monthData.despesas[data.category]) monthData.despesas[data.category] = [];
-                            monthData.despesas[data.category].push({
-                                ...newTransaction,
-                                id: newTransaction.id + i,
-                                parcelas: `${current + i}/${total}`
-                            });
-                            batch.set(doc(db, "users", userId, "months", monthKey), monthData);
+                            const instDate = new Date(transactionDate);
+                            instDate.setMonth(transactionDate.getMonth() + i);
+                            const mKey = `${instDate.getFullYear()}-${(instDate.getMonth() + 1).toString().padStart(2, '0')}`;
+                            const mData = JSON.parse(JSON.stringify(financialData[mKey] || { receitas: [], despesas: {} }));
+                            if (!mData.despesas[data.category]) mData.despesas[data.category] = [];
+                            mData.despesas[data.category].push({ ...newTransaction, id: newTransaction.id + i, parcelas: `${current + i}/${total}`, recorrente: false });
+                            batch.set(doc(db, "users", userId, "months", mKey), mData);
                         }
                         await batch.commit();
                     } else {
-                        // Despesa única
                         const monthKey = transactionDate.toISOString().slice(0, 7);
                         const monthData = JSON.parse(JSON.stringify(financialData[monthKey] || { receitas: [], despesas: {} }));
                         if (!monthData.despesas[data.category]) monthData.despesas[data.category] = [];
@@ -675,74 +689,65 @@
                         await setDoc(doc(db, "users", userId, "months", monthKey), monthData);
                     }
                 } else {
-                    // Receita
                     const monthKey = transactionDate.toISOString().slice(0, 7);
                     const monthData = JSON.parse(JSON.stringify(financialData[monthKey] || { receitas: [], despesas: {} }));
+                    if(!monthData.receitas) monthData.receitas = [];
                     monthData.receitas.push(newTransaction);
                     await setDoc(doc(db, "users", userId, "months", monthKey), monthData);
                 }
-                closeModal();
-            });
+                showLoader(false);
+                document.getElementById('modal-container').innerHTML = '';
+            },
 
-            document.getElementById('delete-btn').addEventListener('click', async () => {
-                const idToDelete = parseFloat(form.id.value);
-                if (!idToDelete) return;
-                const batch = writeBatch(db);
-                for (const mKey in financialData) {
-                    const monthDataCopy = JSON.parse(JSON.stringify(financialData[mKey]));
-                    let changed = false;
-                    monthDataCopy.receitas = monthDataCopy.receitas.filter(i => { if(i.id === idToDelete){changed=true; return false;} return true; });
-                    Object.keys(monthDataCopy.despesas).forEach(cat => {
-                         monthDataCopy.despesas[cat] = monthDataCopy.despesas[cat].filter(i => { if(i.id === idToDelete){changed=true; return false;} return true; });
-                    });
-                    if (changed) {
-                        batch.set(doc(db, "users", userId, "months", mKey), monthDataCopy);
+            async deleteTransaction(id, category, attachmentPath = null) {
+                if (!confirm("Tem a certeza que quer apagar este lançamento?")) return;
+                showLoader(true);
+                const idToDelete = parseFloat(id);
+                 const monthKeyOfItem = Object.keys(financialData).find(mKey => [...(financialData[mKey].receitas || []), ...Object.values(financialData[mKey].despesas || {}).flat()].some(i => i.id === idToDelete));
+                 if(monthKeyOfItem) {
+                    const monthDataCopy = JSON.parse(JSON.stringify(financialData[monthKeyOfItem]));
+                    if (category) {
+                        monthDataCopy.despesas[category] = monthDataCopy.despesas[category].filter(i => i.id !== idToDelete);
+                    } else {
+                        monthDataCopy.receitas = monthDataCopy.receitas.filter(i => i.id !== idToDelete);
                     }
-                }
-                await batch.commit();
-                closeModal();
-            });
+                    await setDoc(doc(db, "users", userId, "months", monthKeyOfItem), monthDataCopy);
+                 }
+                 if(attachmentPath) {
+                    try { await deleteObject(ref(storage, attachmentPath)); } catch (e) { console.warn("Anexo não encontrado para apagar", e)}
+                 }
+                showLoader(false);
+                document.getElementById('modal-container').innerHTML = '';
+            },
 
-             window.togglePaidStatus = async (id, category) => {
-                const monthKey = monthSelector.value;
+            async togglePaidStatus(id, category) {
+                const monthKey = document.getElementById('month-selector').value;
                 const monthData = JSON.parse(JSON.stringify(financialData[monthKey]));
                 const item = monthData.despesas[category]?.find(i => i.id === id);
                 if (item) {
                     item.pago = !item.pago;
                     await setDoc(doc(db, "users", userId, "months", monthKey), monthData);
                 }
-            };
+            },
             
-            // --- INICIALIZAÇÃO E OUTROS EVENTOS ---
-            document.getElementById('tabs').addEventListener('click', (e) => {
-                const clickedTab = e.target.closest('.tab-btn');
-                if (!clickedTab) return;
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                clickedTab.classList.add('active');
-                document.getElementById(clickedTab.dataset.tab).classList.add('active');
-            });
-            
-            monthSelector.addEventListener('change', () => renderDashboard(monthSelector.value));
-            
-            const populateMonthSelector = () => {
-                const now = new Date();
-                const currentRealMonthKey = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-                if (!financialData[currentRealMonthKey]) {
-                    financialData[currentRealMonthKey] = { receitas: [], despesas: {} };
+            async payAllBills(category) {
+                if (!confirm(`Tem a certeza que quer quitar toda a fatura "${category}"?`)) return;
+                showLoader(true);
+                const monthKey = document.getElementById('month-selector').value;
+                const monthData = JSON.parse(JSON.stringify(financialData[monthKey]));
+                if (monthData.despesas && monthData.despesas[category]) {
+                    monthData.despesas[category].forEach(item => item.pago = true);
+                    await setDoc(doc(db, "users", userId, "months", monthKey), monthData);
                 }
-                const sortedMonths = Object.keys(financialData).sort();
-                const currentSelection = monthSelector.value;
-                monthSelector.innerHTML = sortedMonths.map(monthKey => {
-                    const [year, month] = monthKey.split('-');
-                    const monthName = new Date(year, parseInt(month) - 1, 1).toLocaleString('pt-BR', { month: 'long' });
-                    const text = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} de ${year}`;
-                    return `<option value="${monthKey}" ${monthKey === currentSelection ? 'selected' : ''}>${text}</option>`;
-                }).join('');
-            };
-            
-            loadDataAndConfig();
-        });
+                showLoader(false);
+            }
+        };
+
+        // --- INICIALIZAÇÃO ---
+        console.log("A INICIAR EM MODO DE TESTE (ACESSO LIBERADO)");
+        userId = "leandro-leidiane-financas-2024"; 
+        mainModule.init();
+
     </script>
 </body>
 </html>
