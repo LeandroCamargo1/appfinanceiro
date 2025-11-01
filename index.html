@@ -3,763 +3,508 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nós na Conta PRO | Gestão Financeira Completa</title>
-    <!-- Tailwind CSS CDN -->
+    <title>💰 Nós na Conta PRO - Gestão Financeira Moderna</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN -->
+    
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Modern Styles -->
+    <link rel="stylesheet" href="styles-modern.css">
+    
+    <!-- Custom Styles -->
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .tab-btn.active { border-bottom-color: #14b8a6; color: #0f766e; font-weight: 600; }
-        .progress-bar-bg { background-color: #e2e8f0; }
-        .progress-bar-fill { transition: width 0.5s ease-in-out; }
-        .paid-row { opacity: 0.6; }
-        .paid-row .desc-cell { text-decoration: line-through; }
-        .hidden { display: none; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #14b8a6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .skeleton {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        .skeleton-bg {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .paid-item {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+        
+        .offline-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
-<body class="bg-slate-100">
+<body class="bg-gray-50 min-h-screen">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white z-50 flex items-center justify-center opacity-100">
+        <div class="text-center">
+            <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h2 class="loading-text text-xl font-semibold text-gray-700">Nós na Conta PRO</h2>
+            <p class="loading-subtext text-gray-500 mt-2">Preparando sua experiência financeira...</p>
+            
+            <!-- Progress Bar -->
+            <div class="w-64 bg-gray-200 rounded-full h-2 mt-4 mx-auto">
+                <div class="loading-progress-bar bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
 
-    <!-- Conteúdo Principal do App -->
-    <div id="app-container">
-        <header class="bg-gray-800 text-white shadow-lg sticky top-0 z-40">
+    <!-- Offline Indicator -->
+    <div id="offlineIndicator" class="offline-indicator hidden">
+        <div class="bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            Você está offline
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer"></div>
+
+    <!-- Main App Container -->
+    <div id="mainContent" class="hidden">
+    <div id="app">
+        <!-- Header -->
+        <header class="nav-modern bg-white shadow-sm border-b sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-20">
-                    <div class="flex items-center space-x-3"><div class="bg-teal-400 p-2 rounded-full"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></div><h1 class="text-2xl font-extrabold tracking-tight">Nós na Conta</h1></div>
-                    <div class="flex items-center gap-2 sm:gap-4">
-                        <select id="month-selector" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"></select>
-                        <button id="add-transaction-btn" class="bg-teal-500 hover:bg-teal-400 text-gray-800 font-bold p-3 rounded-full shadow-lg transition-transform transform hover:scale-105" title="Adicionar Lançamento"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg></button>
-                        <button id="logout-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold p-3 rounded-full shadow-lg transition-transform transform hover:scale-105" title="Recarregar"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M4 4l1.5 1.5A9 9 0 0120.5 12M20 20l-1.5-1.5A9 9 0 003.5 12"></path></svg></button>
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                                <span class="text-white font-bold text-lg">💰</span>
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-bold text-gray-900">Nós na Conta PRO</h1>
+                                <span id="coupleNames" class="text-sm text-gray-500">Leandro & Leidiane</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <!-- Month Navigator -->
+                        <div class="flex items-center space-x-2 bg-gray-50 rounded-xl p-1">
+                            <button id="prevMonth" class="p-2 hover:bg-white rounded-lg transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            <span id="currentMonth" class="text-sm font-semibold min-w-32 text-center" data-current-date="">Outubro 2025</span>
+                            <button id="nextMonth" class="p-2 hover:bg-white rounded-lg transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Sync Status -->
+                        <div id="syncStatus" class="hidden sm:flex">
+                            <div class="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="text-xs">Offline</span>
+                            </div>
+                        </div>
+                        
+                        <!-- User Info -->
+                        <div id="userInfo" class="hidden sm:block"></div>
+                        
+                        <!-- Login Button -->
+                        <button id="loginBtn" class="hidden sm:flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm font-medium">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                            </svg>
+                            <span>Entrar</span>
+                        </button>
+                        
+                        <!-- Theme Toggle -->
+                        <button id="themeToggle" class="theme-toggle" title="Alternar tema"></button>
+                        
+                        <!-- Settings Menu -->
+                        <div class="relative">
+                            <button id="settingsButton" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </button>
+                            <div id="settingsMenu" class="absolute right-0 mt-2 w-56 modern-card hidden">
+                                <div class="py-2">
+                                    <button id="logoutBtn" class="hidden block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 text-left rounded-lg mx-2">
+                                        🚪 Sair da Conta
+                                    </button>
+                                    <div class="border-t border-gray-200 my-1"></div>
+                                    <button onclick="loadSampleData()" class="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 text-left rounded-lg mx-2">
+                                        📊 Carregar Dados de Exemplo
+                                    </button>
+                                    <button onclick="clearAllData()" class="block w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 text-left rounded-lg mx-2">
+                                        🗑️ Limpar Todos os Dados
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-            <div class="mb-6 bg-white rounded-lg shadow-sm"><nav class="flex space-x-2 sm:space-x-4 overflow-x-auto p-2" id="tabs"><button data-tab="resumo" class="tab-btn active text-gray-500 hover:text-gray-800 py-3 px-4 rounded-t-lg font-medium whitespace-nowrap">Resumo</button><button data-tab="orcamento" class="tab-btn text-gray-500 hover:text-gray-800 py-3 px-4 rounded-t-lg font-medium whitespace-nowrap">Orçamento</button><button data-tab="metas" class="tab-btn text-gray-500 hover:text-gray-800 py-3 px-4 rounded-t-lg font-medium whitespace-nowrap">Metas</button><button data-tab="detalhados" class="tab-btn text-gray-500 hover:text-gray-800 py-3 px-4 rounded-t-lg font-medium whitespace-nowrap">Lançamentos</button><button data-tab="configuracoes" class="tab-btn text-gray-500 hover:text-gray-800 py-3 px-4 rounded-t-lg font-medium whitespace-nowrap">Configurações</button></nav></div>
+        <!-- Navigation Tabs -->
+        <nav class="nav-modern bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex space-x-2">
+                    <button data-tab="resumo" class="nav-tab active">
+                        <span class="mr-2">📊</span>
+                        Dashboard
+                    </button>
+                    <button data-tab="lancamentos" class="nav-tab">
+                        <span class="mr-2">💳</span>
+                        Lançamentos
+                    </button>
+                    <button data-tab="orcamento" class="nav-tab">
+                        <span class="mr-2">🎯</span>
+                        Orçamento
+                    </button>
+                    <button data-tab="metas" class="nav-tab">
+                        <span class="mr-2">🏆</span>
+                        Metas
+                    </button>
+                    <button data-tab="relatorios" class="nav-tab">
+                        <span class="mr-2">📈</span>
+                        Relatórios
+                    </button>
+                </div>
+            </div>
+        </nav>
 
-            <main id="tab-contents">
-                <!-- Abas (conteúdo injetado pelo JS) -->
-            </main>
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Content Containers -->
+            <div id="resumoContent" data-tab-content="resumo" class="tab-content">
+                <!-- Dashboard será renderizado aqui pelo JavaScript -->
+                <div class="mb-6">
+                    <button id="newTransactionBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Nova Transação
+                    </button>
+                </div>
+            </div>
+            
+            <div id="lancamentosContent" data-tab-content="lancamentos" class="tab-content" style="display: none;">
+                <!-- Lista de transações será renderizada aqui -->
+            </div>
+            
+            <div id="orcamentoContent" data-tab-content="orcamento" class="tab-content" style="display: none;">
+                <!-- Orçamentos serão renderizados aqui -->
+            </div>
+            
+            <div id="metasContent" data-tab-content="metas" class="tab-content" style="display: none;">
+                <!-- Metas serão renderizadas aqui -->
+            </div>
+            
+            <div id="relatoriosContent" data-tab-content="relatorios" class="tab-content" style="display: none;">
+                <!-- Relatórios serão renderizados aqui -->
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Modals -->
+    <!-- Transaction Modal -->
+    <div id="transactionModal" data-modal="transactionModal" style="display: none;">
+        <div class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                <div class="px-6 py-4 border-b">
+                    <h3 class="modal-title text-lg font-medium text-gray-900">Nova Transação</h3>
+                </div>
+                <form id="transactionForm" class="px-6 py-4">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                            <input type="text" name="description" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Valor</label>
+                            <input type="text" name="amount" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+                            <select name="type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Selecione</option>
+                                <option value="receita">Receita</option>
+                                <option value="despesa">Despesa</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+                            <select name="category" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Selecione uma categoria</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Data</label>
+                            <input type="date" name="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Parcelas</label>
+                            <input type="number" name="installments" min="1" max="60" value="1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <div id="installmentPreview" style="display: none;"></div>
+                        </div>
+                    </div>
+                </form>
+                <div class="px-6 py-4 border-t flex justify-end space-x-3">
+                    <button type="button" data-close-modal class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        Cancelar
+                    </button>
+                    <button type="submit" form="transactionForm" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                        Salvar
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" data-modal="confirmationModal" style="display: none;">
+        <div class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl max-w-sm w-full mx-4">
+                <div class="px-6 py-4">
+                    <h3 class="confirmation-title text-lg font-medium text-gray-900 mb-2">Confirmar ação</h3>
+                    <p class="confirmation-message text-sm text-gray-600">Tem certeza que deseja continuar?</p>
+                </div>
+                <div class="px-6 py-4 border-t flex justify-end space-x-3">
+                    <button type="button" class="cancel-btn px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        Cancelar
+                    </button>
+                    <button type="button" class="confirm-btn px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700">
+                        Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budget Modal -->
+    <div id="budgetModal" data-modal="budgetModal" style="display: none;">
+        <div class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                <div class="px-6 py-4 border-b">
+                    <h3 class="modal-title text-lg font-medium text-gray-900">Novo Orçamento</h3>
+                </div>
+                <form id="budgetForm" class="px-6 py-4">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nome</label>
+                            <input type="text" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Valor</label>
+                            <input type="text" name="amount" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+                            <select name="category" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Selecione uma categoria</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+                <div class="px-6 py-4 border-t flex justify-end space-x-3">
+                    <button type="button" data-close-modal class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        Cancelar
+                    </button>
+                    <button type="submit" form="budgetForm" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                        Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Goal Modal -->
+    <div id="goalModal" data-modal="goalModal" style="display: none;">
+        <div class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                <div class="px-6 py-4 border-b">
+                    <h3 class="modal-title text-lg font-medium text-gray-900">Nova Meta</h3>
+                </div>
+                <form id="goalForm" class="px-6 py-4">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Título</label>
+                            <input type="text" name="title" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Valor da Meta</label>
+                            <input type="text" name="targetAmount" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Valor Atual</label>
+                            <input type="text" name="currentAmount" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Data Limite</label>
+                            <input type="date" name="targetDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </form>
+                <div class="px-6 py-4 border-t flex justify-end space-x-3">
+                    <button type="button" data-close-modal class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        Cancelar
+                    </button>
+                    <button type="submit" form="goalForm" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                        Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div> <!-- Fechamento mainContent -->
+
+    <!-- Floating Action Button -->
+    <button id="fabButton" class="fab" title="Nova Transação (Ctrl+N)">
+        +
+    </button>
+
+    <!-- Scripts -->
+    <script src="firebase-config.js"></script>
+    <script type="module" src="js/main-static.js"></script>
     
-    <!-- Modais -->
-    <div id="modal-container"></div>
-    <!-- Loader Global -->
-    <div id="global-loader" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="loader"></div></div>
-
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, query, writeBatch, getDoc, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
-
-        // --- Configuração Firebase ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyABSS2JHDfaglvW7h7osKBTW7I4sgU5GHU",
-            authDomain: "meu-painel-financeiro-bae07.firebaseapp.com",
-            projectId: "meu-painel-financeiro-bae07",
-            storageBucket: "meu-painel-financeiro-bae07.appspot.com",
-            messagingSenderId: "445618493671",
-            appId: "1:445618493671:web:ea1ec2626ec433fe102a42"
-        };
-        
-        // --- Inicialização de Serviços ---
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
-        
-        // --- Variáveis Globais de Estado ---
-        let userId = null;
-        let appConfig = { categories: [], budget: {}, goals: [] };
-        let financialData = {};
-        let activeCharts = {};
-        let isInitialLoad = true;
-        let unsubscribeConfig;
-        let unsubscribeFinancialData;
-
-        // --- Elementos DOM ---
-        const appContainer = document.getElementById('app-container');
-        const globalLoader = document.getElementById('global-loader');
-        
-        // --- FUNÇÕES DE UTILIDADE ---
-        const formatCurrency = (value) => (typeof value === 'number' ? value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00');
-        const showLoader = (show) => globalLoader.classList.toggle('hidden', !show);
-        const getCurrentMonthKey = () => {
-            const now = new Date();
-            return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-        };
-
-        // --- MÓDULO PRINCIPAL DA APLICAÇÃO ---
-        const mainModule = {
-            init() {
-                this.renderInitialHTML();
-                this.loadConfigAndData();
-                this.setupEventListeners();
-                this.handleTabClick('resumo');
-            },
-            renderInitialHTML() {
-                document.getElementById('tab-contents').innerHTML = `
-                    <div id="resumo" class="tab-content"></div>
-                    <div id="orcamento" class="tab-content"></div>
-                    <div id="metas" class="tab-content"></div>
-                    <div id="detalhados" class="tab-content"></div>
-                    <div id="configuracoes" class="tab-content"></div>`;
-                document.getElementById('modal-container').innerHTML = ``;
-            },
-            setupEventListeners() {
-                document.getElementById('tabs').addEventListener('click', (e) => {
-                    const btn = e.target.closest('.tab-btn');
-                    if(btn) this.handleTabClick(btn.dataset.tab);
+    <script>
+        // Controle do menu de configurações e melhorias modernas
+        document.addEventListener('DOMContentLoaded', function() {
+            const settingsButton = document.getElementById('settingsButton');
+            const settingsMenu = document.getElementById('settingsMenu');
+            
+            // Toggle menu
+            settingsButton?.addEventListener('click', function(e) {
+                e.stopPropagation();
+                settingsMenu.classList.toggle('hidden');
+            });
+            
+            // Fechar menu ao clicar fora
+            document.addEventListener('click', function(e) {
+                if (settingsButton && settingsMenu && 
+                    !settingsButton.contains(e.target) && 
+                    !settingsMenu.contains(e.target)) {
+                    settingsMenu.classList.add('hidden');
+                }
+            });
+            
+            // Melhorar navegação das abas
+            const tabButtons = document.querySelectorAll('.nav-tab');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remover active de todas as abas
+                    tabButtons.forEach(tab => tab.classList.remove('active'));
+                    // Adicionar active na aba clicada
+                    this.classList.add('active');
                 });
-                document.getElementById('add-transaction-btn')?.addEventListener('click', () => this.renderTransactionModal());
-                document.getElementById('month-selector')?.addEventListener('change', (e) => this.renderAll(e.target.value));
-                document.getElementById('logout-btn').addEventListener('click', () => {
-                     if(confirm("Tem a certeza que quer recarregar a aplicação?")) {
-                         window.location.reload();
-                     }
-                });
-
-                // Listener central para ações dinâmicas
-                document.getElementById('tab-contents').addEventListener('click', (e) => {
-                    const target = e.target;
-                    const action = target.dataset.action;
-                    if(!action) return;
-
-                    const id = parseFloat(target.dataset.id);
-                    const category = target.dataset.category;
-
-                    switch(action) {
-                        case 'toggle-paid':
-                            this.togglePaidStatus(id, category);
-                            break;
-                        case 'delete':
-                            const path = target.dataset.path || '';
-                            this.deleteTransaction(id, category, path);
-                            break;
-                        case 'edit':
-                            const transactionData = JSON.parse(target.dataset.transaction);
-                            this.renderTransactionModal(transactionData);
-                            break;
-                        case 'pay-all':
-                            this.payAllBills(category);
-                            break;
-                    }
-                });
-            },
-            handleTabClick(tabId) {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
-                if(activeBtn) activeBtn.classList.add('active');
-                
-                document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-                const activeContent = document.getElementById(tabId);
-                if(activeContent) activeContent.style.display = 'block';
-
-                const monthKey = document.getElementById('month-selector').value;
-                this.renderAll(monthKey);
-            },
-            loadConfigAndData() {
-                if (!userId) return;
-                if(unsubscribeConfig) unsubscribeConfig();
-                unsubscribeConfig = onSnapshot(doc(db, "users", userId, "config", "appConfig"), (docSnap) => {
-                    if (docSnap.exists()) {
-                        appConfig = { ...{ categories: [], budget: {}, goals: [] }, ...docSnap.data() };
-                    }
-                    const monthKey = document.getElementById('month-selector')?.value || getCurrentMonthKey();
-                    this.renderAll(monthKey);
-                });
-
-                if(unsubscribeFinancialData) unsubscribeFinancialData();
-                unsubscribeFinancialData = onSnapshot(collection(db, "users", userId, "months"), (snapshot) => {
-                    let dataChanged = false;
-                    snapshot.docChanges().forEach(change => {
-                        dataChanged = true;
-                         if (change.type === "removed") delete financialData[change.doc.id];
-                         else financialData[change.doc.id] = change.doc.data();
-                    });
-                    
-                    if(dataChanged) {
-                        if(isInitialLoad) {
-                            const currentMonth = getCurrentMonthKey();
-                             if (!financialData[currentMonth]) financialData[currentMonth] = { receitas: [], despesas: {} };
-                            this.populateMonthSelector();
-                            document.getElementById('month-selector').value = currentMonth;
-                            isInitialLoad = false;
-                        } else { this.populateMonthSelector(); }
-                        
-                        this.renderAll(document.getElementById('month-selector').value);
-                    }
-                });
-            },
-            populateMonthSelector() {
-                const selector = document.getElementById('month-selector');
-                const currentSelection = selector.value;
-                let sortedMonths = Object.keys(financialData).sort();
-                if(sortedMonths.length === 0) {
-                    const currentMonth = getCurrentMonthKey();
-                    if(!sortedMonths.includes(currentMonth)) sortedMonths.push(currentMonth);
-                }
-                selector.innerHTML = sortedMonths.map(monthKey => {
-                    const [year, month] = monthKey.split('-');
-                    const monthName = new Date(year, parseInt(month) - 1, 1).toLocaleString('pt-BR', { month: 'long' });
-                    return `<option value="${monthKey}">${monthName.charAt(0).toUpperCase() + monthName.slice(1)} de ${year}</option>`;
-                }).join('');
-                if (sortedMonths.includes(currentSelection)) selector.value = currentSelection;
-            },
-            renderAll(monthKey) {
-                if(!userId || !monthKey) return;
-                const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab || 'resumo';
-                switch(activeTab) {
-                    case 'resumo': this.renderResumo(monthKey); break;
-                    case 'orcamento': this.renderOrcamento(monthKey); break;
-                    case 'metas': this.renderMetas(); break;
-                    case 'detalhados': this.renderDetalhados(monthKey); break;
-                    case 'configuracoes': this.renderConfiguracoes(); break;
-                }
-            },
+            });
             
-            // --- Funções de Renderização das Abas (completas) ---
-            renderResumo(monthKey) {
-                const container = document.getElementById('resumo');
-                if (!container) return;
-                const monthData = financialData[monthKey] || { receitas: [], despesas: {} };
-                
-                const allExpenses = Object.entries(monthData.despesas || {}).flatMap(([category, items]) => 
-                    items.map(item => ({ ...item, category }))
-                );
-
-                const totalReceitas = (monthData.receitas || []).reduce((sum, item) => sum + item.valor, 0);
-                const totalDespesasPagas = allExpenses.filter(item => item.pago).reduce((sum, item) => sum + item.valor, 0);
-                const totalAPagar = allExpenses.filter(item => !item.pago).reduce((sum, item) => sum + item.valor, 0);
-                const saldoFinal = totalReceitas - totalDespesasPagas;
-
-                container.innerHTML = `
-                    <div class="space-y-8">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-teal-400 flex items-center space-x-4"><div class="bg-teal-100 p-3 rounded-full"><svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></div><div><h2 class="text-lg font-semibold text-gray-600">Receitas</h2><p class="text-3xl font-bold text-gray-800">${formatCurrency(totalReceitas)}</p></div></div>
-                            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-red-400 flex items-center space-x-4"><div class="bg-red-100 p-3 rounded-full"><svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><div><h2 class="text-lg font-semibold text-gray-600">Despesas Pagas</h2><p class="text-3xl font-bold text-gray-800">${formatCurrency(totalDespesasPagas)}</p></div></div>
-                            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-400 flex items-center space-x-4"><div class="bg-yellow-100 p-3 rounded-full"><svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div><div><h2 class="text-lg font-semibold text-gray-600">A Pagar</h2><p class="text-3xl font-bold text-gray-800">${formatCurrency(totalAPagar)}</p></div></div>
-                            <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-400 flex items-center space-x-4"><div class="bg-blue-100 p-3 rounded-full"><svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg></div><div><h2 class="text-lg font-semibold text-gray-600">Saldo Final</h2><p class="text-3xl font-bold text-gray-800 ${saldoFinal < 0 ? 'text-red-500' : ''}">${formatCurrency(saldoFinal)}</p></div></div>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-lg"><h2 class="text-xl font-bold text-gray-800 mb-4">Distribuição de Despesas</h2><div class="max-w-md mx-auto"><canvas id="expensesChart"></canvas></div></div>
-                    </div>
-                `;
-                this.renderChart('expensesChart', allExpenses, 'doughnut');
-            },
+            // Adicionar classe para animações
+            setTimeout(() => {
+                document.body.classList.add('loaded');
+            }, 100);
             
-            renderOrcamento(monthKey) {
-                const container = document.getElementById('orcamento');
-                if (!container) return;
-                const newContainer = container.cloneNode(false);
-                container.parentNode.replaceChild(newContainer, container);
-
-                const budget = appConfig.budget || {};
-                const monthData = financialData[monthKey] || { despesas: {} };
-                const allExpenses = Object.entries(monthData.despesas).flatMap(([category, items]) => 
-                    items.map(item => ({ ...item, category }))
-                );
-
-                const budgetHTML = (appConfig.categories || []).map(cat => {
-                    const budgetValue = budget[cat] || 0;
-                    const spentValue = allExpenses.filter(e => e.category === cat).reduce((sum, e) => sum + e.valor, 0);
-                    const percentage = budgetValue > 0 ? (spentValue / budgetValue) * 100 : 0;
-                    let barColor = 'bg-teal-500';
-                    if (percentage > 75) barColor = 'bg-yellow-500';
-                    if (percentage > 90) barColor = 'bg-red-500';
-                    
-                    return `
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-bold text-gray-700">${cat}</span>
-                                <span class="text-sm">${formatCurrency(spentValue)} / ${formatCurrency(budgetValue)}</span>
-                            </div>
-                            <div class="progress-bar-bg rounded-full h-4 w-full">
-                                <div class="progress-bar-fill rounded-full h-4 ${barColor}" style="width: ${Math.min(percentage, 100)}%;"></div>
-                            </div>
-                            <div class="mt-2 text-right">
-                                <input type="number" step="0.01" data-category="${cat}" value="${budgetValue || ''}" placeholder="Definir orçamento" class="budget-input text-right p-1 border rounded w-40">
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                newContainer.innerHTML = `
-                    <div class="bg-white p-6 rounded-xl shadow-lg">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Orçamento Mensal</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${budgetHTML}</div>
-                        <button id="save-budget-btn" class="mt-6 py-2 px-6 bg-teal-500 text-gray-800 font-bold rounded-lg hover:bg-teal-400">Salvar Orçamento</button>
-                    </div>`;
-
-                newContainer.querySelector('#save-budget-btn').onclick = async (e) => {
-                    const newBudget = { ...appConfig.budget };
-                    newContainer.querySelectorAll('.budget-input').forEach(input => {
-                        newBudget[input.dataset.category] = parseFloat(input.value) || 0;
-                    });
-                    await updateDoc(doc(db, "users", userId, "config", "appConfig"), { budget: newBudget });
-                    alert('Orçamento salvo!');
-                };
-            },
-            
-            renderMetas() {
-                const container = document.getElementById('metas');
-                if(!container) return;
-                
-                const newContainer = container.cloneNode(false);
-                container.parentNode.replaceChild(newContainer, container);
-
-                const goalsHTML = (appConfig.goals || []).map((goal, index) => {
-                     const percentage = goal.target > 0 ? (goal.current / goal.target) * 100 : 0;
-                     return `
-                        <div class="bg-white p-6 rounded-xl shadow-lg">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="text-xl font-bold text-gray-800">${goal.name}</h3>
-                                    <p class="text-gray-500">Meta: ${formatCurrency(goal.target)}</p>
-                                </div>
-                                <button data-index="${index}" class="delete-goal-btn text-red-500 hover:text-red-700 font-bold text-2xl">&times;</button>
-                            </div>
-                            <div class="mt-4">
-                                <div class="progress-bar-bg rounded-full h-6 w-full relative">
-                                    <div class="progress-bar-fill rounded-full h-6 bg-teal-500 flex items-center justify-center text-white font-bold" style="width: ${percentage.toFixed(2)}%;">${percentage.toFixed(0)}%</div>
-                                </div>
-                                <p class="text-center mt-2 font-semibold">${formatCurrency(goal.current)}</p>
-                            </div>
-                            <div class="mt-4 flex gap-2">
-                                <input type="number" step="0.01" id="deposit-${index}" class="flex-grow p-2 border rounded" placeholder="Depositar/Retirar valor">
-                                <button data-index="${index}" class="deposit-btn py-2 px-4 bg-teal-500 text-gray-800 font-semibold rounded-md hover:bg-teal-400">+</button>
-                                <button data-index="${index}" class="withdraw-btn py-2 px-4 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400">-</button>
-                            </div>
-                        </div>
-                     `;
-                }).join('');
-
-                newContainer.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        ${goalsHTML}
-                         <div class="bg-white p-6 rounded-xl shadow-lg border-2 border-dashed border-gray-300">
-                             <h3 class="text-xl font-bold text-gray-800 mb-4">Nova Meta</h3>
-                             <form id="new-goal-form" class="space-y-4">
-                                <input type="text" id="new-goal-name" placeholder="Nome da Meta (ex: Viagem)" class="w-full p-2 border rounded" required>
-                                <input type="number" step="0.01" id="new-goal-target" placeholder="Valor da Meta" class="w-full p-2 border rounded" required>
-                                <button type="submit" class="w-full py-2 bg-teal-500 text-gray-800 font-bold rounded-lg hover:bg-teal-400">Criar Meta</button>
-                             </form>
-                         </div>
-                    </div>
-                `;
-                
-                newContainer.addEventListener('click', async (e) => {
-                    const indexStr = e.target.dataset.index;
-                    if (indexStr === undefined) return;
-                    const index = parseInt(indexStr);
-
-                    const newGoals = JSON.parse(JSON.stringify(appConfig.goals || []));
-                    
-                    if (e.target.classList.contains('delete-goal-btn')) {
-                        if(confirm('Tem a certeza que quer apagar esta meta?')) {
-                            newGoals.splice(index, 1);
-                             await updateDoc(doc(db, "users", userId, "config", "appConfig"), { goals: newGoals });
-                        }
-                        return;
-                    }
-
-                    const amountInput = document.getElementById(`deposit-${index}`);
-                    const amount = parseFloat(amountInput.value) || 0;
-                    if (amount <= 0) return;
-
-                    if (e.target.classList.contains('deposit-btn')) {
-                        newGoals[index].current = (newGoals[index].current || 0) + amount;
-                        if (newGoals[index].current > newGoals[index].target) newGoals[index].current = newGoals[index].target;
-                    } else if (e.target.classList.contains('withdraw-btn')) {
-                        newGoals[index].current = (newGoals[index].current || 0) - amount;
-                        if (newGoals[index].current < 0) newGoals[index].current = 0;
-                    }
-
-                    await updateDoc(doc(db, "users", userId, "config", "appConfig"), { goals: newGoals });
-                    if(amountInput) amountInput.value = '';
-                });
-
-                document.getElementById('new-goal-form').onsubmit = async (e) => {
-                    e.preventDefault();
-                    const name = document.getElementById('new-goal-name').value;
-                    const target = parseFloat(document.getElementById('new-goal-target').value);
-                    if (name && target > 0) {
-                        const newGoals = [...(appConfig.goals || []), { id: Date.now(), name, target, current: 0 }];
-                        await updateDoc(doc(db, "users", userId, "config", "appConfig"), { goals: newGoals });
-                        e.target.reset();
-                    }
-                };
-            },
-            
-            renderDetalhados(monthKey) {
-                const container = document.getElementById('detalhados');
-                if(!container) return;
-
-                const monthData = financialData[monthKey] || { receitas: [], despesas: {} };
-                
-                const uniqueCategories = Object.keys(monthData.despesas || {});
-                const filterHTML = `
-                    <div class="bg-white p-4 rounded-xl shadow-lg mb-8 flex items-center gap-4">
-                        <label for="category-filter" class="font-semibold text-gray-700">Filtrar por Categoria:</label>
-                        <select id="category-filter" class="p-2 border border-gray-300 rounded-lg">
-                            <option value="all">Todas as Categorias</option>
-                            ${uniqueCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
-                        </select>
-                    </div>
-                `;
-
-                const currentFilter = container.querySelector('#category-filter')?.value || 'all';
-
-                const filteredDespesas = (currentFilter === 'all')
-                    ? monthData.despesas
-                    : { [currentFilter]: monthData.despesas[currentFilter] };
-
-                let tableHTML = '';
-                if (monthData.receitas && monthData.receitas.length > 0 && currentFilter === 'all') {
-                     tableHTML += this.createTableHTML('Receitas', monthData.receitas, false);
-                }
-                
-                Object.entries(filteredDespesas || {}).sort((a,b) => a[0].localeCompare(b[0])).forEach(([category, items]) => {
-                    if (items && items.length > 0) {
-                        tableHTML += this.createTableHTML(category, items, true);
-                    }
-                });
-                
-                container.innerHTML = filterHTML + `<div class="space-y-8">${tableHTML || '<div class="bg-white p-6 rounded-xl shadow-lg text-center text-gray-500"><p>Nenhum lançamento para a categoria selecionada.</p></div>'}</div>`;
-                
-                const filterSelect = container.querySelector('#category-filter');
-                filterSelect.value = currentFilter;
-                filterSelect.onchange = () => this.renderDetalhados(monthKey);
-            },
-            
-            renderConfiguracoes() {
-                const container = document.getElementById('configuracoes');
-                if(!container) return;
-
-                const categoriesHTML = (appConfig.categories || []).sort().map(cat => `
-                    <div class="flex justify-between items-center p-3 border rounded-lg bg-gray-50">
-                        <span class="text-gray-700">${cat}</span>
-                        <button data-category="${cat}" class="delete-category-btn text-red-500 hover:text-red-700 font-bold text-xl">&times;</button>
-                    </div>`).join('');
-
-                container.innerHTML = `
-                    <div class="bg-white p-6 rounded-xl shadow-lg max-w-lg mx-auto">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Gerir Categorias</h2>
-                        <div id="category-list" class="space-y-2 mb-6">${categoriesHTML}</div>
-                        <form id="category-form" class="flex items-center gap-4">
-                            <input type="text" id="new-category-name" placeholder="Nova categoria" class="flex-grow p-2 border rounded" required>
-                            <button type="submit" class="py-2 px-4 bg-teal-500 text-gray-800 font-semibold rounded-md hover:bg-teal-400">Adicionar</button>
-                        </form>
-                    </div>`;
-
-                document.getElementById('category-form').onsubmit = async (e) => {
-                    e.preventDefault();
-                    const input = document.getElementById('new-category-name');
-                    const newCategory = input.value.trim();
-                    if(newCategory && !(appConfig.categories || []).includes(newCategory)) {
-                        const newCategories = [...(appConfig.categories || []), newCategory];
-                        await updateDoc(doc(db, "users", userId, "config", "appConfig"), { categories: newCategories });
-                        input.value = '';
-                    }
-                };
-                
-                document.getElementById('category-list').onclick = async (e) => {
-                    if(e.target.classList.contains('delete-category-btn')) {
-                         const categoryToDelete = e.target.dataset.category;
-                         if (confirm(`Tem a certeza que quer apagar a categoria "${categoryToDelete}"?`)) {
-                            const newCategories = (appConfig.categories || []).filter(c => c !== categoryToDelete);
-                            await updateDoc(doc(db, "users", userId, "config", "appConfig"), { categories: newCategories });
-                         }
-                    }
-                };
-            },
-            
-            createTableHTML(title, items, isExpense = false) {
-                const total = items.reduce((sum, i) => sum + i.valor, 0);
-                let payAllButton = '';
-                if (isExpense && title.toLowerCase().includes('cartão')) {
-                    payAllButton = `<button data-action="pay-all" data-category="${title}" class="ml-4 py-1 px-3 bg-teal-100 text-teal-700 text-xs font-bold rounded-full hover:bg-teal-200">Quitar Fatura</button>`;
-                }
-                
-                const rows = items.sort((a,b)=>a.descricao.localeCompare(b.descricao)).map(item => {
-                    const transactionData = JSON.stringify({ ...item, category: isExpense ? title : undefined });
-                    const responsavelBadge = item.responsavel && item.responsavel !== 'N/A' 
-                        ? `<span class="text-xs font-medium bg-gray-200 text-gray-600 px-2 py-1 rounded-full">${item.responsavel}</span>` : '';
-                    const attachmentIcon = item.attachmentURL ? `<a href="${item.attachmentURL}" target="_blank" class="ml-2 text-teal-500 hover:text-teal-700">📎</a>` : '';
-
-                    if (isExpense) {
-                        const rowClass = item.pago ? 'paid-row' : '';
-                        let actionButtonHTML;
-                        if (item.pago) {
-                            actionButtonHTML = `<button data-action="toggle-paid" data-id="${item.id}" data-category="${title}" class="text-xs text-gray-500 hover:underline">Desmarcar</button>`;
-                        } else {
-                            actionButtonHTML = `<button data-action="toggle-paid" data-id="${item.id}" data-category="${title}" class="bg-teal-100 text-teal-700 text-xs font-bold py-1 px-3 rounded-full hover:bg-teal-200 transition-colors">Pagar</button>`;
-                        }
-
-                        return `<tr class="border-b border-gray-200 hover:bg-gray-50 group ${rowClass}" data-action="edit" data-transaction='${transactionData}'>
-                            <td class="w-24 px-2 py-4 text-center">${actionButtonHTML}</td>
-                            <td class="px-6 py-4 cursor-pointer desc-cell">${item.descricao} ${attachmentIcon}</td>
-                            <td class="px-6 py-4 cursor-pointer text-center">${responsavelBadge}</td>
-                            <td class="px-6 py-4 cursor-pointer text-center">${item.parcelas || '—'}</td>
-                            <td class="px-6 py-4 text-right cursor-pointer">${formatCurrency(item.valor)}</td>
-                            <td class="w-12 px-2 py-4 text-center"><button data-action="delete" data-id="${item.id}" data-category="${title}" data-path="${item.attachmentPath || ''}" title="Excluir" class="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 font-bold text-xl">&times;</button></td>
-                        </tr>`;
-                    }
-                    return `<tr class="border-b border-gray-200 hover:bg-gray-50 group" data-action="edit" data-transaction='${transactionData}'>
-                        <td class="px-6 py-4 cursor-pointer">${item.descricao} ${attachmentIcon}</td>
-                        <td class="px-6 py-4 cursor-pointer text-center">${responsavelBadge}</td>
-                        <td class="px-6 py-4 text-right cursor-pointer">${formatCurrency(item.valor)}</td>
-                        <td class="w-12 px-2 py-4 text-center"><button data-action="delete" data-id="${item.id}" data-path="${item.attachmentPath || ''}" title="Excluir" class="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 font-bold text-xl">&times;</button></td>
-                    </tr>`;
-                }).join('');
-
-                const header = isExpense ? `
-                    <th class="px-6 py-3 text-center">Ação</th>
-                    <th class="px-6 py-3 text-left">Descrição</th>
-                    <th class="px-6 py-3 text-center">Responsável</th>
-                    <th class="px-6 py-3 text-center">Parcelas</th>
-                    <th class="px-6 py-3 text-right">Valor</th>` : `
-                    <th class="px-6 py-3 text-left">Descrição</th>
-                    <th class="px-6 py-3 text-center">Responsável</th>
-                    <th class="px-6 py-3 text-right">Valor</th>`;
-                
-                const footerCols = isExpense ? 'colspan="4"' : 'colspan="2"';
-
-                return `<div class="bg-white p-6 rounded-xl shadow-lg">
-                    <div class="flex items-center mb-4"><h2 class="text-xl font-bold text-gray-800">${title}</h2>${payAllButton}</div>
-                    <div class="overflow-x-auto"><table class="min-w-full text-sm">
-                        <thead class="bg-gray-50 text-gray-500 uppercase text-xs"><tr>${header}<th class="w-12 px-2 py-3"><span class="sr-only">Ações</span></th></tr></thead>
-                        <tbody class="text-gray-700">${rows}<tr class="font-bold bg-gray-50"><td class="px-6 py-3" ${footerCols}>TOTAL</td><td class="px-6 py-3 text-right">${formatCurrency(total)}</td><td></td></tr></tbody>
-                    </table></div></div>`;
-            },
-            
-            renderChart(canvasId, expenses, type) {
-                const container = document.getElementById(canvasId);
-                if (!container) return;
-                const ctx = container.getContext('2d');
-                
-                const totals = (expenses || []).reduce((acc, expense) => {
-                    const { category, valor } = expense;
-                    if (category) {
-                        if (!acc[category]) {
-                            acc[category] = 0;
-                        }
-                        acc[category] += valor;
-                    }
-                    return acc;
-                }, {});
-
-                const categoryTotals = Object.entries(totals).map(([category, total]) => ({
-                    category,
-                    total
-                })).filter(c => c.total > 0);
-
-                if (activeCharts[canvasId]) activeCharts[canvasId].destroy();
-                activeCharts[canvasId] = new Chart(ctx, {
-                    type: type,
-                    data: {
-                        labels: categoryTotals.map(d => d.category),
-                        datasets: [{ data: categoryTotals.map(d => d.total), backgroundColor: ['#2dd4bf', '#fb7185', '#facc15', '#60a5fa', '#a78bfa', '#f472b6', '#fb923c', '#9ca3af', '#34d399', '#f87171'], hoverOffset: 4, borderColor: '#ffffff', borderWidth: 4, }]
-                    },
-                    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { padding: 20 } } } }
-                });
-            },
-            
-            renderTransactionModal(t = null) {
-                const modalContainer = document.getElementById('modal-container');
-                const options = (appConfig.categories || []).sort().map(c => `<option value="${c}" ${t?.category === c ? 'selected' : ''}>${c}</option>`).join('');
-                modalContainer.innerHTML = `
-                <div id="transaction-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
-                    <div class="modal-content bg-white p-8 rounded-2xl shadow-2xl w-full max-w-lg">
-                        <h2 class="text-2xl font-bold mb-6" id="modal-title">${t ? 'Editar' : 'Adicionar'} Lançamento</h2>
-                        <form id="transaction-form" class="space-y-4">
-                            <input type="hidden" name="id" value="${t?.id || ''}">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div><label for="date" class="block text-sm font-medium text-gray-700">Data</label><input type="date" name="date" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg" required></div>
-                                <div><label for="type" class="block text-sm font-medium text-gray-700">Tipo</label><select name="type" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg"><option value="despesa" ${t && !t.category ? '' : 'selected'}>Despesa</option><option value="receita" ${!t || t.category ? '' : 'selected'}>Receita</option></select></div>
-                            </div>
-                            <div><label for="description" class="block text-sm font-medium text-gray-700">Descrição</label><input type="text" name="description" value="${t?.descricao || ''}" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg" required></div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div><label for="amount" class="block text-sm font-medium text-gray-700">Valor</label><input type="number" name="amount" step="0.01" value="${t?.valor || ''}" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg" required></div>
-                                <div><label for="responsavel" class="block text-sm font-medium text-gray-700">Responsável</label><select name="responsavel" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg"><option value="N/A">Nenhum</option><option value="Leandro" ${t?.responsavel === 'Leandro' ? 'selected' : ''}>Leandro</option><option value="Leidiane" ${t?.responsavel === 'Leidiane' ? 'selected' : ''}>Leidiane</option></select></div>
-                            </div>
-                            <div id="despesa-fields" class="space-y-4 ${!t || t.category ? '' : 'hidden'}">
-                                <div><label for="category" class="block text-sm font-medium text-gray-700">Categoria</label><select name="category" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg">${options}</select></div>
-                                <div><label for="installments" class="block text-sm font-medium text-gray-700">Parcelas (ex: 1/10)</label><input type="text" name="installments" value="${t?.parcelas || ''}" class="mt-1 block w-full p-2 border border-gray-300 rounded-lg"></div>
-                                <div><label for="attachment" class="block text-sm font-medium text-gray-700">Anexo</label><input type="file" name="attachment" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"></div>
-                                <div class="flex items-center"><input type="checkbox" name="recorrente" class="h-4 w-4 text-teal-600 rounded" ${t?.recorrente ? 'checked' : ''}><label for="recorrente" class="ml-2 block text-sm text-gray-900">Despesa recorrente</label></div>
-                            </div>
-                            <div class="flex justify-end gap-4 pt-4">
-                                ${t ? `<button type="button" id="delete-btn" class="py-2 px-4 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700">Excluir</button>` : ''}
-                                <button type="button" id="cancel-btn" class="py-2 px-4 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300">Cancelar</button>
-                                <button type="submit" class="py-2 px-4 bg-teal-500 text-gray-800 font-semibold rounded-md hover:bg-teal-400">Salvar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>`;
-                
-                const form = document.getElementById('transaction-form');
-                const typeSelect = form.querySelector('[name="type"]');
-                const despesaFields = document.getElementById('despesa-fields');
-                const closeModal = () => modalContainer.innerHTML = '';
-
-                if (t) {
-                    const monthKeyOfItem = Object.keys(financialData).find(mKey => [...(financialData[mKey].receitas || []), ...Object.values(financialData[mKey].despesas || {}).flat()].some(i => i.id === t.id));
-                    form.date.value = monthKeyOfItem ? `${monthKeyOfItem}-15` : getCurrentMonthKey() + '-15';
-                } else {
-                     form.date.valueAsDate = new Date();
-                }
-
-                typeSelect.onchange = () => despesaFields.classList.toggle('hidden', typeSelect.value !== 'despesa');
-                form.onsubmit = (e) => this.saveTransaction(e);
-                document.getElementById('cancel-btn').onclick = closeModal;
-                if(t) document.getElementById('delete-btn').onclick = () => this.deleteTransaction(t.id, t.category, t.attachmentPath);
-            },
-            
-            async saveTransaction(e) {
-                e.preventDefault();
-                showLoader(true);
-                const form = e.target;
-                const data = Object.fromEntries(new FormData(form).entries());
-                const transactionDate = new Date(data.date + 'T12:00:00Z');
-                
-                let attachmentURL = null;
-                let attachmentPath = null;
-                const attachmentFile = form.attachment.files[0];
-                if (attachmentFile) {
-                    attachmentPath = `attachments/${userId}/${Date.now()}_${attachmentFile.name}`;
-                    const storageRef = ref(storage, attachmentPath);
-                    await uploadBytes(storageRef, attachmentFile);
-                    attachmentURL = await getDownloadURL(storageRef);
-                }
-
-                if (data.id) { // Edição
-                    const idToUpdate = parseFloat(data.id);
-                    const monthKeyOfItem = Object.keys(financialData).find(mKey => [...(financialData[mKey].receitas || []), ...Object.values(financialData[mKey].despesas || {}).flat()].some(i => i.id === idToUpdate));
-                    if (monthKeyOfItem) {
-                        const monthDataCopy = JSON.parse(JSON.stringify(financialData[monthKeyOfItem]));
-                        let itemFound = false;
-                        monthDataCopy.receitas = (monthDataCopy.receitas || []).filter(i => { if (i.id === idToUpdate){ itemFound = true; return false;} return true; });
-                        if(!itemFound) {
-                             Object.keys(monthDataCopy.despesas).forEach(cat => {
-                                monthDataCopy.despesas[cat] = (monthDataCopy.despesas[cat] || []).filter(i => { if (i.id === idToUpdate){ itemFound = true; return false;} return true; });
-                             });
-                        }
-                        await setDoc(doc(db, "users", userId, "months", monthKeyOfItem), monthDataCopy);
-                    }
-                }
-                
-                const newTransaction = { id: data.id ? parseFloat(data.id) : Date.now(), descricao: data.description, valor: parseFloat(data.amount), responsavel: data.responsavel, attachmentURL, attachmentPath };
-
-                if (data.type === 'despesa') {
-                    Object.assign(newTransaction, { category: data.category, parcelas: data.installments || '', pago: false, recorrente: !!data.recorrente });
-                    const match = data.installments && !data.id ? data.installments.match(/^(\d+)\/(\d+)$/) : null;
-                    if (match) { // Parcelas só para novos lançamentos
-                        const current = parseInt(match[1]), total = parseInt(match[2]);
-                        const batch = writeBatch(db);
-                        for (let i = 0; i < (total - current + 1); i++) {
-                            const instDate = new Date(transactionDate);
-                            instDate.setMonth(transactionDate.getMonth() + i);
-                            const mKey = `${instDate.getFullYear()}-${(instDate.getMonth() + 1).toString().padStart(2, '0')}`;
-                            const mData = JSON.parse(JSON.stringify(financialData[mKey] || { receitas: [], despesas: {} }));
-                            if (!mData.despesas[data.category]) mData.despesas[data.category] = [];
-                            mData.despesas[data.category].push({ ...newTransaction, id: newTransaction.id + i, parcelas: `${current + i}/${total}`, recorrente: false });
-                            batch.set(doc(db, "users", userId, "months", mKey), mData);
-                        }
-                        await batch.commit();
-                    } else {
-                        const monthKey = transactionDate.toISOString().slice(0, 7);
-                        const monthData = JSON.parse(JSON.stringify(financialData[monthKey] || { receitas: [], despesas: {} }));
-                        if (!monthData.despesas[data.category]) monthData.despesas[data.category] = [];
-                        monthData.despesas[data.category].push(newTransaction);
-                        await setDoc(doc(db, "users", userId, "months", monthKey), monthData);
-                    }
-                } else {
-                    const monthKey = transactionDate.toISOString().slice(0, 7);
-                    const monthData = JSON.parse(JSON.stringify(financialData[monthKey] || { receitas: [], despesas: {} }));
-                    if(!monthData.receitas) monthData.receitas = [];
-                    monthData.receitas.push(newTransaction);
-                    await setDoc(doc(db, "users", userId, "months", monthKey), monthData);
-                }
-                showLoader(false);
-                document.getElementById('modal-container').innerHTML = '';
-            },
-
-            async deleteTransaction(id, category, attachmentPath = null) {
-                if (!confirm("Tem a certeza que quer apagar este lançamento?")) return;
-                showLoader(true);
-                const idToDelete = parseFloat(id);
-                 const monthKeyOfItem = Object.keys(financialData).find(mKey => [...(financialData[mKey].receitas || []), ...Object.values(financialData[mKey].despesas || {}).flat()].some(i => i.id === idToDelete));
-                 if(monthKeyOfItem) {
-                    const monthDataCopy = JSON.parse(JSON.stringify(financialData[monthKeyOfItem]));
-                    if (category) {
-                        monthDataCopy.despesas[category] = monthDataCopy.despesas[category].filter(i => i.id !== idToDelete);
-                    } else {
-                        monthDataCopy.receitas = monthDataCopy.receitas.filter(i => i.id !== idToDelete);
-                    }
-                    await setDoc(doc(db, "users", userId, "months", monthKeyOfItem), monthDataCopy);
-                 }
-                 if(attachmentPath) {
-                    try { await deleteObject(ref(storage, attachmentPath)); } catch (e) { console.warn("Anexo não encontrado para apagar", e)}
-                 }
-                showLoader(false);
-                document.getElementById('modal-container').innerHTML = '';
-            },
-
-            async togglePaidStatus(id, category) {
-                const monthKey = document.getElementById('month-selector').value;
-                const monthData = financialData[monthKey];
-                if (!monthData || !monthData.despesas || !monthData.despesas[category]) return;
-
-                const monthDataCopy = JSON.parse(JSON.stringify(monthData));
-                const item = monthDataCopy.despesas[category].find(i => i.id === id);
-                
-                if (item) {
-                    item.pago = !item.pago;
-                    try {
-                        const docRef = doc(db, "users", userId, "months", monthKey);
-                        await updateDoc(docRef, { despesas: monthDataCopy.despesas });
-                    } catch (error) {
-                        console.error("Erro ao atualizar o estado de pagamento:", error);
-                        alert("Não foi possível salvar a alteração. Verifique a sua conexão.");
-                    }
-                }
-            },
-            
-            async payAllBills(category) {
-                if (!confirm(`Tem a certeza que quer quitar toda a fatura "${category}"?`)) return;
-                
-                const monthKey = document.getElementById('month-selector').value;
-                const monthData = financialData[monthKey];
-
-                if (monthData?.despesas?.[category]) {
-                    const monthDataCopy = JSON.parse(JSON.stringify(monthData));
-                    monthDataCopy.despesas[category].forEach(item => item.pago = true);
-                    try {
-                        await updateDoc(doc(db, "users", userId, "months", monthKey), {
-                            despesas: monthDataCopy.despesas
-                        });
-                    } catch(error) {
-                         console.error("Erro ao quitar a fatura:", error);
-                         alert("Não foi possível quitar a fatura. Verifique a sua conexão.");
-                    }
+            // Atualizar o mês atual no display
+            function updateCurrentMonthDisplay() {
+                const currentMonthSpan = document.getElementById('currentMonth');
+                if (currentMonthSpan) {
+                    const now = new Date();
+                    const monthName = now.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+                    currentMonthSpan.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+                    currentMonthSpan.dataset.currentDate = now.toISOString().split('T')[0];
                 }
             }
-        };
-
-        // --- INICIALIZAÇÃO ---
-        console.log("A INICIAR EM MODO DE TESTE (ACESSO LIBERADO)");
-        userId = "leandro-leidiane-financas-2024"; 
-        mainModule.init();
-
+            
+            // Chamar ao carregar a página
+            updateCurrentMonthDisplay();
+        });
+        
+        // Função para carregar dados de exemplo
+        function loadSampleData() {
+            if (window.SampleDataGenerator) {
+                window.SampleDataGenerator.loadSampleData();
+                if (window.app) {
+                    window.app.renderDashboard();
+                }
+                alert('✅ Dados de exemplo carregados com sucesso!');
+            } else {
+                alert('❌ Erro: SampleDataGenerator não disponível');
+            }
+            document.getElementById('settingsMenu').classList.add('hidden');
+        }
+        
+        // Função para limpar todos os dados
+        function clearAllData() {
+            if (confirm('⚠️ Tem certeza que deseja limpar todos os dados? Esta ação não pode ser desfeita.')) {
+                if (window.SampleDataGenerator) {
+                    window.SampleDataGenerator.clearAllData();
+                    if (window.app) {
+                        window.app.renderDashboard();
+                    }
+                    alert('🗑️ Todos os dados foram limpos!');
+                } else {
+                    localStorage.clear();
+                    location.reload();
+                }
+            }
+            document.getElementById('settingsMenu').classList.add('hidden');
+        }
     </script>
 </body>
 </html>
-
