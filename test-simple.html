@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Simples de Import</title>
+</head>
+<body>
+    <h1>Teste de Import</h1>
+    <div id="status">Testando...</div>
+    
+    <script type="module">
+        console.log('🔍 Iniciando teste simples...');
+        
+        try {
+            console.log('📦 Testando import do CriticalAppLoader...');
+            import('./js/utils/CriticalAppLoader.js')
+                .then(module => {
+                    console.log('✅ CriticalAppLoader importado com sucesso:', module);
+                    document.getElementById('status').innerHTML = '✅ CriticalAppLoader OK!';
+                    
+                    // Teste o próximo
+                    return import('./js/utils/SampleDataGenerator.js');
+                })
+                .then(module => {
+                    console.log('✅ SampleDataGenerator importado com sucesso:', module);
+                    document.getElementById('status').innerHTML += '<br>✅ SampleDataGenerator OK!';
+                    
+                    // Teste o próximo
+                    return import('./js/core/FinanceApp.js');
+                })
+                .then(module => {
+                    console.log('✅ FinanceApp importado com sucesso:', module);
+                    document.getElementById('status').innerHTML += '<br>✅ FinanceApp OK!<br>🎉 Todos os imports funcionaram!';
+                })
+                .catch(error => {
+                    console.error('❌ Erro:', error);
+                    document.getElementById('status').innerHTML = `❌ Erro: ${error.message}`;
+                });
+        } catch (error) {
+            console.error('❌ Erro na importação:', error);
+            document.getElementById('status').innerHTML = `❌ Erro: ${error.message}`;
+        }
+    </script>
+</body>
+</html>

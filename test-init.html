@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Inicialização</title>
+    <link rel="stylesheet" href="styles-modern.css">
+</head>
+<body>
+    <div class="container mx-auto p-8">
+        <h1 class="text-2xl font-bold mb-4">🔧 Teste de Inicialização</h1>
+        <div id="log" class="bg-gray-100 p-4 rounded-lg font-mono text-sm h-96 overflow-y-auto"></div>
+        <button onclick="testApp()" class="mt-4 btn-modern btn-primary">
+            Testar Aplicação
+        </button>
+    </div>
+
+    <script type="module">
+        const log = document.getElementById('log');
+        
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = {
+                success: 'text-green-600',
+                error: 'text-red-600',
+                warning: 'text-yellow-600',
+                info: 'text-blue-600'
+            };
+            
+            log.innerHTML += `<div class="${color[type] || color.info}"><strong>${timestamp}</strong>: ${message}</div>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Interceptar console.log
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = (...args) => {
+            addLog(args.join(' '), 'info');
+            originalLog(...args);
+        };
+        
+        console.error = (...args) => {
+            addLog(args.join(' '), 'error');
+            originalError(...args);
+        };
+        
+        console.warn = (...args) => {
+            addLog(args.join(' '), 'warning');
+            originalWarn(...args);
+        };
+
+        window.testApp = async function() {
+            addLog('🚀 Iniciando teste da aplicação...', 'info');
+            
+            try {
+                addLog('📦 Importando FinanceApp...', 'info');
+                const { FinanceApp } = await import('./js/core/FinanceApp.js');
+                addLog('✅ FinanceApp importado com sucesso', 'success');
+                
+                addLog('🏗️ Criando instância do FinanceApp...', 'info');
+                const app = new FinanceApp();
+                
+                addLog('⚙️ Inicializando aplicação...', 'info');
+                await app.initialize();
+                
+                addLog('🎉 Aplicação inicializada com sucesso!', 'success');
+                window.app = app;
+                
+            } catch (error) {
+                addLog(`❌ Erro: ${error.message}`, 'error');
+                addLog(`📍 Stack: ${error.stack}`, 'error');
+            }
+        };
+        
+        addLog('📄 Página carregada, pronto para teste', 'info');
+    </script>
+</body>
+</html>
