@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1f2937">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Gestão Financeira Familiar</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        /* Login Screen Styles */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .login-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: var(--spacing-xl);
+            animation: fadeInUp 0.6s ease;
+        }
+        
+        .login-logo {
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+        }
+        
+        .login-logo-icon {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: var(--spacing-md);
+            animation: pulse-ring 2s ease infinite;
+        }
+        
+        .login-logo h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .login-logo p {
+            color: var(--gray-400);
+            font-size: 0.875rem;
+        }
+        
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .login-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .user-selector {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--gray-700);
+            background: var(--gray-800);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .user-btn:hover {
+            border-color: var(--primary-500);
+            background: var(--gray-700);
+            transform: translateX(8px);
+        }
+        
+        .user-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .user-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            flex-shrink: 0;
+        }
+        
+        .user-avatar.leandro {
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+        }
+        
+        .user-avatar.leidiane {
+            background: linear-gradient(135deg, var(--danger-500), var(--danger-700));
+        }
+        
+        .user-info {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .user-name {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.25rem;
+        }
+        
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+        }
+        
+        .user-arrow {
+            color: var(--gray-500);
+            font-size: 1.25rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .user-btn:hover .user-arrow {
+            transform: translateX(4px);
+            color: var(--primary-400);
+        }
+        
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: var(--spacing-lg) 0;
+            color: var(--gray-500);
+            font-size: 0.75rem;
+        }
+        
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-700);
+        }
+        
+        .login-divider span {
+            padding: 0 var(--spacing-md);
+        }
+        
+        .password-section {
+            display: none;
+            animation: fadeInUp 0.3s ease;
+        }
+        
+        .password-section.show {
+            display: block;
+        }
+        
+        .selected-user {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--gray-800);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .selected-user .user-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 1.25rem;
+        }
+        
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-sm);
+            width: 100%;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+        
+        .back-btn:hover {
+            color: white;
+        }
+        
+        /* Current User Display in Header */
+        .current-user-badge {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            background: var(--glass-bg);
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--radius-full);
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .current-user-badge:hover {
+            background: var(--gray-700);
+        }
+        
+        .current-user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+        
+        .current-user-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .logout-icon {
+            font-size: 0.875rem;
+            color: var(--gray-400);
+        }
+        
+        /* App hidden state */
+        .app-container {
+            display: none;
+        }
+        
+        .app-container.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== LOGIN SCREEN ========== -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-container">
+            <div class="login-logo">
+                <span class="login-logo-icon">💰</span>
+                <h1>Gestão Financeira</h1>
+                <p>Controle Financeiro Familiar</p>
+            </div>
+            
+            <div class="login-card">
+                <h2 class="login-title">Quem está acessando?</h2>
+                
+                <div id="user-selector" class="user-selector">
+                    <button onclick="selectUser('leandro')" class="user-btn">
+                        <div class="user-avatar leandro">👨</div>
+                        <div class="user-info">
+                            <p class="user-name">Leandro</p>
+                            <p class="user-role">Administrador</p>
+                        </div>
+                        <span class="user-arrow">→</span>
+                    </button>
+                    
+                    <button onclick="selectUser('leidiane')" class="user-btn">
+                        <div class="user-avatar leidiane">👩</div>
+                        <div class="user-info">
+                            <p class="user-name">Leidiane</p>
+                            <p class="user-role">Administradora</p>
+                        </div>
+                        <span class="user-arrow">→</span>
+                    </button>
+                </div>
+                
+                <div id="password-section" class="password-section">
+                    <div class="selected-user">
+                        <div id="selected-avatar" class="user-avatar"></div>
+                        <div class="user-info">
+                            <p id="selected-name" class="user-name"></p>
+                            <p class="user-role">Digite sua senha</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="password" id="login-password" class="form-input" placeholder="Senha" 
+                            onkeypress="if(event.key === 'Enter') doLogin()" autofocus>
+                    </div>
+                    
+                    <button onclick="doLogin()" class="btn btn-primary" style="width: 100%; margin-top: var(--spacing-sm);">
+                        🔓 Entrar
+                    </button>
+                    
+                    <button onclick="backToUserSelect()" class="back-btn">
+                        ← Voltar para seleção
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== APP CONTAINER ========== -->
+    <div id="app-container" class="app-container">
+        
+        <!-- ========== HEADER ========== -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-top">
+                    <div class="brand">
+                        <div class="brand-title">
+                            <h1>💰 Gestão Financeira</h1>
+                            <span class="connection-indicator connecting" id="connection-status"></span>
+                        </div>
+                        <p class="brand-subtitle">Controle Financeiro Familiar</p>
+                        <div id="current-user-badge" class="current-user-badge" onclick="logout()">
+                            <div id="header-avatar" class="current-user-avatar"></div>
+                            <span id="header-username" class="current-user-name"></span>
+                            <span class="logout-icon">🚪</span>
+                        </div>
+                    </div>
+                    <div class="balance-display">
+                        <p class="balance-label">Saldo Atual</p>
+                        <p class="balance-value" id="global-balance">R$ 0,00</p>
+                        <p class="balance-update" id="last-update"></p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ========== MAIN ========== -->
+        <main class="main-container">
+            
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card income">
+                    <p class="kpi-label">Entradas</p>
+                    <p class="kpi-value income" id="kpi-income">R$ 0</p>
+                </div>
+                <div class="kpi-card expense">
+                    <p class="kpi-label">Saídas</p>
+                    <p class="kpi-value expense" id="kpi-expense">R$ 0</p>
+                </div>
+                <div class="kpi-card efficiency">
+                    <p class="kpi-label">Eficiência</p>
+                    <p class="kpi-value efficiency" id="kpi-efficiency">0%</p>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <nav class="tab-navigation">
+                <button onclick="showTab('add')" id="tab-add" class="tab-btn active">
+                    <span class="tab-icon">➕</span>
+                    <span>Novo</span>
+                </button>
+                <button onclick="showTab('history')" id="tab-history" class="tab-btn">
+                    <span class="tab-icon">📋</span>
+                    <span>Histórico</span>
+                </button>
+                <button onclick="showTab('goals')" id="tab-goals" class="tab-btn">
+                    <span class="tab-icon">🎯</span>
+                    <span>Reserva</span>
+                </button>
+                <button onclick="showTab('reports')" id="tab-reports" class="tab-btn">
+                    <span class="tab-icon">📊</span>
+                    <span>Análise</span>
+                </button>
+            </nav>
+
+            <!-- ========== TAB: NOVO LANÇAMENTO ========== -->
+            <section id="content-add" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-header-dot"></span>
+                        <h2 class="card-title">Registrar Movimento</h2>
+                    </div>
+                    
+                    <form id="finance-form">
+                        <div class="form-group">
+                            <label class="form-label">Descrição</label>
+                            <input type="text" id="desc" class="form-input" placeholder="Ex: Supermercado, Salário..." required autocomplete="off">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Valor (R$)</label>
+                                <input type="number" id="val" class="form-input large" step="0.01" min="0.01" placeholder="0,00" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tipo</label>
+                                <select id="type" class="form-select">
+                                    <option value="out">🔴 Saída</option>
+                                    <option value="in">🟢 Entrada</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Categoria</label>
+                            <select id="cat" class="form-select">
+                                <option value="Alimentação">🍽️ Alimentação</option>
+                                <option value="Moradia">🏠 Moradia</option>
+                                <option value="Transporte">🚗 Transporte</option>
+                                <option value="Saúde">💊 Saúde</option>
+                                <option value="Educação">📚 Educação</option>
+                                <option value="Lazer">🎮 Lazer</option>
+                                <option value="Vestuário">👕 Vestuário</option>
+                                <option value="Serviços">⚡ Serviços/Contas</option>
+                                <option value="Passivo">💳 Passivo/Dívidas</option>
+                                <option value="Investimento">📈 Investimento</option>
+                                <option value="Salário">💰 Salário</option>
+                                <option value="Freelance">💼 Freelance</option>
+                                <option value="Outros">📦 Outros</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Data</label>
+                            <input type="date" id="entry-date" class="form-input">
+                        </div>
+                        
+                        <button type="submit" id="submit-btn" class="btn btn-primary">
+                            <span id="submit-text">💾 Salvar Lançamento</span>
+                            <div id="submit-loader" class="loading-spinner" style="display: none;"></div>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Lançamentos Rápidos -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-header-dot" style="background: var(--warning-500);"></span>
+                        <h2 class="card-title">Lançamentos Rápidos</h2>
+                    </div>
+                    <div class="quick-actions">
+                        <button onclick="quickEntry('Mercado', 'Alimentação', 'out')" class="quick-btn">
+                            <span class="quick-icon">🛒</span>
+                            <span>Mercado</span>
+                        </button>
+                        <button onclick="quickEntry('Combustível', 'Transporte', 'out')" class="quick-btn">
+                            <span class="quick-icon">⛽</span>
+                            <span>Gasolina</span>
+                        </button>
+                        <button onclick="quickEntry('Salário', 'Salário', 'in')" class="quick-btn income">
+                            <span class="quick-icon">💵</span>
+                            <span>Salário</span>
+                        </button>
+                        <button onclick="quickEntry('Luz', 'Serviços', 'out')" class="quick-btn">
+                            <span class="quick-icon">💡</span>
+                            <span>Luz</span>
+                        </button>
+                        <button onclick="quickEntry('Internet', 'Serviços', 'out')" class="quick-btn">
+                            <span class="quick-icon">🌐</span>
+                            <span>Internet</span>
+                        </button>
+                        <button onclick="quickEntry('Pix Recebido', 'Outros', 'in')" class="quick-btn income">
+                            <span class="quick-icon">📲</span>
+                            <span>Pix</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== TAB: HISTÓRICO ========== -->
+            <section id="content-history" class="tab-content" style="display: none;">
+                <!-- Filtros -->
+                <div class="card" style="padding: var(--spacing-md);">
+                    <div class="filter-bar">
+                        <select id="filter-type" onchange="filterTransactions()" class="form-select">
+                            <option value="all">Todos</option>
+                            <option value="in">Entradas</option>
+                            <option value="out">Saídas</option>
+                        </select>
+                        <select id="filter-cat" onchange="filterTransactions()" class="form-select">
+                            <option value="all">Categorias</option>
+                        </select>
+                        <input type="month" id="filter-month" onchange="filterTransactions()" class="form-input">
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div id="list-container" class="transaction-list">
+                        <div class="empty-state">
+                            <div class="loading-spinner" style="margin: 0 auto;"></div>
+                            <p class="empty-state-text" style="margin-top: 1rem;">Carregando...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="padding: var(--spacing-md);">
+                    <div class="stats-row">
+                        <span class="stats-label">Total exibido:</span>
+                        <span class="stats-value" id="filtered-total">R$ 0,00</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== TAB: RESERVA ========== -->
+            <section id="content-goals" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="card-header" style="justify-content: center;">
+                        <h2 class="card-title">🛡️ Reserva de Emergência</h2>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-ring">
+                            <svg width="160" height="160">
+                                <defs>
+                                    <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#3b82f6"/>
+                                        <stop offset="100%" stop-color="#10b981"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle class="progress-ring-bg" cx="80" cy="80" r="70"></circle>
+                                <circle id="reserve-progress-circle" class="progress-ring-fill" cx="80" cy="80" r="70" 
+                                    stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
+                            </svg>
+                            <div class="progress-value">
+                                <span id="reserve-percent" class="progress-percent">0%</span>
+                                <p class="progress-label-small">completo</p>
+                            </div>
+                        </div>
+                        <p id="reserve-label" class="progress-description">R$ 0,00 de R$ 28.000</p>
+                    </div>
+                    
+                    <div class="stats-box">
+                        <div class="stats-row">
+                            <span class="stats-label">Meta Mensal Sugerida:</span>
+                            <span id="monthly-goal" class="stats-value primary">R$ 2.333</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Tempo p/ Meta:</span>
+                            <span id="time-to-goal" class="stats-value success">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-header-dot" style="background: var(--gray-500);"></span>
+                        <h2 class="card-title">Configurar Meta</h2>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Valor da Reserva (R$)</label>
+                        <input type="number" id="reserve-goal-input" class="form-input" value="28000" onchange="updateReserveGoal()">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== TAB: ANÁLISE ========== -->
+            <section id="content-reports" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-header-dot" style="background: var(--danger-500);"></span>
+                        <h2 class="card-title">Gastos por Categoria</h2>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="category-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-header-dot" style="background: var(--success-500);"></span>
+                        <h2 class="card-title">Evolução Mensal</h2>
+                    </div>
+                    <div class="chart-container small">
+                        <canvas id="monthly-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-header-dot" style="background: var(--warning-500);"></span>
+                        <h2 class="card-title">🏆 Top 5 Gastos do Mês</h2>
+                    </div>
+                    <div id="top-expenses">
+                        <p class="empty-state-text" style="text-align: center; padding: 1rem;">Nenhum gasto este mês</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ========== TOAST ========== -->
+        <div id="toast" class="toast">
+            <span id="toast-icon">✓</span>
+            <span id="toast-text"></span>
+        </div>
+
+        <!-- ========== MODAL CONFIG ========== -->
+        <div id="config-modal" class="modal-overlay">
+            <div class="modal">
+                <h2 class="modal-title">🔧 Configurar Firebase</h2>
+                <p class="modal-description">Cole suas credenciais do Firebase Console para sincronização em tempo real.</p>
+                
+                <div class="form-group">
+                    <input type="text" id="config-apiKey" class="form-input" placeholder="API Key">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="config-authDomain" class="form-input" placeholder="Auth Domain">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="config-projectId" class="form-input" placeholder="Project ID">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="config-storageBucket" class="form-input" placeholder="Storage Bucket">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="config-messagingSenderId" class="form-input" placeholder="Messaging Sender ID">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="config-appId" class="form-input" placeholder="App ID">
+                </div>
+                
+                <div class="modal-actions">
+                    <button onclick="closeConfigModal()" class="btn" style="background: var(--gray-100); color: var(--gray-700);">Cancelar</button>
+                    <button onclick="saveFirebaseConfig()" class="btn btn-primary" style="width: auto;">Salvar</button>
+                </div>
+                
+                <button onclick="useLocalMode()" class="btn" style="width: 100%; margin-top: var(--spacing-sm); background: var(--warning-100); color: var(--warning-700);">
+                    ⚠️ Usar Modo Local
+                </button>
+            </div>
+        </div>
+
+        <!-- ========== FAB BUTTON ========== -->
+        <div style="position: fixed; bottom: var(--spacing-lg); right: var(--spacing-lg); z-index: 100;">
+            <button onclick="openConfigModal()" class="fab" title="Configurações" style="position: relative;">
+                ⚙️
+            </button>
+        </div>
+
+    </div><!-- End App Container -->
+
+    <!-- ========== FIREBASE & APP LOGIC ========== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, doc, deleteDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        // ========== FIREBASE CONFIG ==========
+        const DEFAULT_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyDUJ3DVXY4M9cCnNs4xEBTwu60nFDgdfTs",
+            authDomain: "gestaofinanceira-9511e.firebaseapp.com",
+            projectId: "gestaofinanceira-9511e",
+            storageBucket: "gestaofinanceira-9511e.firebasestorage.app",
+            messagingSenderId: "915486047838",
+            appId: "1:915486047838:web:b68ed996cad1b4b7cffecf",
+            measurementId: "G-3D15YGJQGW"
+        };
+
+        // ========== USUÁRIOS DO SISTEMA ==========
+        const USERS = {
+            leandro: {
+                name: 'Leandro',
+                password: '1234', // Troque por uma senha segura
+                avatar: '👨',
+                role: 'Administrador',
+                color: 'leandro'
+            },
+            leidiane: {
+                name: 'Leidiane',
+                password: '1234', // Troque por uma senha segura
+                avatar: '👩',
+                role: 'Administradora',
+                color: 'leidiane'
+            }
+        };
+
+        // ========== STATE ==========
+        let db = null;
+        let auth = null;
+        let firebaseUser = null;
+        let currentAppUser = null; // Usuário do app (Leandro ou Leidiane)
+        let selectedUserId = null;
+        let transactions = [];
+        let RESERVE_GOAL = parseInt(localStorage.getItem('reserveGoal')) || 28000;
+        let isLocalMode = false;
+        let categoryChart = null;
+        let monthlyChart = null;
+
+        // ========== LOGIN FUNCTIONS ==========
+        window.selectUser = function(userId) {
+            selectedUserId = userId;
+            const user = USERS[userId];
+            
+            document.getElementById('selected-avatar').textContent = user.avatar;
+            document.getElementById('selected-avatar').className = `user-avatar ${user.color}`;
+            document.getElementById('selected-name').textContent = user.name;
+            
+            document.getElementById('user-selector').style.display = 'none';
+            document.getElementById('password-section').classList.add('show');
+            
+            setTimeout(() => {
+                document.getElementById('login-password').focus();
+            }, 100);
+        };
+
+        window.backToUserSelect = function() {
+            selectedUserId = null;
+            document.getElementById('user-selector').style.display = 'flex';
+            document.getElementById('password-section').classList.remove('show');
+            document.getElementById('login-password').value = '';
+        };
+
+        window.doLogin = function() {
+            const password = document.getElementById('login-password').value;
+            const user = USERS[selectedUserId];
+            
+            if (!user) {
+                showToast('Selecione um usuário', 'error');
+                return;
+            }
+            
+            if (password !== user.password) {
+                showToast('Senha incorreta!', 'error');
+                document.getElementById('login-password').value = '';
+                document.getElementById('login-password').focus();
+                return;
+            }
+            
+            // Login bem-sucedido
+            currentAppUser = { id: selectedUserId, ...user };
+            localStorage.setItem('currentUser', JSON.stringify(currentAppUser));
+            
+            showApp();
+            showToast(`Bem-vindo(a), ${user.name}!`, 'success');
+        };
+
+        window.logout = function() {
+            if (!confirm('Deseja sair?')) return;
+            
+            currentAppUser = null;
+            selectedUserId = null;
+            localStorage.removeItem('currentUser');
+            
+            document.getElementById('login-password').value = '';
+            backToUserSelect();
+            hideApp();
+            
+            showToast('Você saiu do sistema', 'info');
+        };
+
+        function showApp() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-container').classList.add('show');
+            
+            // Atualizar header com info do usuário
+            const headerAvatar = document.getElementById('header-avatar');
+            headerAvatar.textContent = currentAppUser.avatar;
+            headerAvatar.style.background = currentAppUser.color === 'leandro' 
+                ? 'linear-gradient(135deg, var(--primary-500), var(--primary-700))'
+                : 'linear-gradient(135deg, var(--danger-500), var(--danger-700))';
+            
+            document.getElementById('header-username').textContent = currentAppUser.name;
+            
+            // Inicializar o app
+            initApp();
+        }
+
+        function hideApp() {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('app-container').classList.remove('show');
+        }
+
+        // ========== INIT ==========
+        function initApp() {
+            document.getElementById('reserve-goal-input').value = RESERVE_GOAL;
+            document.getElementById('entry-date').valueAsDate = new Date();
+            
+            const savedConfig = localStorage.getItem('firebaseConfig');
+            const configToUse = savedConfig ? JSON.parse(savedConfig) : DEFAULT_FIREBASE_CONFIG;
+            initFirebase(configToUse);
+            
+            initCharts();
+            populateCategoryFilter();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Verificar se há usuário salvo
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentAppUser = JSON.parse(savedUser);
+                showApp();
+            }
+        });
+
+        // ========== FIREBASE ==========
+        function initFirebase(config) {
+            try {
+                const app = initializeApp(config);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                
+                updateConnectionStatus('connecting');
+                
+                signInAnonymously(auth)
+                    .then(() => console.log("Auth OK"))
+                    .catch((error) => {
+                        console.error("Auth Error:", error);
+                        showToast("Erro de autenticação", 'error');
+                        useLocalMode();
+                    });
+                
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        firebaseUser = user;
+                        setupRealtimeSync();
+                        updateConnectionStatus('connected');
+                    }
+                });
+            } catch (error) {
+                console.error("Firebase Error:", error);
+                showToast("Erro de conexão", 'error');
+                useLocalMode();
+            }
+        }
+
+        function setupRealtimeSync() {
+            if (!db || !firebaseUser) return;
+            
+            // Usa o ID do Firebase mas armazena dados de forma compartilhada entre Leandro e Leidiane
+            const colRef = collection(db, 'family', 'camargo', 'transactions');
+            const q = query(colRef, orderBy('timestamp', 'desc'));
+            
+            onSnapshot(q, (snapshot) => {
+                transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+                updateUI();
+                document.getElementById('last-update').innerText = `Atualizado: ${new Date().toLocaleTimeString('pt-BR')}`;
+            }, (error) => {
+                console.error("Sync Error:", error);
+                showToast("Erro ao sincronizar", 'error');
+            });
+        }
+
+        // ========== CRUD ==========
+        window.addTransaction = async function(entry) {
+            // Adicionar informação de quem criou
+            entry.createdBy = currentAppUser ? currentAppUser.name : 'Sistema';
+            
+            if (isLocalMode) {
+                entry.id = Date.now().toString();
+                entry.timestamp = { seconds: Date.now() / 1000 };
+                transactions.unshift(entry);
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+                updateUI();
+                showToast('Salvo localmente!', 'success');
+                return true;
+            }
+            
+            if (!db || !firebaseUser) {
+                showToast("Conectando...", 'info');
+                return false;
+            }
+            
+            try {
+                entry.timestamp = serverTimestamp();
+                entry.firebaseUserId = firebaseUser.uid;
+                await addDoc(collection(db, 'family', 'camargo', 'transactions'), entry);
+                showToast('Sincronizado!', 'success');
+                return true;
+            } catch (e) {
+                console.error("Save Error:", e);
+                showToast('Erro ao salvar', 'error');
+                return false;
+            }
+        };
+
+        window.deleteEntry = async function(id) {
+            if (!confirm('Deseja excluir este lançamento?')) return;
+            
+            if (isLocalMode) {
+                transactions = transactions.filter(t => t.id !== id);
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+                updateUI();
+                showToast('Removido!', 'success');
+                return;
+            }
+            
+            if (!db || !firebaseUser) return;
+            
+            try {
+                await deleteDoc(doc(db, 'family', 'camargo', 'transactions', id));
+                showToast('Removido!', 'success');
+            } catch (e) {
+                showToast('Erro ao remover', 'error');
+            }
+        };
+
+        // ========== UI ==========
+        window.showTab = function(id) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('content-' + id).style.display = 'block';
+            document.getElementById('tab-' + id).classList.add('active');
+            
+            if (id === 'reports') setTimeout(() => updateCharts(), 100);
+        };
+
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const text = document.getElementById('toast-text');
+            
+            icon.textContent = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+            text.textContent = msg;
+            
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        window.showToast = showToast;
+
+        function updateConnectionStatus(status) {
+            const indicator = document.getElementById('connection-status');
+            indicator.className = 'connection-indicator ' + status;
+        }
+
+        function updateUI() {
+            const income = transactions.filter(t => t.type === 'in').reduce((a, b) => a + (parseFloat(b.val) || 0), 0);
+            const expense = transactions.filter(t => t.type === 'out').reduce((a, b) => a + (parseFloat(b.val) || 0), 0);
+            const balance = income - expense;
+            const efficiency = income > 0 ? ((balance / income) * 100).toFixed(0) : 0;
+
+            const balanceEl = document.getElementById('global-balance');
+            balanceEl.innerText = formatCurrency(balance);
+            balanceEl.className = 'balance-value' + (balance < 0 ? ' negative' : '');
+            
+            document.getElementById('kpi-income').innerText = formatCurrency(income);
+            document.getElementById('kpi-expense').innerText = formatCurrency(expense);
+            document.getElementById('kpi-efficiency').innerText = efficiency + '%';
+            
+            filterTransactions();
+            updateReserveProgress(balance);
+            updateCharts();
+        }
+
+        function renderTransactionList(list) {
+            const container = document.getElementById('list-container');
+            
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p class="empty-state-icon">📭</p>
+                        <p class="empty-state-text">Nenhum lançamento</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = list.map(t => {
+                const date = t.timestamp?.seconds ? new Date(t.timestamp.seconds * 1000).toLocaleDateString('pt-BR') : t.date || '-';
+                const createdBy = t.createdBy ? `<span style="color: var(--primary-400); font-size: 0.65rem;">• ${t.createdBy}</span>` : '';
+                return `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-indicator ${t.type === 'in' ? 'income' : 'expense'}"></div>
+                            <div class="transaction-details">
+                                <p class="transaction-desc">${escapeHtml(t.desc)}</p>
+                                <div class="transaction-meta">
+                                    <span class="transaction-category">${escapeHtml(t.cat)}</span>
+                                    <span style="color: var(--gray-300);">•</span>
+                                    <span class="transaction-date">${date}</span>
+                                    ${createdBy}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="transaction-actions">
+                            <p class="transaction-value ${t.type === 'in' ? 'income' : 'expense'}">
+                                ${t.type === 'in' ? '+' : '-'} ${formatCurrency(t.val)}
+                            </p>
+                            <button onclick="deleteEntry('${t.id}')" class="btn btn-icon btn-danger" title="Excluir">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            const total = list.reduce((acc, t) => t.type === 'in' ? acc + parseFloat(t.val) : acc - parseFloat(t.val), 0);
+            const totalEl = document.getElementById('filtered-total');
+            totalEl.innerText = formatCurrency(total);
+            totalEl.style.color = total >= 0 ? 'var(--success-600)' : 'var(--danger-600)';
+        }
+
+        window.filterTransactions = function() {
+            const typeFilter = document.getElementById('filter-type').value;
+            const catFilter = document.getElementById('filter-cat').value;
+            const monthFilter = document.getElementById('filter-month').value;
+            
+            const filtered = transactions.filter(t => {
+                if (typeFilter !== 'all' && t.type !== typeFilter) return false;
+                if (catFilter !== 'all' && t.cat !== catFilter) return false;
+                if (monthFilter) {
+                    const tDate = t.timestamp?.seconds ? new Date(t.timestamp.seconds * 1000) : new Date(t.date);
+                    const filterDate = new Date(monthFilter + '-01');
+                    if (tDate.getFullYear() !== filterDate.getFullYear() || tDate.getMonth() !== filterDate.getMonth()) return false;
+                }
+                return true;
+            });
+            
+            renderTransactionList(filtered);
+        };
+
+        function populateCategoryFilter() {
+            const categories = ['Alimentação', 'Moradia', 'Transporte', 'Saúde', 'Educação', 'Lazer', 'Vestuário', 'Serviços', 'Passivo', 'Investimento', 'Salário', 'Freelance', 'Outros'];
+            const select = document.getElementById('filter-cat');
+            select.innerHTML = '<option value="all">Todas Categorias</option>' + categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        }
+
+        function updateReserveProgress(balance) {
+            const percent = Math.min(Math.max((balance / RESERVE_GOAL) * 100, 0), 100).toFixed(0);
+            const circle = document.getElementById('reserve-progress-circle');
+            const circumference = 2 * Math.PI * 70;
+            circle.style.strokeDashoffset = circumference - (percent / 100) * circumference;
+            
+            document.getElementById('reserve-percent').innerText = percent + '%';
+            document.getElementById('reserve-label').innerText = `${formatCurrency(Math.max(balance, 0))} de ${formatCurrency(RESERVE_GOAL)}`;
+            
+            const monthlyGoal = RESERVE_GOAL / 12;
+            document.getElementById('monthly-goal').innerText = formatCurrency(monthlyGoal);
+            
+            if (balance >= RESERVE_GOAL) {
+                document.getElementById('time-to-goal').innerText = '✅ Meta atingida!';
+            } else {
+                const remaining = RESERVE_GOAL - balance;
+                const months = Math.ceil(remaining / monthlyGoal);
+                document.getElementById('time-to-goal').innerText = `~${months} meses`;
+            }
+        }
+
+        window.updateReserveGoal = function() {
+            RESERVE_GOAL = parseInt(document.getElementById('reserve-goal-input').value) || 28000;
+            localStorage.setItem('reserveGoal', RESERVE_GOAL);
+            updateUI();
+            showToast('Meta atualizada!', 'success');
+        };
+
+        // ========== CHARTS ==========
+        function initCharts() {
+            const ctxCategory = document.getElementById('category-chart')?.getContext('2d');
+            const ctxMonthly = document.getElementById('monthly-chart')?.getContext('2d');
+            
+            if (ctxCategory) {
+                categoryChart = new Chart(ctxCategory, {
+                    type: 'doughnut',
+                    data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, padding: 15 } } },
+                        cutout: '65%'
+                    }
+                });
+            }
+            
+            if (ctxMonthly) {
+                monthlyChart = new Chart(ctxMonthly, {
+                    type: 'bar',
+                    data: { labels: [], datasets: [] },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } },
+                        plugins: { legend: { position: 'top', labels: { font: { size: 11, family: 'Inter' } } } }
+                    }
+                });
+            }
+        }
+
+        function updateCharts() {
+            const expensesByCategory = {};
+            transactions.filter(t => t.type === 'out').forEach(t => {
+                expensesByCategory[t.cat] = (expensesByCategory[t.cat] || 0) + parseFloat(t.val);
+            });
+            
+            const colors = {
+                'Alimentação': '#ef4444', 'Moradia': '#f97316', 'Transporte': '#eab308',
+                'Saúde': '#22c55e', 'Educação': '#3b82f6', 'Lazer': '#8b5cf6',
+                'Vestuário': '#ec4899', 'Serviços': '#06b6d4', 'Investimento': '#10b981', 
+                'Passivo': '#dc2626', 'Outros': '#6b7280'
+            };
+            
+            if (categoryChart) {
+                categoryChart.data.labels = Object.keys(expensesByCategory);
+                categoryChart.data.datasets[0].data = Object.values(expensesByCategory);
+                categoryChart.data.datasets[0].backgroundColor = Object.keys(expensesByCategory).map(cat => colors[cat] || '#6b7280');
+                categoryChart.update();
+            }
+            
+            const monthlyData = {};
+            transactions.forEach(t => {
+                const date = t.timestamp?.seconds ? new Date(t.timestamp.seconds * 1000) : new Date();
+                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                if (!monthlyData[monthKey]) monthlyData[monthKey] = { in: 0, out: 0 };
+                monthlyData[monthKey][t.type] += parseFloat(t.val);
+            });
+            
+            const sortedMonths = Object.keys(monthlyData).sort().slice(-6);
+            
+            if (monthlyChart) {
+                monthlyChart.data.labels = sortedMonths.map(m => { const [y, mon] = m.split('-'); return `${mon}/${y.slice(2)}`; });
+                monthlyChart.data.datasets = [
+                    { label: 'Entradas', data: sortedMonths.map(m => monthlyData[m].in), backgroundColor: '#10b981', borderRadius: 6 },
+                    { label: 'Saídas', data: sortedMonths.map(m => monthlyData[m].out), backgroundColor: '#ef4444', borderRadius: 6 }
+                ];
+                monthlyChart.update();
+            }
+            
+            // Top 5
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            const topExpenses = transactions
+                .filter(t => {
+                    if (t.type !== 'out') return false;
+                    const date = t.timestamp?.seconds ? new Date(t.timestamp.seconds * 1000) : new Date();
+                    return date.toISOString().slice(0, 7) === currentMonth;
+                })
+                .sort((a, b) => parseFloat(b.val) - parseFloat(a.val))
+                .slice(0, 5);
+            
+            const topContainer = document.getElementById('top-expenses');
+            topContainer.innerHTML = topExpenses.length ? topExpenses.map((t, i) => `
+                <div class="top-expense-item">
+                    <span class="top-expense-rank">${i + 1}</span>
+                    <span class="top-expense-desc">${escapeHtml(t.desc)}</span>
+                    <span class="top-expense-value">${formatCurrency(t.val)}</span>
+                </div>
+            `).join('') : '<p class="empty-state-text" style="text-align: center; padding: 1rem;">Nenhum gasto este mês</p>';
+        }
+
+        // ========== FORM ==========
+        document.getElementById('finance-form').onsubmit = async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submit-btn');
+            const btnText = document.getElementById('submit-text');
+            const loader = document.getElementById('submit-loader');
+            
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            loader.style.display = 'block';
+            
+            const entry = {
+                desc: document.getElementById('desc').value.trim(),
+                val: parseFloat(document.getElementById('val').value),
+                cat: document.getElementById('cat').value,
+                type: document.getElementById('type').value,
+                date: document.getElementById('entry-date').value
+            };
+            
+            const success = await addTransaction(entry);
+            
+            if (success) {
+                e.target.reset();
+                document.getElementById('entry-date').valueAsDate = new Date();
+            }
+            
+            btn.disabled = false;
+            btnText.style.display = 'inline';
+            loader.style.display = 'none';
+        };
+
+        // ========== QUICK ENTRY ==========
+        window.quickEntry = function(desc, cat, type) {
+            document.getElementById('desc').value = desc;
+            document.getElementById('cat').value = cat;
+            document.getElementById('type').value = type;
+            document.getElementById('val').focus();
+        };
+
+        // ========== AUTO-CATEGORY ==========
+        const smartCategories = {
+            'mercado': 'Alimentação', 'supermercado': 'Alimentação', 'restaurante': 'Alimentação', 'ifood': 'Alimentação', 'padaria': 'Alimentação',
+            'aluguel': 'Moradia', 'condomínio': 'Moradia', 'iptu': 'Moradia',
+            'uber': 'Transporte', 'gasolina': 'Transporte', 'combustível': 'Transporte', 'estacionamento': 'Transporte',
+            'farmácia': 'Saúde', 'médico': 'Saúde', 'academia': 'Saúde', 'remédio': 'Saúde',
+            'curso': 'Educação', 'faculdade': 'Educação', 'livro': 'Educação',
+            'netflix': 'Lazer', 'cinema': 'Lazer', 'spotify': 'Lazer',
+            'roupa': 'Vestuário', 'sapato': 'Vestuário',
+            'luz': 'Serviços', 'energia': 'Serviços', 'água': 'Serviços', 'internet': 'Serviços', 'telefone': 'Serviços',
+            'salário': 'Salário', 'freelance': 'Freelance'
+        };
+
+        document.getElementById('desc').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            for (let key in smartCategories) {
+                if (val.includes(key)) {
+                    document.getElementById('cat').value = smartCategories[key];
+                    break;
+                }
+            }
+        });
+
+        // ========== CONFIG MODAL ==========
+        window.openConfigModal = function() {
+            document.getElementById('config-modal').classList.add('show');
+            const saved = localStorage.getItem('firebaseConfig');
+            if (saved) {
+                const config = JSON.parse(saved);
+                document.getElementById('config-apiKey').value = config.apiKey || '';
+                document.getElementById('config-authDomain').value = config.authDomain || '';
+                document.getElementById('config-projectId').value = config.projectId || '';
+                document.getElementById('config-storageBucket').value = config.storageBucket || '';
+                document.getElementById('config-messagingSenderId').value = config.messagingSenderId || '';
+                document.getElementById('config-appId').value = config.appId || '';
+            }
+        };
+
+        window.closeConfigModal = function() {
+            document.getElementById('config-modal').classList.remove('show');
+        };
+
+        window.saveFirebaseConfig = function() {
+            const config = {
+                apiKey: document.getElementById('config-apiKey').value.trim(),
+                authDomain: document.getElementById('config-authDomain').value.trim(),
+                projectId: document.getElementById('config-projectId').value.trim(),
+                storageBucket: document.getElementById('config-storageBucket').value.trim(),
+                messagingSenderId: document.getElementById('config-messagingSenderId').value.trim(),
+                appId: document.getElementById('config-appId').value.trim()
+            };
+            
+            if (!config.apiKey || !config.projectId) {
+                showToast('Preencha API Key e Project ID', 'error');
+                return;
+            }
+            
+            localStorage.setItem('firebaseConfig', JSON.stringify(config));
+            closeConfigModal();
+            location.reload();
+        };
+
+        window.useLocalMode = function() {
+            isLocalMode = true;
+            updateConnectionStatus('disconnected');
+            closeConfigModal();
+            const localData = localStorage.getItem('transactions');
+            if (localData) transactions = JSON.parse(localData);
+            updateUI();
+            showToast('Modo local ativado', 'info');
+        };
+
+        // ========== UTILS ==========
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+
+</body>
+</html>

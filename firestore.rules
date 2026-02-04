@@ -1,0 +1,51 @@
+// ===========================================
+// REGRAS DE SEGURANÇA DO FIRESTORE
+// ===========================================
+// Copie e cole estas regras no Firebase Console:
+// Firestore Database > Regras
+// ===========================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Regras para transações do usuário
+    // Cada usuário só pode ler/escrever seus próprios dados
+    match /users/{userId}/transactions/{transactionId} {
+      // Permite leitura se o usuário estiver autenticado e for o dono dos dados
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Permite escrita se:
+      // 1. Usuário está autenticado
+      // 2. Usuário é o dono dos dados
+      // 3. Os dados são válidos
+      allow create: if request.auth != null 
+                    && request.auth.uid == userId
+                    && isValidTransaction(request.resource.data);
+      
+      allow update: if request.auth != null 
+                    && request.auth.uid == userId
+                    && isValidTransaction(request.resource.data);
+      
+      allow delete: if request.auth != null 
+                    && request.auth.uid == userId;
+    }
+    
+    // Função para validar estrutura da transação
+    function isValidTransaction(data) {
+      return data.keys().hasAll(['desc', 'val', 'cat', 'type'])
+             && data.desc is string
+             && data.desc.size() > 0
+             && data.desc.size() <= 200
+             && data.val is number
+             && data.val > 0
+             && data.cat is string
+             && data.type in ['in', 'out'];
+    }
+    
+    // Bloqueia acesso a qualquer outro documento
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
