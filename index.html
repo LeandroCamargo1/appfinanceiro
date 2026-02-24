@@ -23,19 +23,19 @@
     <link rel="stylesheet" href="styles.css">
     
     <style>
-        /* Login Screen Styles */
+        /* Login Screen Styles - Clean Design */
         .login-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+            background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
         
         .login-screen.hidden {
@@ -46,48 +46,44 @@
         
         .login-container {
             width: 100%;
-            max-width: 400px;
-            padding: var(--spacing-xl);
-            animation: fadeInUp 0.6s ease;
+            max-width: 380px;
+            padding: var(--spacing-lg);
         }
         
         .login-logo {
             text-align: center;
-            margin-bottom: var(--spacing-2xl);
+            margin-bottom: var(--spacing-xl);
         }
         
         .login-logo-icon {
-            font-size: 4rem;
+            font-size: 3rem;
             display: block;
-            margin-bottom: var(--spacing-md);
-            animation: pulse-ring 2s ease infinite;
+            margin-bottom: var(--spacing-sm);
         }
         
         .login-logo h1 {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 800;
-            color: white;
+            color: var(--gray-900);
             margin-bottom: var(--spacing-xs);
         }
         
         .login-logo p {
-            color: var(--gray-400);
+            color: var(--gray-500);
             font-size: 0.875rem;
         }
         
         .login-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
+            background: #ffffff;
             border-radius: var(--radius-xl);
-            padding: var(--spacing-xl);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow-xl);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--gray-200);
         }
         
         .login-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-700);
             text-align: center;
             margin-bottom: var(--spacing-lg);
         }
@@ -95,48 +91,48 @@
         .user-selector {
             display: flex;
             flex-direction: column;
-            gap: var(--spacing-md);
+            gap: var(--spacing-sm);
         }
         
         .user-btn {
             display: flex;
             align-items: center;
             gap: var(--spacing-md);
-            padding: var(--spacing-lg);
+            padding: var(--spacing-md);
             border-radius: var(--radius-lg);
-            border: 2px solid var(--gray-700);
-            background: var(--gray-800);
+            border: 1px solid var(--gray-200);
+            background: var(--gray-50);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
         
         .user-btn:hover {
-            border-color: var(--primary-500);
-            background: var(--gray-700);
-            transform: translateX(8px);
+            border-color: var(--gray-300);
+            background: var(--gray-100);
         }
         
         .user-btn:active {
-            transform: scale(0.98);
+            background: var(--gray-200);
         }
         
         .user-avatar {
-            width: 56px;
-            height: 56px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             flex-shrink: 0;
+            background: var(--gray-200);
         }
         
         .user-avatar.leandro {
-            background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+            background: var(--primary-100);
         }
         
         .user-avatar.leidiane {
-            background: linear-gradient(135deg, var(--danger-500), var(--danger-700));
+            background: var(--danger-100);
         }
         
         .user-info {
@@ -145,33 +141,33 @@
         }
         
         .user-name {
-            font-size: 1.125rem;
+            font-size: 1rem;
             font-weight: 700;
-            color: white;
-            margin-bottom: 0.25rem;
+            color: var(--gray-900);
+            margin-bottom: 0.125rem;
         }
         
         .user-role {
             font-size: 0.75rem;
-            color: var(--gray-400);
+            color: var(--gray-500);
         }
         
         .user-arrow {
-            color: var(--gray-500);
-            font-size: 1.25rem;
-            transition: transform 0.3s ease;
+            color: var(--gray-400);
+            font-size: 1rem;
+            transition: transform 0.2s ease;
         }
         
         .user-btn:hover .user-arrow {
-            transform: translateX(4px);
-            color: var(--primary-400);
+            transform: translateX(2px);
+            color: var(--gray-600);
         }
         
         .login-divider {
             display: flex;
             align-items: center;
             margin: var(--spacing-lg) 0;
-            color: var(--gray-500);
+            color: var(--gray-400);
             font-size: 0.75rem;
         }
         
@@ -180,7 +176,7 @@
             content: '';
             flex: 1;
             height: 1px;
-            background: var(--gray-700);
+            background: var(--gray-200);
         }
         
         .login-divider span {
@@ -189,7 +185,6 @@
         
         .password-section {
             display: none;
-            animation: fadeInUp 0.3s ease;
         }
         
         .password-section.show {
@@ -215,7 +210,7 @@
         .back-btn {
             background: none;
             border: none;
-            color: var(--gray-400);
+            color: var(--gray-500);
             cursor: pointer;
             font-size: 0.875rem;
             display: flex;
@@ -229,7 +224,7 @@
         }
         
         .back-btn:hover {
-            color: white;
+            color: var(--gray-900);
         }
         
         /* Current User Display in Header */
@@ -237,36 +232,38 @@
             display: flex;
             align-items: center;
             gap: var(--spacing-sm);
-            background: var(--glass-bg);
+            background: var(--gray-100);
             padding: var(--spacing-xs) var(--spacing-md);
             border-radius: var(--radius-full);
-            border: 1px solid var(--glass-border);
+            border: 1px solid var(--gray-200);
             cursor: pointer;
             transition: all 0.2s;
+            margin-top: var(--spacing-sm);
         }
         
         .current-user-badge:hover {
-            background: var(--gray-700);
+            background: var(--gray-200);
         }
         
         .current-user-avatar {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
+            background: var(--gray-200);
         }
         
         .current-user-name {
             font-size: 0.75rem;
             font-weight: 600;
-            color: white;
+            color: var(--gray-700);
         }
         
         .logout-icon {
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             color: var(--gray-400);
         }
         
@@ -680,13 +677,12 @@
 
         // ========== FIREBASE CONFIG ==========
         const DEFAULT_FIREBASE_CONFIG = {
-            apiKey: "AIzaSyDUJ3DVXY4M9cCnNs4xEBTwu60nFDgdfTs",
-            authDomain: "gestaofinanceira-9511e.firebaseapp.com",
-            projectId: "gestaofinanceira-9511e",
-            storageBucket: "gestaofinanceira-9511e.firebasestorage.app",
-            messagingSenderId: "915486047838",
-            appId: "1:915486047838:web:b68ed996cad1b4b7cffecf",
-            measurementId: "G-3D15YGJQGW"
+            apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            authDomain: "gestao-financeira-hokkaido.firebaseapp.com",
+            projectId: "gestao-financeira-hokkaido",
+            storageBucket: "gestao-financeira-hokkaido.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef123456789"
         };
 
         // ========== USUÁRIOS DO SISTEMA ==========
@@ -789,8 +785,8 @@
             const headerAvatar = document.getElementById('header-avatar');
             headerAvatar.textContent = currentAppUser.avatar;
             headerAvatar.style.background = currentAppUser.color === 'leandro' 
-                ? 'linear-gradient(135deg, var(--primary-500), var(--primary-700))'
-                : 'linear-gradient(135deg, var(--danger-500), var(--danger-700))';
+                ? 'var(--primary-100)'
+                : 'var(--danger-100)';
             
             document.getElementById('header-username').textContent = currentAppUser.name;
             
