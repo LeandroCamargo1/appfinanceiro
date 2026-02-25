@@ -869,7 +869,10 @@
     <button class="fab-option" onclick="abrirModalLancamento(); toggleFabMenu();">📋 Novo Lançamento</button>
     <button class="fab-option" onclick="abrirModalMeta(); toggleFabMenu();">🐷 Nova Meta</button>
     <button class="fab-option" onclick="exportarPDF(); toggleFabMenu();">📄 Exportar PDF</button>
+    <button class="fab-option" onclick="exportarJSON(); toggleFabMenu();">💾 Salvar JSON</button>
+    <button class="fab-option" onclick="document.getElementById('importJSONInput').click(); toggleFabMenu();">📂 Carregar JSON</button>
   </div>
+  <input type="file" id="importJSONInput" style="display:none" accept=".json" onchange="importarJSON(event)">
 
   <!-- ========== MODAL LANÇAMENTO ========== -->
   <div class="modal-overlay" id="modalLancamento">
@@ -970,6 +973,19 @@
       <div class="modal-actions">
         <button class="btn-secondary" onclick="fecharModalAporte()">Cancelar</button>
         <button class="btn-primary" onclick="salvarAporte()">💰 Depositar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL BACKUP JSON ========== -->
+  <div class="modal-overlay" id="modalBackup">
+    <div class="modal">
+      <h3>💾 Backup de Dados</h3>
+      <p style="color:var(--text-secondary);margin-bottom:16px;font-size:0.9rem;">Seus dados serão salvos em um arquivo JSON que pode ser salvo e restaurado depois.</p>
+      <div id="backupPreview" style="background:var(--bg-input);padding:14px;border-radius:8px;max-height:200px;overflow-y:auto;margin-bottom:16px;font-size:0.8rem;font-family:monospace;white-space:pre-wrap;word-break:break-all;color:var(--text-secondary);"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="fecharModalBackup()">Cancelar</button>
+        <button class="btn-primary" onclick="baixarJSON()">⬇️ Baixar JSON</button>
       </div>
     </div>
   </div>
@@ -1886,6 +1902,61 @@
       if (mesesRestantes > 0 || anos === 0) tempo += `${mesesRestantes} ${mesesRestantes === 1 ? 'mês' : 'meses'}`;
 
       res.innerHTML = `🎯 Guardando <strong>${fmt(aporte)}/mês<\/strong>, você atinge <strong>${fmt(meta)}<\/strong> em <strong>${tempo}<\/strong> (${meses} parcelas).`;
+    }
+
+    /* ==========================================================
+       BACKUP JSON
+    ========================================================== */
+    function exportarJSON() {
+      const preview = document.getElementById('backupPreview');
+      const jsonData = JSON.stringify(dados, null, 2);
+      preview.textContent = jsonData.substring(0, 500) + (jsonData.length > 500 ? '\n... (' + (jsonData.length - 500) + ' caracteres) ...' : '');
+      document.getElementById('modalBackup').classList.add('show');
+    }
+
+    function fecharModalBackup() {
+      document.getElementById('modalBackup').classList.remove('show');
+    }
+
+    function baixarJSON() {
+      const jsonData = JSON.stringify(dados, null, 2);
+      const blob = new Blob([jsonData], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `lean-finance-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      fecharModalBackup();
+      mostrarToast('✅ Backup salvo com sucesso!', 'success');
+    }
+
+    function importarJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          if (!importedData.lancamentos || !importedData.metas) {
+            throw new Error('Formato de arquivo inválido');
+          }
+          
+          if (confirm('Deseja restaurar os dados deste arquivo? Os dados atuais serão substituídos.')) {
+            dados = importedData;
+            salvarDados();
+            renderAll();
+            mostrarToast('✅ Dados restaurados com sucesso!', 'success');
+          }
+        } catch (err) {
+          mostrarToast('❌ Erro ao importar: ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = ''; // Reset input
     }
 
     /* ==========================================================

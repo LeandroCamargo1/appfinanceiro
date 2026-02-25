@@ -1,0 +1,39 @@
+{
+  "lancamentos": [
+    {
+      "id": "r1",
+      "descricao": "Salário Leandro",
+      "valor": 4000,
+      "categoria": "Receitas Fixas",
+      "tipo": "receita",
+      "parcela": ""
+    },
+    {
+      "id": "r2",
+      "descricao": "Salário Leidiane",
+      "valor": 2800,
+      "categoria": "Receitas Fixas",
+      "tipo": "receita",
+      "parcela": ""
+    },
+    {
+      "id": "d1",
+      "descricao": "EDP",
+      "valor": 200,
+      "categoria": "Moradia",
+      "tipo": "despesa",
+      "parcela": ""
+    }
+  ],
+  "metas": [
+    {
+      "id": "m1",
+      "nome": "Férias",
+      "valorTotal": 5000,
+      "valorGuardado": 1200,
+      "dataAlvo": "",
+      "prioridade": "alta",
+      "dataConclusao": null
+    }
+  ]
+}
