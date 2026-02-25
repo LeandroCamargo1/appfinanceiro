@@ -3,23 +3,39 @@
     {
       "id": "r1",
       "descricao": "Salário Leandro",
-      "valor": 4000,
+      "valor": 1600,
       "categoria": "Receitas Fixas",
       "tipo": "receita",
       "parcela": ""
     },
     {
       "id": "r2",
-      "descricao": "Salário Leidiane",
-      "valor": 2800,
+      "descricao": "Ressarcimento GitHub (HOKKAIDO)",
+      "valor": 293.61,
       "categoria": "Receitas Fixas",
       "tipo": "receita",
       "parcela": ""
     },
     {
       "id": "d1",
-      "descricao": "EDP",
-      "valor": 200,
+      "descricao": "Internet",
+      "valor": 348,
+      "categoria": "Moradia",
+      "tipo": "despesa",
+      "parcela": ""
+    },
+    {
+      "id": "d2",
+      "descricao": "EDP (Energia)",
+      "valor": 230.42,
+      "categoria": "Moradia",
+      "tipo": "despesa",
+      "parcela": ""
+    },
+    {
+      "id": "d3",
+      "descricao": "SABESP (Água)",
+      "valor": 72.45,
       "categoria": "Moradia",
       "tipo": "despesa",
       "parcela": ""
@@ -28,9 +44,9 @@
   "metas": [
     {
       "id": "m1",
-      "nome": "Férias",
-      "valorTotal": 5000,
-      "valorGuardado": 1200,
+      "nome": "Nossa Casa",
+      "valorTotal": 100000,
+      "valorGuardado": 50,
       "dataAlvo": "",
       "prioridade": "alta",
       "dataConclusao": null

@@ -1013,40 +1013,49 @@
     ========================================================== */
     const DADOS_INICIAIS = {
       lancamentos: [
-        // Receitas
-        { id: 'r1', descricao: 'Salário Leandro', valor: 4000, categoria: 'Receitas Fixas', tipo: 'receita', parcela: '' },
-        { id: 'r2', descricao: 'Salário Leidiane', valor: 2800, categoria: 'Receitas Fixas', tipo: 'receita', parcela: '' },
-        // Despesas
-        { id: 'd1', descricao: 'EDP', valor: 200, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
-        { id: 'd2', descricao: 'SABESP', valor: 75, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
-        { id: 'd3', descricao: 'Internet', valor: 360, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
-        { id: 'd4', descricao: 'Gasolina', valor: 400, categoria: 'Transporte', tipo: 'despesa', parcela: '' },
-        { id: 'd5', descricao: 'TV Cabo', valor: 30, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
-        { id: 'd6', descricao: 'IPVA', valor: 190, categoria: 'Impostos', tipo: 'despesa', parcela: '' },
-        { id: 'd7', descricao: 'Alura', valor: 97, categoria: 'Educação', tipo: 'despesa', parcela: 'recorrente' },
-        { id: 'd8', descricao: 'Copilot', valor: 51.99, categoria: 'Educação', tipo: 'despesa', parcela: '' },
-        { id: 'd9', descricao: 'Facul Leandro', valor: 314.27, categoria: 'Educação', tipo: 'despesa', parcela: '' },
-        { id: 'd10', descricao: 'Facul Leidiane', valor: 276.38, categoria: 'Educação', tipo: 'despesa', parcela: '' },
-        { id: 'd11', descricao: 'Pós Leandro', valor: 211, categoria: 'Educação', tipo: 'despesa', parcela: '' },
+        // === Receitas ===
+        { id: 'r1', descricao: 'Salário Leandro', valor: 1600, categoria: 'Receitas Fixas', tipo: 'receita', parcela: '' },
+        { id: 'r2', descricao: 'Ressarcimento GitHub (HOKKAIDO)', valor: 293.61, categoria: 'Receitas Fixas', tipo: 'receita', parcela: '' },
+        // === Custos Fixos e Moradia ===
+        { id: 'd1', descricao: 'Internet', valor: 348, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
+        { id: 'd2', descricao: 'EDP (Energia)', valor: 230.42, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
+        { id: 'd3', descricao: 'SABESP (Água)', valor: 72.45, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
+        { id: 'd4', descricao: 'TV a Cabo', valor: 30, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
+        { id: 'd5', descricao: 'Moradia (Nagumo/Rosalina)', valor: 109.02, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
+        // === Educação e Assinaturas ===
+        { id: 'd6', descricao: 'Faculdade Leandro', valor: 314.27, categoria: 'Educação', tipo: 'despesa', parcela: '' },
+        { id: 'd7', descricao: 'Faculdade Leidiane', valor: 276.38, categoria: 'Educação', tipo: 'despesa', parcela: '' },
+        { id: 'd8', descricao: 'Pós-Graduação Leandro', valor: 211, categoria: 'Educação', tipo: 'despesa', parcela: '' },
+        { id: 'd9', descricao: 'Alura', valor: 97, categoria: 'Educação', tipo: 'despesa', parcela: 'recorrente' },
+        { id: 'd10', descricao: 'Copilot', valor: 51.99, categoria: 'Educação', tipo: 'despesa', parcela: '' },
+        { id: 'd11', descricao: 'Google GB', valor: 9.99, categoria: 'Educação', tipo: 'despesa', parcela: '' },
+        // === Saúde e Bem-Estar ===
         { id: 'd12', descricao: 'Jiu Jitsu', valor: 288, categoria: 'Saúde', tipo: 'despesa', parcela: '' },
-        { id: 'd13', descricao: 'Wellhub', valor: 120, categoria: 'Saúde', tipo: 'despesa', parcela: '' },
-        { id: 'd14', descricao: 'Crunchyroll', valor: 15, categoria: 'Lazer', tipo: 'despesa', parcela: '' },
-        { id: 'd15', descricao: 'Wegovy', valor: 112.19, categoria: 'Saúde', tipo: 'despesa', parcela: '' },
-        { id: 'd16', descricao: 'Suplemento', valor: 107.77, categoria: 'Cartão Santander', tipo: 'despesa', parcela: '3/3' },
-        { id: 'd17', descricao: 'Perfume', valor: 96.50, categoria: 'Cartão Santander', tipo: 'despesa', parcela: '3/6' },
-        { id: 'd18', descricao: 'Roupa', valor: 138.81, categoria: 'Cartão Santander', tipo: 'despesa', parcela: '3/3' },
-        { id: 'd19', descricao: 'Escapamento', valor: 95, categoria: 'Cartão Santander', tipo: 'despesa', parcela: '4/10' },
-        { id: 'd20', descricao: 'Empréstimo', valor: 510, categoria: 'Cartão Nubank', tipo: 'despesa', parcela: '2/10' },
-        { id: 'd21', descricao: 'Notebook', valor: 170.73, categoria: 'Cartão Nubank', tipo: 'despesa', parcela: '5/10' },
-        { id: 'd22', descricao: 'Boticário', valor: 52.62, categoria: 'Cartão Nubank', tipo: 'despesa', parcela: '2/3' },
-        { id: 'd23', descricao: 'Shopee', valor: 61.56, categoria: 'Compras', tipo: 'despesa', parcela: '' },
+        { id: 'd13', descricao: 'Dentista', valor: 150, categoria: 'Saúde', tipo: 'despesa', parcela: '' },
+        { id: 'd14', descricao: 'Wellhub', valor: 120, categoria: 'Saúde', tipo: 'despesa', parcela: '' },
+        { id: 'd15', descricao: 'Wegovy (Medicamento)', valor: 112.19, categoria: 'Saúde', tipo: 'despesa', parcela: '' },
+        { id: 'd16', descricao: 'Nimesulida', valor: 5.39, categoria: 'Saúde', tipo: 'despesa', parcela: '' },
+        // === Transporte e Manutenção ===
+        { id: 'd17', descricao: 'Gasolina', valor: 400, categoria: 'Transporte', tipo: 'despesa', parcela: '' },
+        { id: 'd18', descricao: 'Mecânico', valor: 256.65, categoria: 'Manutenção', tipo: 'despesa', parcela: '' },
+        { id: 'd19', descricao: 'IPVA', valor: 190.31, categoria: 'Impostos', tipo: 'despesa', parcela: '' },
+        { id: 'd20', descricao: 'Manutenção Celular (Tela)', valor: 91.52, categoria: 'Manutenção', tipo: 'despesa', parcela: '1/3' },
+        // === Estilo de Vida, Compras e Lazer ===
+        { id: 'd21', descricao: 'Perfume Árabe', valor: 175, categoria: 'Compras', tipo: 'despesa', parcela: '1/2' },
+        { id: 'd22', descricao: 'Roupa Casamento', valor: 161, categoria: 'Eventos', tipo: 'despesa', parcela: '' },
+        { id: 'd23', descricao: 'C&A', valor: 102.50, categoria: 'Vestuário', tipo: 'despesa', parcela: '' },
         { id: 'd24', descricao: 'Loja Tá na Moda', valor: 78, categoria: 'Vestuário', tipo: 'despesa', parcela: '' },
-        { id: 'd25', descricao: 'C&A', valor: 102.50, categoria: 'Vestuário', tipo: 'despesa', parcela: '' },
-        { id: 'd26', descricao: 'Mecânico', valor: 256.65, categoria: 'Manutenção', tipo: 'despesa', parcela: '' },
-        { id: 'd27', descricao: 'Garrafa Água', valor: 73.20, categoria: 'Casa', tipo: 'despesa', parcela: '' },
-        { id: 'd28', descricao: 'Roupa Casamento', valor: 161, categoria: 'Eventos', tipo: 'despesa', parcela: '' },
+        { id: 'd25', descricao: 'Suplemento', valor: 107.77, categoria: 'Cartão Santander', tipo: 'despesa', parcela: '3/3' },
+        { id: 'd26', descricao: 'Lazer (Sorvetes/Futebol/Japa/Livro)', valor: 76.99, categoria: 'Lazer', tipo: 'despesa', parcela: '' },
+        // === Dívidas e Parcelamentos em Cartão ===
+        { id: 'd27', descricao: 'Empréstimo (Nubank)', valor: 510, categoria: 'Cartão Nubank', tipo: 'despesa', parcela: '2/10' },
+        { id: 'd28', descricao: 'Notebook (Nubank)', valor: 170.73, categoria: 'Cartão Nubank', tipo: 'despesa', parcela: '5/10' },
+        { id: 'd29', descricao: 'Escapamento', valor: 95, categoria: 'Cartão Santander', tipo: 'despesa', parcela: '4/10' },
+        { id: 'd30', descricao: 'Diversos Cartão (Boticário/Perfume/Roupa)', valor: 287.93, categoria: 'Cartão Santander', tipo: 'despesa', parcela: '' },
       ],
-      metas: []
+      metas: [
+        { id: 'm1', nome: 'Nossa Casa', valorTotal: 100000, valorGuardado: 50, dataAlvo: '', prioridade: 'alta', dataConclusao: null },
+      ]
     };
 
     /* ==========================================================
