@@ -909,6 +909,121 @@
       .orcamento-bar-track { min-width: 100%; }
       .evolucao-chart { height: 150px; }
     }
+
+    /* ======================================================
+       TOGGLE SWITCH (Fixo/Recorrente)
+    ====================================================== */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+    .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-switch .toggle-slider {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--text-muted); border-radius: 12px;
+      transition: all var(--transition-speed); cursor: pointer;
+    }
+    .toggle-switch .toggle-slider::before {
+      content: ''; position: absolute; width: 18px; height: 18px;
+      border-radius: 50%; background: #fff; top: 3px; left: 3px;
+      transition: transform var(--transition-speed);
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--green); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+    .badge-fixo { background: var(--accent-light); color: var(--accent); }
+
+    /* Conta & Responsável */
+    .badge-conta { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: 600; background: var(--blue-light); color: var(--blue); }
+    .badge-resp { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+
+    /* Date range filter */
+    .date-range-group { display: flex; align-items: center; gap: 6px; }
+    .date-range-group input[type="date"] {
+      padding: 8px 10px; border-radius: 50px;
+      background: var(--bg-input); color: var(--text-primary);
+      border: 1px solid var(--border); font-size: 0.8rem;
+    }
+    .date-range-group input[type="date"]:focus { border-color: var(--accent); }
+    .date-range-group span { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+
+    /* Previsão de Saldo Futuro */
+    .previsao-section {
+      background: var(--bg-card); border-radius: var(--radius);
+      padding: 24px; border: 1px solid var(--border); margin-bottom: 28px;
+    }
+    .previsao-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; }
+    .previsao-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .previsao-card {
+      background: var(--bg-input); border-radius: var(--radius-sm);
+      padding: 16px; text-align: center;
+    }
+    .previsao-card-mes { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+    .previsao-card-val { font-size: 1.2rem; font-weight: 800; }
+    .previsao-base { font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; }
+
+    /* Relatório Anual */
+    .relatorio-anual-content { max-height: 70vh; overflow-y: auto; }
+    .relatorio-resumo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .relatorio-resumo-card { background: var(--bg-input); border-radius: var(--radius-sm); padding: 14px; text-align: center; }
+    .relatorio-resumo-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+    .relatorio-resumo-valor { font-size: 1.3rem; font-weight: 800; margin-top: 4px; }
+    .relatorio-cat-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .relatorio-cat-table th, .relatorio-cat-table td { padding: 10px 12px; text-align: left; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
+    .relatorio-cat-table th { color: var(--text-muted); font-weight: 700; font-size: 0.75rem; text-transform: uppercase; }
+    .relatorio-select-ano { padding: 8px 14px; border-radius: 50px; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border); font-size: 0.85rem; font-weight: 600; }
+
+    /* Agendamentos */
+    .agendamentos-section {
+      background: var(--bg-card); border-radius: var(--radius);
+      padding: 24px; border: 1px solid var(--border); margin-bottom: 28px;
+    }
+    .agendamentos-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .agendamento-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-radius: var(--radius-sm);
+      background: var(--bg-input); margin-bottom: 8px;
+    }
+    .agendamento-info { flex: 1; }
+    .agendamento-desc { font-weight: 600; font-size: 0.9rem; }
+    .agendamento-details { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+    .agendamento-valor { font-weight: 700; min-width: 100px; text-align: right; margin-right: 12px; }
+    .agendamento-actions { display: flex; gap: 6px; }
+
+    /* Histórico de Aportes */
+    .aportes-historico { margin-top: 12px; }
+    .aportes-historico-title { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; cursor: pointer; }
+    .aportes-historico-title:hover { color: var(--accent); }
+    .aporte-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 12px; font-size: 0.8rem;
+      border-left: 3px solid var(--green); margin-bottom: 4px;
+      background: var(--bg-input); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+    .aporte-data { color: var(--text-muted); }
+    .aporte-valor { font-weight: 700; color: var(--green); }
+
+    /* Parcelas Consolidadas */
+    .parcelas-view { max-height: 60vh; overflow-y: auto; }
+    .parcela-serie {
+      background: var(--bg-input); border-radius: var(--radius-sm);
+      padding: 16px; margin-bottom: 12px;
+    }
+    .parcela-serie-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .parcela-serie-nome { font-weight: 700; font-size: 0.95rem; }
+    .parcela-serie-info { font-size: 0.8rem; color: var(--text-muted); }
+    .parcela-timeline { display: flex; gap: 4px; flex-wrap: wrap; }
+    .parcela-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 700;
+    }
+    .parcela-dot-paid { background: var(--green-light); color: var(--green); }
+    .parcela-dot-current { background: var(--accent); color: #fff; }
+    .parcela-dot-future { background: var(--bg-primary); color: var(--text-muted); border: 1px solid var(--border); }
+
+    @media (max-width: 768px) {
+      .previsao-grid { grid-template-columns: 1fr; }
+      .date-range-group { flex-wrap: wrap; }
+      .relatorio-resumo-grid { grid-template-columns: 1fr 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -1022,6 +1137,12 @@
     <!-- Gráfico de Evolução Mensal -->
     <div class="evolucao-section" id="evolucaoSection"></div>
 
+    <!-- Previsão de Saldo Futuro -->
+    <div class="previsao-section" id="previsaoSection"></div>
+
+    <!-- Agendamentos Futuros -->
+    <div class="agendamentos-section" id="agendamentosSection"></div>
+
     <!-- Alertas -->
     <div class="alerts-container" id="alertsContainer"></div>
 
@@ -1064,7 +1185,7 @@
   <!-- ========== LANÇAMENTOS ========== -->
   <section id="tab-lancamentos" class="tab-content">
     <div class="lancamentos-toolbar">
-      <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar por descrição..." oninput="renderTable()">
+      <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar descrição, valor ou categoria..." oninput="renderTable()">
       <select class="filter-select" id="filterCategoria" onchange="renderTable()">
         <option value="">Todas as categorias</option>
       </select>
@@ -1073,8 +1194,24 @@
         <option value="receita">Receitas</option>
         <option value="despesa">Despesas</option>
       </select>
+      <select class="filter-select" id="filterConta" onchange="renderTable()">
+        <option value="">Todas as contas</option>
+      </select>
+      <select class="filter-select" id="filterResp" onchange="renderTable()">
+        <option value="">Todos</option>
+        <option value="Leandro">Leandro</option>
+        <option value="Leidiane">Leidiane</option>
+        <option value="Ambos">Ambos</option>
+      </select>
+      <div class="date-range-group">
+        <span>De</span>
+        <input type="date" id="filterDataInicio" onchange="renderTable()">
+        <span>Até</span>
+        <input type="date" id="filterDataFim" onchange="renderTable()">
+      </div>
       <button class="btn-primary" onclick="abrirModalLancamento()">＋ Novo Lançamento</button>
-      <button class="btn-secondary" onclick="exportarPDF()">📄 Exportar PDF</button>
+      <button class="btn-secondary" onclick="exportarPDF()">📄 PDF</button>
+      <button class="btn-secondary" onclick="exportarCSV()">📊 CSV</button>
     </div>
     <div class="table-wrapper">
       <table>
@@ -1082,6 +1219,8 @@
           <tr>
             <th onclick="sortTable('descricao')">Descrição <span class="sort-icon">⇅</span></th>
             <th onclick="sortTable('categoria')">Categoria <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable('conta')">Conta <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable('responsavel')">Resp. <span class="sort-icon">⇅</span></th>
             <th onclick="sortTable('valor')">Valor <span class="sort-icon">⇅</span></th>
             <th onclick="sortTable('data')">Data <span class="sort-icon">⇅</span></th>
             <th>Tipo</th>
@@ -1169,6 +1308,9 @@
     <button class="fab-option" onclick="exportarPDF(); toggleFabMenu();">📄 Exportar PDF</button>
     <button class="fab-option" onclick="abrirModalOrcamento(); toggleFabMenu();">📊 Orçamento</button>
     <button class="fab-option" onclick="abrirModalCategorias(); toggleFabMenu();">🏷️ Categorias</button>
+    <button class="fab-option" onclick="abrirModalAgendamento(); toggleFabMenu();">📅 Agendar Lançamento</button>
+    <button class="fab-option" onclick="abrirRelatorioAnual(); toggleFabMenu();">📊 Relatório Anual</button>
+    <button class="fab-option" onclick="abrirModalParcelas(); toggleFabMenu();">🔄 Ver Parcelas</button>
     <button class="fab-option" onclick="exportarJSON(); toggleFabMenu();">💾 Salvar JSON</button>
     <button class="fab-option" onclick="document.getElementById('importJSONInput').click(); toggleFabMenu();">📂 Carregar JSON</button>
   </div>
@@ -1204,6 +1346,27 @@
       <div class="form-group">
         <label for="lancData">Data</label>
         <input type="date" id="lancData">
+      </div>
+      <div class="form-group">
+        <label for="lancConta">Conta / Carteira</label>
+        <select id="lancConta"></select>
+      </div>
+      <div class="form-group">
+        <label for="lancResponsavel">Responsável</label>
+        <select id="lancResponsavel">
+          <option value="Leandro">Leandro</option>
+          <option value="Leidiane">Leidiane</option>
+          <option value="Ambos">Ambos</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="toggle-row">
+          <label for="lancFixo">Despesa Fixa (copiar ao fechar mês)</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="lancFixo">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
       </div>
       <input type="hidden" id="lancEditId" value="">
       <div class="modal-actions">
@@ -1306,6 +1469,77 @@
     </div>
   </div>
 
+  <!-- ========== MODAL AGENDAMENTO ========== -->
+  <div class="modal-overlay" id="modalAgendamento">
+    <div class="modal">
+      <h3>📅 Agendar Lançamento Futuro</h3>
+      <div class="form-group">
+        <label for="agendDesc">Descrição</label>
+        <input type="text" id="agendDesc" placeholder="Ex: IPVA 2027">
+      </div>
+      <div class="form-group">
+        <label for="agendValor">Valor (R$)</label>
+        <input type="number" id="agendValor" placeholder="Ex: 500" step="0.01">
+      </div>
+      <div class="form-group">
+        <label for="agendCategoria">Categoria</label>
+        <select id="agendCategoria"></select>
+      </div>
+      <div class="form-group">
+        <label for="agendTipo">Tipo</label>
+        <select id="agendTipo">
+          <option value="despesa">Despesa</option>
+          <option value="receita">Receita</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="agendData">Data Prevista</label>
+        <input type="date" id="agendData">
+      </div>
+      <div class="form-group">
+        <label for="agendConta">Conta</label>
+        <select id="agendConta"></select>
+      </div>
+      <div class="form-group">
+        <label for="agendResp">Responsável</label>
+        <select id="agendResp">
+          <option value="Leandro">Leandro</option>
+          <option value="Leidiane">Leidiane</option>
+          <option value="Ambos">Ambos</option>
+        </select>
+      </div>
+      <input type="hidden" id="agendEditId" value="">
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="fecharModalAgendamento()">Cancelar</button>
+        <button class="btn-primary" onclick="salvarAgendamento()">📅 Agendar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL RELATÓRIO ANUAL ========== -->
+  <div class="modal-overlay" id="modalRelatorioAnual">
+    <div class="modal" style="max-width:700px;">
+      <h3>📊 Relatório Anual Consolidado
+        <select class="relatorio-select-ano" id="relatorioAno" onchange="renderRelatorioAnual()"></select>
+      </h3>
+      <div class="relatorio-anual-content" id="relatorioAnualContent"></div>
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="fecharRelatorioAnual()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL PARCELAS CONSOLIDADAS ========== -->
+  <div class="modal-overlay" id="modalParcelas">
+    <div class="modal" style="max-width:600px;">
+      <h3>🔄 Parcelas — Visão Consolidada</h3>
+      <div class="parcelas-view" id="parcelasContent"></div>
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="fecharModalParcelas()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ========== CONQUISTA POPUP ========== -->
   <div class="overlay" id="conquistaOverlay" onclick="fecharConquista()"></div>
   <div class="conquista-popup" id="conquistaPopup">
@@ -1365,53 +1599,56 @@
        DADOS INICIAIS
     ========================================================== */
     const CATEGORIAS_PADRAO = ['Receitas Fixas','Moradia','Transporte','Impostos','Educação','Saúde','Lazer','Cartão Santander','Cartão Nubank','Compras','Vestuário','Manutenção','Casa','Eventos','Outros'];
+    const CONTAS_PADRAO = ['Nubank', 'Santander', 'Carteira', 'Outro'];
 
     const DADOS_INICIAIS = {
       categorias: [...CATEGORIAS_PADRAO],
+      contas: [...CONTAS_PADRAO],
       orcamentos: [],
+      agendados: [],
       lancamentos: [
         // === Receitas ===
-        { id: 'r1', descricao: 'Salário Leandro', valor: 1600, categoria: 'Receitas Fixas', tipo: 'receita', parcela: '' },
-        { id: 'r2', descricao: 'Ressarcimento GitHub (HOKKAIDO)', valor: 293.61, categoria: 'Receitas Fixas', tipo: 'receita', parcela: '' },
+        { id: 'r1', descricao: 'Salário Leandro', valor: 1600, categoria: 'Receitas Fixas', tipo: 'receita', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Leandro' },
+        { id: 'r2', descricao: 'Ressarcimento GitHub (HOKKAIDO)', valor: 293.61, categoria: 'Receitas Fixas', tipo: 'receita', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Leandro' },
         // === Custos Fixos e Moradia ===
-        { id: 'd1', descricao: 'Internet', valor: 348, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
-        { id: 'd2', descricao: 'EDP (Energia)', valor: 230.42, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
-        { id: 'd3', descricao: 'SABESP (Água)', valor: 72.45, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
-        { id: 'd4', descricao: 'TV a Cabo', valor: 30, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
-        { id: 'd5', descricao: 'Moradia (Nagumo/Rosalina)', valor: 109.02, categoria: 'Moradia', tipo: 'despesa', parcela: '' },
+        { id: 'd1', descricao: 'Internet', valor: 348, categoria: 'Moradia', tipo: 'despesa', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Ambos' },
+        { id: 'd2', descricao: 'EDP (Energia)', valor: 230.42, categoria: 'Moradia', tipo: 'despesa', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Ambos' },
+        { id: 'd3', descricao: 'SABESP (Água)', valor: 72.45, categoria: 'Moradia', tipo: 'despesa', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Ambos' },
+        { id: 'd4', descricao: 'TV a Cabo', valor: 30, categoria: 'Moradia', tipo: 'despesa', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Ambos' },
+        { id: 'd5', descricao: 'Moradia (Nagumo/Rosalina)', valor: 109.02, categoria: 'Moradia', tipo: 'despesa', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Ambos' },
         // === Educação e Assinaturas ===
-        { id: 'd6', descricao: 'Faculdade Leandro', valor: 314.27, categoria: 'Educação', tipo: 'despesa', parcela: '' },
-        { id: 'd7', descricao: 'Faculdade Leidiane', valor: 276.38, categoria: 'Educação', tipo: 'despesa', parcela: '' },
-        { id: 'd8', descricao: 'Pós-Graduação Leandro', valor: 211, categoria: 'Educação', tipo: 'despesa', parcela: '' },
-        { id: 'd9', descricao: 'Alura', valor: 97, categoria: 'Educação', tipo: 'despesa', parcela: 'recorrente' },
-        { id: 'd10', descricao: 'Copilot', valor: 51.99, categoria: 'Educação', tipo: 'despesa', parcela: '' },
-        { id: 'd11', descricao: 'Google GB', valor: 9.99, categoria: 'Educação', tipo: 'despesa', parcela: '' },
+        { id: 'd6', descricao: 'Faculdade Leandro', valor: 314.27, categoria: 'Educação', tipo: 'despesa', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Leandro' },
+        { id: 'd7', descricao: 'Faculdade Leidiane', valor: 276.38, categoria: 'Educação', tipo: 'despesa', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Leidiane' },
+        { id: 'd8', descricao: 'Pós-Graduação Leandro', valor: 211, categoria: 'Educação', tipo: 'despesa', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Leandro' },
+        { id: 'd9', descricao: 'Alura', valor: 97, categoria: 'Educação', tipo: 'despesa', parcela: 'recorrente', fixo: true, conta: 'Nubank', responsavel: 'Leandro' },
+        { id: 'd10', descricao: 'Copilot', valor: 51.99, categoria: 'Educação', tipo: 'despesa', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Leandro' },
+        { id: 'd11', descricao: 'Google GB', valor: 9.99, categoria: 'Educação', tipo: 'despesa', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Leandro' },
         // === Saúde e Bem-Estar ===
-        { id: 'd12', descricao: 'Jiu Jitsu', valor: 288, categoria: 'Saúde', tipo: 'despesa', parcela: '' },
-        { id: 'd13', descricao: 'Dentista', valor: 150, categoria: 'Saúde', tipo: 'despesa', parcela: '' },
-        { id: 'd14', descricao: 'Wellhub', valor: 120, categoria: 'Saúde', tipo: 'despesa', parcela: '' },
-        { id: 'd15', descricao: 'Wegovy (Medicamento)', valor: 112.19, categoria: 'Saúde', tipo: 'despesa', parcela: '' },
-        { id: 'd16', descricao: 'Nimesulida', valor: 5.39, categoria: 'Saúde', tipo: 'despesa', parcela: '' },
+        { id: 'd12', descricao: 'Jiu Jitsu', valor: 288, categoria: 'Saúde', tipo: 'despesa', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Leandro' },
+        { id: 'd13', descricao: 'Dentista', valor: 150, categoria: 'Saúde', tipo: 'despesa', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Ambos' },
+        { id: 'd14', descricao: 'Wellhub', valor: 120, categoria: 'Saúde', tipo: 'despesa', parcela: '', fixo: true, conta: 'Nubank', responsavel: 'Leidiane' },
+        { id: 'd15', descricao: 'Wegovy (Medicamento)', valor: 112.19, categoria: 'Saúde', tipo: 'despesa', parcela: '', fixo: false, conta: 'Nubank', responsavel: 'Ambos' },
+        { id: 'd16', descricao: 'Nimesulida', valor: 5.39, categoria: 'Saúde', tipo: 'despesa', parcela: '', fixo: false, conta: 'Carteira', responsavel: 'Ambos' },
         // === Transporte e Manutenção ===
-        { id: 'd17', descricao: 'Gasolina', valor: 400, categoria: 'Transporte', tipo: 'despesa', parcela: '' },
-        { id: 'd18', descricao: 'Mecânico', valor: 256.65, categoria: 'Manutenção', tipo: 'despesa', parcela: '' },
-        { id: 'd19', descricao: 'IPVA', valor: 190.31, categoria: 'Impostos', tipo: 'despesa', parcela: '' },
-        { id: 'd20', descricao: 'Manutenção Celular (Tela)', valor: 91.52, categoria: 'Manutenção', tipo: 'despesa', parcela: '1/3' },
+        { id: 'd17', descricao: 'Gasolina', valor: 400, categoria: 'Transporte', tipo: 'despesa', parcela: '', fixo: true, conta: 'Carteira', responsavel: 'Leandro' },
+        { id: 'd18', descricao: 'Mecânico', valor: 256.65, categoria: 'Manutenção', tipo: 'despesa', parcela: '', fixo: false, conta: 'Nubank', responsavel: 'Leandro' },
+        { id: 'd19', descricao: 'IPVA', valor: 190.31, categoria: 'Impostos', tipo: 'despesa', parcela: '', fixo: false, conta: 'Nubank', responsavel: 'Leandro' },
+        { id: 'd20', descricao: 'Manutenção Celular (Tela)', valor: 91.52, categoria: 'Manutenção', tipo: 'despesa', parcela: '1/3', fixo: false, conta: 'Nubank', responsavel: 'Leandro' },
         // === Estilo de Vida, Compras e Lazer ===
-        { id: 'd21', descricao: 'Perfume Árabe', valor: 175, categoria: 'Compras', tipo: 'despesa', parcela: '1/2' },
-        { id: 'd22', descricao: 'Roupa Casamento', valor: 161, categoria: 'Eventos', tipo: 'despesa', parcela: '' },
-        { id: 'd23', descricao: 'C&A', valor: 102.50, categoria: 'Vestuário', tipo: 'despesa', parcela: '' },
-        { id: 'd24', descricao: 'Loja Tá na Moda', valor: 78, categoria: 'Vestuário', tipo: 'despesa', parcela: '' },
-        { id: 'd25', descricao: 'Suplemento', valor: 107.77, categoria: 'Cartão Santander', tipo: 'despesa', parcela: '3/3' },
-        { id: 'd26', descricao: 'Lazer (Sorvetes/Futebol/Japa/Livro)', valor: 76.99, categoria: 'Lazer', tipo: 'despesa', parcela: '' },
+        { id: 'd21', descricao: 'Perfume Árabe', valor: 175, categoria: 'Compras', tipo: 'despesa', parcela: '1/2', fixo: false, conta: 'Santander', responsavel: 'Leandro' },
+        { id: 'd22', descricao: 'Roupa Casamento', valor: 161, categoria: 'Eventos', tipo: 'despesa', parcela: '', fixo: false, conta: 'Santander', responsavel: 'Ambos' },
+        { id: 'd23', descricao: 'C&A', valor: 102.50, categoria: 'Vestuário', tipo: 'despesa', parcela: '', fixo: false, conta: 'Nubank', responsavel: 'Leidiane' },
+        { id: 'd24', descricao: 'Loja Tá na Moda', valor: 78, categoria: 'Vestuário', tipo: 'despesa', parcela: '', fixo: false, conta: 'Nubank', responsavel: 'Leidiane' },
+        { id: 'd25', descricao: 'Suplemento', valor: 107.77, categoria: 'Cartão Santander', tipo: 'despesa', parcela: '3/3', fixo: false, conta: 'Santander', responsavel: 'Leandro' },
+        { id: 'd26', descricao: 'Lazer (Sorvetes/Futebol/Japa/Livro)', valor: 76.99, categoria: 'Lazer', tipo: 'despesa', parcela: '', fixo: false, conta: 'Carteira', responsavel: 'Ambos' },
         // === Dívidas e Parcelamentos em Cartão ===
-        { id: 'd27', descricao: 'Empréstimo (Nubank)', valor: 510, categoria: 'Cartão Nubank', tipo: 'despesa', parcela: '2/10' },
-        { id: 'd28', descricao: 'Notebook (Nubank)', valor: 170.73, categoria: 'Cartão Nubank', tipo: 'despesa', parcela: '5/10' },
-        { id: 'd29', descricao: 'Escapamento', valor: 95, categoria: 'Cartão Santander', tipo: 'despesa', parcela: '4/10' },
-        { id: 'd30', descricao: 'Diversos Cartão (Boticário/Perfume/Roupa)', valor: 287.93, categoria: 'Cartão Santander', tipo: 'despesa', parcela: '' },
+        { id: 'd27', descricao: 'Empréstimo (Nubank)', valor: 510, categoria: 'Cartão Nubank', tipo: 'despesa', parcela: '2/10', fixo: false, conta: 'Nubank', responsavel: 'Leandro' },
+        { id: 'd28', descricao: 'Notebook (Nubank)', valor: 170.73, categoria: 'Cartão Nubank', tipo: 'despesa', parcela: '5/10', fixo: false, conta: 'Nubank', responsavel: 'Leandro' },
+        { id: 'd29', descricao: 'Escapamento', valor: 95, categoria: 'Cartão Santander', tipo: 'despesa', parcela: '4/10', fixo: false, conta: 'Santander', responsavel: 'Leandro' },
+        { id: 'd30', descricao: 'Diversos Cartão (Boticário/Perfume/Roupa)', valor: 287.93, categoria: 'Cartão Santander', tipo: 'despesa', parcela: '', fixo: false, conta: 'Santander', responsavel: 'Ambos' },
       ],
       metas: [
-        { id: 'm1', nome: 'Nossa Casa', valorTotal: 100000, valorGuardado: 50, dataAlvo: '', prioridade: 'alta', dataConclusao: null },
+        { id: 'm1', nome: 'Nossa Casa', valorTotal: 100000, valorGuardado: 50, dataAlvo: '', prioridade: 'alta', dataConclusao: null, aportes: [] },
       ]
     };
 
@@ -1509,9 +1746,21 @@
         if (!dados.metas) dados.metas = [];
         if (!dados.categorias) dados.categorias = [...CATEGORIAS_PADRAO];
         if (!dados.orcamentos) dados.orcamentos = [];
+        if (!dados.contas) dados.contas = [...CONTAS_PADRAO];
+        if (!dados.agendados) dados.agendados = [];
       } else {
         dados = JSON.parse(JSON.stringify(DADOS_INICIAIS));
       }
+      // Migra campos novos em lançamentos existentes
+      dados.lancamentos.forEach(l => {
+        if (l.fixo === undefined) l.fixo = (l.tipo === 'receita' || l.parcela === 'recorrente');
+        if (!l.conta) l.conta = '';
+        if (!l.responsavel) l.responsavel = '';
+      });
+      // Migra aportes nas metas
+      dados.metas.forEach(m => {
+        if (!m.aportes) m.aportes = [];
+      });
       // Define mês atual e migra dados antigos sem campo 'mes'
       mesAtual = getMesAtualStr();
       const migrou = migrarDadosMes();
@@ -1578,6 +1827,14 @@
           if (!dados.metas) dados.metas = [];
           if (!dados.categorias) dados.categorias = [...CATEGORIAS_PADRAO];
           if (!dados.orcamentos) dados.orcamentos = [];
+          if (!dados.contas) dados.contas = [...CONTAS_PADRAO];
+          if (!dados.agendados) dados.agendados = [];
+          dados.lancamentos.forEach(l => {
+            if (l.fixo === undefined) l.fixo = (l.tipo === 'receita' || l.parcela === 'recorrente');
+            if (!l.conta) l.conta = '';
+            if (!l.responsavel) l.responsavel = '';
+          });
+          dados.metas.forEach(m => { if (!m.aportes) m.aportes = []; });
           const migrou = migrarDadosMes();
           atualizarContadorId();
 
@@ -1604,6 +1861,14 @@
           if (!dados.metas) dados.metas = [];
           if (!dados.categorias) dados.categorias = [...CATEGORIAS_PADRAO];
           if (!dados.orcamentos) dados.orcamentos = [];
+          if (!dados.contas) dados.contas = [...CONTAS_PADRAO];
+          if (!dados.agendados) dados.agendados = [];
+          dados.lancamentos.forEach(l => {
+            if (l.fixo === undefined) l.fixo = (l.tipo === 'receita' || l.parcela === 'recorrente');
+            if (!l.conta) l.conta = '';
+            if (!l.responsavel) l.responsavel = '';
+          });
+          dados.metas.forEach(m => { if (!m.aportes) m.aportes = []; });
           migrarDadosMes();
           atualizarContadorId();
           localStorage.setItem('leanFinanceData', JSON.stringify(dados));
@@ -1652,26 +1917,61 @@
       if (receitas === 0) return 0;
       let nota = 10;
 
-      // Comprometimento geral (quanto mais gasta, menor a nota)
+      // 1. Comprometimento geral (peso alto)
       const compGeral = (despesas / receitas) * 100;
-      if (compGeral > 100) nota -= 5;
-      else if (compGeral > 90) nota -= 4;
-      else if (compGeral > 80) nota -= 3;
-      else if (compGeral > 70) nota -= 2;
-      else if (compGeral > 60) nota -= 1;
+      if (compGeral > 100) nota -= 4;
+      else if (compGeral > 90) nota -= 3;
+      else if (compGeral > 80) nota -= 2;
+      else if (compGeral > 70) nota -= 1;
+      else if (compGeral > 60) nota -= 0.5;
 
-      // Comprometimento cartões
+      // 2. Taxa de poupança (quanto sobra / receita)
+      const taxaPoupanca = Math.max(0, saldo / receitas) * 100;
+      if (taxaPoupanca >= 20) nota += 1;
+      else if (taxaPoupanca >= 10) nota += 0.5;
+      else if (taxaPoupanca < 5) nota -= 0.5;
+
+      // 3. Comprometimento com dívidas/cartões (relação dívida/renda)
       const compCartoes = calcularComprometimentoCartoes();
-      if (compCartoes > 30) nota -= 2;
-      else if (compCartoes > 20) nota -= 1;
+      if (compCartoes > 40) nota -= 2;
+      else if (compCartoes > 30) nota -= 1.5;
+      else if (compCartoes > 20) nota -= 0.5;
 
-      // Saldo positivo
-      if (saldo > 1000) nota += 1;
-      if (saldo < 0) nota -= 2;
+      // 4. Parcelas ativas (número de parcelamentos)
+      const parcelasAtivas = dados.lancamentos.filter(l =>
+        l.mes === mesAtual && l.parcela && l.parcela !== 'recorrente' && l.parcela.includes('/')
+      ).length;
+      if (parcelasAtivas > 5) nota -= 1;
+      else if (parcelasAtivas > 3) nota -= 0.5;
 
-      // Metas ativas
+      // 5. Diversidade de poupança (metas + aportes)
       const metasAtivas = dados.metas.filter(m => (m.valorGuardado / m.valorTotal) < 1).length;
+      const totalGuardado = dados.metas.reduce((s, m) => s + m.valorGuardado, 0);
       if (metasAtivas > 0) nota += 0.5;
+      if (totalGuardado > 1000) nota += 0.5;
+
+      // 6. Reserva de emergência (se tem meta com esse nome e >50%)
+      const reserva = dados.metas.find(m => m.nome.toLowerCase().includes('reserva') || m.nome.toLowerCase().includes('emerg'));
+      if (reserva) {
+        const pctReserva = (reserva.valorGuardado / reserva.valorTotal) * 100;
+        if (pctReserva >= 100) nota += 1;
+        else if (pctReserva >= 50) nota += 0.5;
+      }
+
+      // 7. Orçamentos configurados e respeitados
+      if (dados.orcamentos && dados.orcamentos.length > 0) {
+        const estourados = dados.orcamentos.filter(orc => {
+          const gasto = dados.lancamentos
+            .filter(l => l.mes === mesAtual && l.tipo === 'despesa' && l.categoria === orc.categoria)
+            .reduce((s, l) => s + l.valor, 0);
+          return orc.limite > 0 && gasto > orc.limite;
+        }).length;
+        if (estourados === 0) nota += 0.5;
+        else nota -= estourados * 0.3;
+      }
+
+      // 8. Saldo
+      if (saldo < 0) nota -= 2;
 
       return Math.max(0, Math.min(10, Math.round(nota * 10) / 10));
     }
@@ -1797,6 +2097,12 @@
 
       // Gráfico de evolução mensal
       renderEvolucao();
+
+      // Previsão de saldo futuro
+      renderPrevisao();
+
+      // Agendamentos futuros
+      renderAgendamentos();
 
       // Footer
       document.getElementById('footerReceitas').textContent = fmt(receitas);
@@ -1926,12 +2232,28 @@
       const search = document.getElementById('searchInput').value.toLowerCase();
       const cat = document.getElementById('filterCategoria').value;
       const tipo = document.getElementById('filterTipo').value;
+      const conta = document.getElementById('filterConta').value;
+      const resp = document.getElementById('filterResp').value;
+      const dataInicio = document.getElementById('filterDataInicio').value;
+      const dataFim = document.getElementById('filterDataFim').value;
 
       let filtered = dados.lancamentos.filter(l => {
-        if (l.mes !== mesAtual) return false;
-        if (search && !l.descricao.toLowerCase().includes(search)) return false;
+        // Filtro por mês (se não estiver usando filtro por período)
+        if (!dataInicio && !dataFim && l.mes !== mesAtual) return false;
+        // Busca por descrição, valor e categoria
+        if (search) {
+          const matchDesc = l.descricao.toLowerCase().includes(search);
+          const matchCat = l.categoria.toLowerCase().includes(search);
+          const matchValor = fmt(l.valor).toLowerCase().includes(search) || String(l.valor).includes(search);
+          const matchResp = (l.responsavel || '').toLowerCase().includes(search);
+          if (!matchDesc && !matchCat && !matchValor && !matchResp) return false;
+        }
         if (cat && l.categoria !== cat) return false;
         if (tipo && l.tipo !== tipo) return false;
+        if (conta && l.conta !== conta) return false;
+        if (resp && l.responsavel !== resp) return false;
+        if (dataInicio && l.data && l.data < dataInicio) return false;
+        if (dataFim && l.data && l.data > dataFim) return false;
         return true;
       });
 
@@ -1974,8 +2296,10 @@
 
         return `
           <tr>
-            <td>${l.descricao}<\/td>
+            <td>${l.descricao}${l.fixo ? ' <span class="badge badge-fixo">📌 Fixo<\/span>' : ''}<\/td>
             <td>${l.categoria}<\/td>
+            <td>${l.conta ? '<span class="badge-conta">' + l.conta + '<\/span>' : '—'}<\/td>
+            <td><span class="badge-resp">${l.responsavel || '—'}<\/span><\/td>
             <td class="money-value ${l.tipo === 'receita' ? 'text-green' : 'text-red'}">${l.tipo === 'receita' ? '+' : '-'} ${fmt(l.valor)}<\/td>
             <td>${dataDisplay}<\/td>
             <td>${badge}<\/td>
@@ -2013,12 +2337,26 @@
       const select = document.getElementById('filterCategoria');
       select.innerHTML = '<option value="">Todas as categorias<\/option>' +
         cats.map(c => `<option value="${c}">${c}<\/option>`).join('');
+
+      // Populate contas filter
+      const contasAll = [...new Set([...(dados.contas || []), ...dados.lancamentos.map(l => l.conta).filter(Boolean)])].sort();
+      const selectConta = document.getElementById('filterConta');
+      selectConta.innerHTML = '<option value="">Todas as contas<\/option>' +
+        contasAll.map(c => `<option value="${c}">${c}<\/option>`).join('');
     }
 
     function popularSelectCategorias(selectId, valorAtual) {
       const select = document.getElementById(selectId);
       const allCats = [...new Set([...dados.categorias, ...dados.lancamentos.map(l => l.categoria)])];
       select.innerHTML = allCats.map(c =>
+        `<option value="${c}" ${c === valorAtual ? 'selected' : ''}>${c}<\/option>`
+      ).join('');
+    }
+
+    function popularSelectContas(selectId, valorAtual) {
+      const select = document.getElementById(selectId);
+      const allContas = [...new Set([...(dados.contas || CONTAS_PADRAO), ...dados.lancamentos.map(l => l.conta).filter(Boolean)])];
+      select.innerHTML = allContas.map(c =>
         `<option value="${c}" ${c === valorAtual ? 'selected' : ''}>${c}<\/option>`
       ).join('');
     }
@@ -2034,6 +2372,9 @@
       document.getElementById('lancTipo').value = 'despesa';
       document.getElementById('lancParcela').value = '';
       document.getElementById('lancData').value = new Date().toISOString().split('T')[0];
+      popularSelectContas('lancConta', 'Nubank');
+      document.getElementById('lancResponsavel').value = 'Leandro';
+      document.getElementById('lancFixo').checked = false;
       document.getElementById('lancEditId').value = '';
       document.getElementById('modalLancamento').classList.add('show');
     }
@@ -2052,6 +2393,9 @@
       document.getElementById('lancTipo').value = l.tipo;
       document.getElementById('lancParcela').value = l.parcela || '';
       document.getElementById('lancData').value = l.data || '';
+      popularSelectContas('lancConta', l.conta || 'Nubank');
+      document.getElementById('lancResponsavel').value = l.responsavel || 'Leandro';
+      document.getElementById('lancFixo').checked = !!l.fixo;
       document.getElementById('lancEditId').value = id;
       document.getElementById('modalLancamento').classList.add('show');
     }
@@ -2063,6 +2407,9 @@
       const tipo = document.getElementById('lancTipo').value;
       const parcela = document.getElementById('lancParcela').value.trim();
       const dataLanc = document.getElementById('lancData').value;
+      const conta = document.getElementById('lancConta').value;
+      const responsavel = document.getElementById('lancResponsavel').value;
+      const fixo = document.getElementById('lancFixo').checked;
       const editId = document.getElementById('lancEditId').value;
 
       if (!desc || isNaN(valor) || valor <= 0) {
@@ -2073,11 +2420,11 @@
       if (editId) {
         const idx = dados.lancamentos.findIndex(l => l.id === editId);
         if (idx >= 0) {
-          dados.lancamentos[idx] = { ...dados.lancamentos[idx], descricao: desc, valor, categoria: cat, tipo, parcela, data: dataLanc };
+          dados.lancamentos[idx] = { ...dados.lancamentos[idx], descricao: desc, valor, categoria: cat, tipo, parcela, data: dataLanc, conta, responsavel, fixo };
           mostrarToast('Lançamento atualizado!', 'success');
         }
       } else {
-        dados.lancamentos.push({ id: 'l' + (contadorId++), descricao: desc, valor, categoria: cat, tipo, parcela, mes: mesAtual, data: dataLanc });
+        dados.lancamentos.push({ id: 'l' + (contadorId++), descricao: desc, valor, categoria: cat, tipo, parcela, mes: mesAtual, data: dataLanc, conta, responsavel, fixo });
         mostrarToast('Lançamento adicionado!', 'success');
       }
 
@@ -2142,6 +2489,27 @@
             simHTML = `<div class="meta-simulacao">💡 Guardando ${fmt(sugValor)}/mês → atinge em ~${meses} ${meses === 1 ? 'mês' : 'meses'}<\/div>`;
           }
 
+          // Histórico de aportes
+          let aportesHTML = '';
+          if (m.aportes && m.aportes.length > 0) {
+            const ultimos = m.aportes.slice(-5).reverse();
+            aportesHTML = `
+              <div class="aportes-historico">
+                <div class="aportes-historico-title" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+                  📜 Últimos aportes (${m.aportes.length} total) ▾
+                <\/div>
+                <div style="display:none;">
+                  ${ultimos.map(a => `
+                    <div class="aporte-item">
+                      <span class="aporte-data">${new Date(a.data + 'T00:00:00').toLocaleDateString('pt-BR')}<\/span>
+                      <span class="aporte-valor">${fmt(a.valor)}<\/span>
+                    <\/div>
+                  `).join('')}
+                <\/div>
+              <\/div>
+            `;
+          }
+
           return `
             <div class="meta-card" draggable="true" ondragstart="dragStart(event, '${m.id}')" ondragover="dragOver(event)" ondrop="drop(event, '${m.id}')">
               <div class="meta-card-header">
@@ -2159,6 +2527,7 @@
               <div class="meta-conquistas">${conquHTML}<\/div>
               ${dataAlvoHTML}
               ${simHTML}
+              ${aportesHTML}
               <div class="meta-actions">
                 ${!isComplete ? `<button class="meta-btn meta-btn-add" onclick="abrirModalAporte('${m.id}')">＋ Aporte<\/button>` : ''}
                 <button class="meta-btn meta-btn-edit" onclick="editarMeta('${m.id}')">✏️ Editar<\/button>
@@ -2341,6 +2710,10 @@
 
       const oldGuardado = meta.valorGuardado;
       meta.valorGuardado += valor;
+
+      // Registra no histórico de aportes
+      if (!meta.aportes) meta.aportes = [];
+      meta.aportes.push({ data: new Date().toISOString().split('T')[0], valor });
 
       // Se completou, salva data conclusão
       if (meta.valorGuardado >= meta.valorTotal && oldGuardado < meta.valorTotal) {
@@ -2566,11 +2939,13 @@
 
         <h2>📋 Lançamentos<\/h2>
         <table>
-          <tr><th>Descrição<\/th><th>Categoria<\/th><th>Data<\/th><th>Tipo<\/th><th>Valor<\/th><th>Parcela<\/th><\/tr>
+          <tr><th>Descrição<\/th><th>Categoria<\/th><th>Conta<\/th><th>Resp.<\/th><th>Data<\/th><th>Tipo<\/th><th>Valor<\/th><th>Parcela<\/th><\/tr>
           ${dados.lancamentos.filter(l => l.mes === mesAtual).map(l => `
             <tr>
-              <td>${l.descricao}<\/td>
+              <td>${l.descricao}${l.fixo ? ' 📌' : ''}<\/td>
               <td>${l.categoria}<\/td>
+              <td>${l.conta || '—'}<\/td>
+              <td>${l.responsavel || '—'}<\/td>
               <td>${l.data ? new Date(l.data + 'T00:00:00').toLocaleDateString('pt-BR') : '—'}<\/td>
               <td>${l.tipo === 'receita' ? 'Receita' : 'Despesa'}<\/td>
               <td class="${l.tipo === 'receita' ? 'green' : 'red'}">${fmt(l.valor)}<\/td>
@@ -2695,13 +3070,13 @@
         return;
       }
 
-      if (!confirm(`Fechar ${getMesLabel(mesAtual)} e iniciar ${getMesLabel(mesProximo)}?\n\nItens recorrentes, fixos e parcelas serão copiados automaticamente para o próximo mês.`)) return;
+      if (!confirm(`Fechar ${getMesLabel(mesAtual)} e iniciar ${getMesLabel(mesProximo)}?\n\nItens fixos, recorrentes e parcelas serão copiados automaticamente para o próximo mês.\nDespesas avulsas (não marcadas como fixas) NÃO serão copiadas.`)) return;
 
       const lancamentosMes = dados.lancamentos.filter(l => l.mes === mesAtual);
       let copiados = 0;
 
       lancamentosMes.forEach(l => {
-        // Copia receitas (sempre recorrentes)
+        // Copia receitas (sempre)
         if (l.tipo === 'receita') {
           dados.lancamentos.push({
             id: 'l' + (contadorId++),
@@ -2710,12 +3085,15 @@
             categoria: l.categoria,
             tipo: l.tipo,
             parcela: l.parcela,
-            mes: mesProximo
+            mes: mesProximo,
+            conta: l.conta || '',
+            responsavel: l.responsavel || '',
+            fixo: l.fixo !== undefined ? l.fixo : true
           });
           copiados++;
         }
-        // Copia despesas recorrentes ou fixas (sem parcela)
-        else if (l.parcela === 'recorrente' || l.parcela === '') {
+        // Copia despesas recorrentes
+        else if (l.parcela === 'recorrente') {
           dados.lancamentos.push({
             id: 'l' + (contadorId++),
             descricao: l.descricao,
@@ -2723,7 +3101,26 @@
             categoria: l.categoria,
             tipo: l.tipo,
             parcela: l.parcela,
-            mes: mesProximo
+            mes: mesProximo,
+            conta: l.conta || '',
+            responsavel: l.responsavel || '',
+            fixo: true
+          });
+          copiados++;
+        }
+        // Copia despesas FIXAS (apenas se marcada como fixa)
+        else if (l.fixo && l.parcela === '') {
+          dados.lancamentos.push({
+            id: 'l' + (contadorId++),
+            descricao: l.descricao,
+            valor: l.valor,
+            categoria: l.categoria,
+            tipo: l.tipo,
+            parcela: l.parcela,
+            mes: mesProximo,
+            conta: l.conta || '',
+            responsavel: l.responsavel || '',
+            fixo: true
           });
           copiados++;
         }
@@ -2740,7 +3137,10 @@
               categoria: l.categoria,
               tipo: l.tipo,
               parcela: `${parcelaAtual + 1}/${parcelaTotal}`,
-              mes: mesProximo
+              mes: mesProximo,
+              conta: l.conta || '',
+              responsavel: l.responsavel || '',
+              fixo: false
             });
             copiados++;
           }
@@ -3185,6 +3585,7 @@
       iniciarSyncFirebase();
       initNotificacoes();
       setTimeout(() => verificarNotificacoes(), 3000);
+      setTimeout(() => verificarAgendamentos(), 4000);
 
       mostrarToast(`Bem-vindo(a), ${user.displayName || user.email}! 👋`, 'success');
     }
@@ -3213,6 +3614,401 @@
         document.getElementById('userMenu').classList.remove('show');
       }
     });
+
+    /* ==========================================================
+       EXPORTAR CSV
+    ========================================================== */
+    function exportarCSV() {
+      const lancMes = dados.lancamentos.filter(l => l.mes === mesAtual);
+      const headers = ['Descrição', 'Categoria', 'Conta', 'Responsável', 'Tipo', 'Valor', 'Parcela', 'Data', 'Fixo'];
+      const rows = lancMes.map(l => [
+        `"${l.descricao}"`,
+        `"${l.categoria}"`,
+        `"${l.conta || ''}"`,
+        `"${l.responsavel || ''}"`,
+        l.tipo,
+        l.valor.toFixed(2).replace('.', ','),
+        `"${l.parcela || ''}"`,
+        l.data || '',
+        l.fixo ? 'Sim' : 'Não'
+      ]);
+
+      const csv = [headers.join(';'), ...rows.map(r => r.join(';'))].join('\n');
+      const BOM = '\uFEFF';
+      const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `lean-finance-${mesAtual}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      mostrarToast('📊 CSV exportado com sucesso!', 'success');
+    }
+
+    /* ==========================================================
+       PREVISÃO DE SALDO FUTURO
+    ========================================================== */
+    function renderPrevisao() {
+      const container = document.getElementById('previsaoSection');
+      const lancMes = dados.lancamentos.filter(l => l.mes === mesAtual);
+
+      // Base: receitas fixas e despesas fixas/recorrentes do mês atual
+      const receitasFixas = lancMes.filter(l => l.tipo === 'receita').reduce((s, l) => s + l.valor, 0);
+      const despesasFixas = lancMes.filter(l => l.tipo === 'despesa' && (l.fixo || l.parcela === 'recorrente')).reduce((s, l) => s + l.valor, 0);
+
+      // Parcelas que continuam
+      const parcelasFuturas = [];
+      lancMes.filter(l => l.parcela && l.parcela.includes('/')).forEach(l => {
+        const [atual, total] = l.parcela.split('/').map(Number);
+        for (let i = 1; i <= 3; i++) {
+          if (atual + i <= total) {
+            parcelasFuturas.push({ mes: i, valor: l.valor, desc: l.descricao });
+          }
+        }
+      });
+
+      // Agendados
+      const hoje = new Date();
+
+      let html = `<h3>🔮 Previsão de Saldo Futuro</h3><div class="previsao-grid">`;
+
+      for (let i = 1; i <= 3; i++) {
+        const mesProj = getMesProximo(i === 1 ? mesAtual : getMesProximo(i === 2 ? mesAtual : getMesProximo(mesAtual)));
+        let mesStr = mesAtual;
+        for (let j = 0; j < i; j++) mesStr = getMesProximo(mesStr);
+
+        const parcelasMes = parcelasFuturas.filter(p => p.mes === i).reduce((s, p) => s + p.valor, 0);
+
+        // Agendados nesse mês
+        const agendMes = (dados.agendados || []).filter(a => {
+          if (!a.data) return false;
+          const [aAno, aMes] = a.data.split('-');
+          const [mAno, mMes] = mesStr.split('-');
+          return aAno === mAno && aMes === mMes;
+        });
+        const agendReceita = agendMes.filter(a => a.tipo === 'receita').reduce((s, a) => s + a.valor, 0);
+        const agendDespesa = agendMes.filter(a => a.tipo === 'despesa').reduce((s, a) => s + a.valor, 0);
+
+        const recProj = receitasFixas + agendReceita;
+        const despProj = despesasFixas + parcelasMes + agendDespesa;
+        const saldoProj = recProj - despProj;
+
+        html += `
+          <div class="previsao-card">
+            <div class="previsao-card-mes">${getMesLabel(mesStr)}<\/div>
+            <div class="previsao-card-val ${saldoProj >= 0 ? 'text-green' : 'text-red'} money-value">${fmt(saldoProj)}<\/div>
+            <div class="previsao-base">Rec: ${fmt(recProj)} | Desp: ${fmt(despProj)}<\/div>
+          <\/div>
+        `;
+      }
+
+      html += '<\/div>';
+      container.innerHTML = html;
+    }
+
+    /* ==========================================================
+       AGENDAMENTOS
+    ========================================================== */
+    function renderAgendamentos() {
+      const container = document.getElementById('agendamentosSection');
+      if (!dados.agendados || dados.agendados.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      const agendados = [...dados.agendados].sort((a, b) => (a.data || '').localeCompare(b.data || ''));
+
+      const hoje = new Date().toISOString().split('T')[0];
+      const vencidos = agendados.filter(a => a.data && a.data <= hoje);
+
+      let html = `<h3>📅 Lançamentos Agendados
+        <span style="font-size:0.8rem;color:var(--text-muted);">${agendados.length} agendado${agendados.length > 1 ? 's' : ''}<\/span>
+      <\/h3>`;
+
+      if (vencidos.length > 0) {
+        html += `<div class="alert alert-info" style="margin-bottom:12px;">⏰ ${vencidos.length} agendamento${vencidos.length > 1 ? 's' : ''} vencido${vencidos.length > 1 ? 's' : ''}! Confirme para lançar.<\/div>`;
+      }
+
+      html += agendados.map(a => {
+        const vencido = a.data && a.data <= hoje;
+        const dataStr = a.data ? new Date(a.data + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+        return `
+          <div class="agendamento-item" style="${vencido ? 'border-left:3px solid var(--yellow);' : ''}">
+            <div class="agendamento-info">
+              <div class="agendamento-desc">${a.descricao} ${vencido ? '⏰' : ''}<\/div>
+              <div class="agendamento-details">${a.categoria} · ${a.conta || ''} · ${a.responsavel || ''} · ${dataStr}<\/div>
+            <\/div>
+            <div class="agendamento-valor money-value ${a.tipo === 'receita' ? 'text-green' : 'text-red'}">${a.tipo === 'receita' ? '+' : '-'} ${fmt(a.valor)}<\/div>
+            <div class="agendamento-actions">
+              <button class="btn-edit-sm" onclick="confirmarAgendamento('${a.id}')" title="Confirmar e lançar">✅<\/button>
+              <button class="btn-danger-sm" onclick="excluirAgendamento('${a.id}')" title="Excluir">🗑️<\/button>
+            <\/div>
+          <\/div>
+        `;
+      }).join('');
+
+      container.innerHTML = html;
+    }
+
+    function abrirModalAgendamento() {
+      document.getElementById('agendDesc').value = '';
+      document.getElementById('agendValor').value = '';
+      popularSelectCategorias('agendCategoria', 'Moradia');
+      document.getElementById('agendTipo').value = 'despesa';
+      document.getElementById('agendData').value = '';
+      popularSelectContas('agendConta', 'Nubank');
+      document.getElementById('agendResp').value = 'Leandro';
+      document.getElementById('agendEditId').value = '';
+      document.getElementById('modalAgendamento').classList.add('show');
+    }
+
+    function fecharModalAgendamento() {
+      document.getElementById('modalAgendamento').classList.remove('show');
+    }
+
+    function salvarAgendamento() {
+      const desc = document.getElementById('agendDesc').value.trim();
+      const valor = parseFloat(document.getElementById('agendValor').value);
+      const cat = document.getElementById('agendCategoria').value;
+      const tipo = document.getElementById('agendTipo').value;
+      const data = document.getElementById('agendData').value;
+      const conta = document.getElementById('agendConta').value;
+      const responsavel = document.getElementById('agendResp').value;
+
+      if (!desc || isNaN(valor) || valor <= 0 || !data) {
+        mostrarToast('Preencha todos os campos (inclua a data prevista).', 'error');
+        return;
+      }
+
+      if (!dados.agendados) dados.agendados = [];
+      dados.agendados.push({
+        id: 'ag' + (contadorId++),
+        descricao: desc,
+        valor,
+        categoria: cat,
+        tipo,
+        data,
+        conta,
+        responsavel
+      });
+
+      salvarDados();
+      fecharModalAgendamento();
+      renderAll();
+      mostrarToast('📅 Lançamento agendado com sucesso!', 'success');
+    }
+
+    function confirmarAgendamento(id) {
+      const ag = (dados.agendados || []).find(a => a.id === id);
+      if (!ag) return;
+
+      // Determina o mês correto baseado na data
+      const [ano, mes] = ag.data.split('-');
+      const mesLanc = `${ano}-${mes}`;
+
+      dados.lancamentos.push({
+        id: 'l' + (contadorId++),
+        descricao: ag.descricao,
+        valor: ag.valor,
+        categoria: ag.categoria,
+        tipo: ag.tipo,
+        parcela: '',
+        mes: mesLanc,
+        data: ag.data,
+        conta: ag.conta || '',
+        responsavel: ag.responsavel || '',
+        fixo: false
+      });
+
+      dados.agendados = dados.agendados.filter(a => a.id !== id);
+      salvarDados();
+      renderAll();
+      mostrarToast(`✅ "${ag.descricao}" lançado com sucesso!`, 'success');
+    }
+
+    function excluirAgendamento(id) {
+      if (!confirm('Excluir este agendamento?')) return;
+      dados.agendados = (dados.agendados || []).filter(a => a.id !== id);
+      salvarDados();
+      renderAll();
+      mostrarToast('Agendamento excluído.', 'warning');
+    }
+
+    function verificarAgendamentos() {
+      const hoje = new Date().toISOString().split('T')[0];
+      const vencidos = (dados.agendados || []).filter(a => a.data && a.data <= hoje);
+      if (vencidos.length > 0) {
+        mostrarToast(`⏰ Você tem ${vencidos.length} agendamento${vencidos.length > 1 ? 's' : ''} pendente${vencidos.length > 1 ? 's' : ''}! Confira na aba Início.`, 'warning');
+      }
+    }
+
+    /* ==========================================================
+       RELATÓRIO ANUAL CONSOLIDADO
+    ========================================================== */
+    function abrirRelatorioAnual() {
+      // Popula select de anos
+      const anos = [...new Set(dados.lancamentos.map(l => l.mes ? l.mes.split('-')[0] : '').filter(Boolean))].sort().reverse();
+      const select = document.getElementById('relatorioAno');
+      const anoAtual = new Date().getFullYear().toString();
+      select.innerHTML = anos.map(a => `<option value="${a}" ${a === anoAtual ? 'selected' : ''}>${a}<\/option>`).join('');
+
+      renderRelatorioAnual();
+      document.getElementById('modalRelatorioAnual').classList.add('show');
+    }
+
+    function fecharRelatorioAnual() {
+      document.getElementById('modalRelatorioAnual').classList.remove('show');
+    }
+
+    function renderRelatorioAnual() {
+      const ano = document.getElementById('relatorioAno').value;
+      const container = document.getElementById('relatorioAnualContent');
+
+      const lancAno = dados.lancamentos.filter(l => l.mes && l.mes.startsWith(ano));
+      const recTotal = lancAno.filter(l => l.tipo === 'receita').reduce((s, l) => s + l.valor, 0);
+      const despTotal = lancAno.filter(l => l.tipo === 'despesa').reduce((s, l) => s + l.valor, 0);
+      const saldoTotal = recTotal - despTotal;
+      const media = despTotal / 12;
+
+      // Resumo
+      let html = `
+        <div class="relatorio-resumo-grid">
+          <div class="relatorio-resumo-card">
+            <div class="relatorio-resumo-label">Receitas ${ano}<\/div>
+            <div class="relatorio-resumo-valor text-green money-value">${fmt(recTotal)}<\/div>
+          <\/div>
+          <div class="relatorio-resumo-card">
+            <div class="relatorio-resumo-label">Despesas ${ano}<\/div>
+            <div class="relatorio-resumo-valor text-red money-value">${fmt(despTotal)}<\/div>
+          <\/div>
+          <div class="relatorio-resumo-card">
+            <div class="relatorio-resumo-label">Saldo ${ano}<\/div>
+            <div class="relatorio-resumo-valor ${saldoTotal >= 0 ? 'text-green' : 'text-red'} money-value">${fmt(saldoTotal)}<\/div>
+          <\/div>
+          <div class="relatorio-resumo-card">
+            <div class="relatorio-resumo-label">Média Mensal Desp.<\/div>
+            <div class="relatorio-resumo-valor text-red money-value">${fmt(media)}<\/div>
+          <\/div>
+        <\/div>
+      `;
+
+      // Totais por categoria
+      const catMap = {};
+      lancAno.filter(l => l.tipo === 'despesa').forEach(l => {
+        if (!catMap[l.categoria]) catMap[l.categoria] = 0;
+        catMap[l.categoria] += l.valor;
+      });
+      const catSorted = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
+
+      html += `<h4 style="margin:16px 0 8px;">📋 Despesas por Categoria — ${ano}<\/h4>`;
+      html += `<table class="relatorio-cat-table"><tr><th>Categoria<\/th><th>Total<\/th><th>% do Total<\/th><th>Média/mês<\/th><\/tr>`;
+      catSorted.forEach(([cat, val]) => {
+        const pct = (val / despTotal) * 100;
+        html += `<tr><td>${cat}<\/td><td class="money-value text-red">${fmt(val)}<\/td><td>${pct.toFixed(1)}%<\/td><td class="money-value">${fmt(val / 12)}<\/td><\/tr>`;
+      });
+      html += '<\/table>';
+
+      // Evolução 12 meses
+      html += `<h4 style="margin:16px 0 8px;">📈 Evolução Mensal — ${ano}<\/h4>`;
+      html += `<table class="relatorio-cat-table"><tr><th>Mês<\/th><th>Receitas<\/th><th>Despesas<\/th><th>Saldo<\/th><\/tr>`;
+      for (let m = 1; m <= 12; m++) {
+        const mesStr = `${ano}-${String(m).padStart(2, '0')}`;
+        const s = calcularSaldo(mesStr);
+        if (s.receitas === 0 && s.despesas === 0) continue;
+        html += `<tr>
+          <td>${NOMES_MESES[m - 1]}<\/td>
+          <td class="money-value text-green">${fmt(s.receitas)}<\/td>
+          <td class="money-value text-red">${fmt(s.despesas)}<\/td>
+          <td class="money-value ${s.saldo >= 0 ? 'text-green' : 'text-red'}">${fmt(s.saldo)}<\/td>
+        <\/tr>`;
+      }
+      html += '<\/table>';
+
+      // Totais por responsável
+      const respMap = {};
+      lancAno.filter(l => l.tipo === 'despesa').forEach(l => {
+        const r = l.responsavel || 'Não definido';
+        if (!respMap[r]) respMap[r] = 0;
+        respMap[r] += l.valor;
+      });
+      const respSorted = Object.entries(respMap).sort((a, b) => b[1] - a[1]);
+
+      html += `<h4 style="margin:16px 0 8px;">👤 Despesas por Responsável — ${ano}<\/h4>`;
+      html += `<table class="relatorio-cat-table"><tr><th>Responsável<\/th><th>Total<\/th><th>%<\/th><\/tr>`;
+      respSorted.forEach(([r, val]) => {
+        const pct = (val / despTotal) * 100;
+        html += `<tr><td>${r}<\/td><td class="money-value text-red">${fmt(val)}<\/td><td>${pct.toFixed(1)}%<\/td><\/tr>`;
+      });
+      html += '<\/table>';
+
+      container.innerHTML = html;
+    }
+
+    /* ==========================================================
+       PARCELAS — VISÃO CONSOLIDADA
+    ========================================================== */
+    function abrirModalParcelas() {
+      renderParcelasConsolidadas();
+      document.getElementById('modalParcelas').classList.add('show');
+    }
+
+    function fecharModalParcelas() {
+      document.getElementById('modalParcelas').classList.remove('show');
+    }
+
+    function renderParcelasConsolidadas() {
+      const container = document.getElementById('parcelasContent');
+
+      // Agrupa todas as parcelas por descrição
+      const seriesMap = {};
+      dados.lancamentos.filter(l => l.parcela && l.parcela !== 'recorrente' && l.parcela.includes('/')).forEach(l => {
+        const key = l.descricao + '|' + l.valor;
+        if (!seriesMap[key]) {
+          seriesMap[key] = { descricao: l.descricao, valor: l.valor, categoria: l.categoria, parcelas: [] };
+        }
+        const [atual, total] = l.parcela.split('/').map(Number);
+        seriesMap[key].parcelas.push({ num: atual, total, mes: l.mes, id: l.id });
+      });
+
+      const series = Object.values(seriesMap);
+      if (series.length === 0) {
+        container.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:30px;">Nenhuma parcela encontrada.<\/div>';
+        return;
+      }
+
+      container.innerHTML = series.map(s => {
+        // Determina o total de parcelas
+        const totalParcelas = Math.max(...s.parcelas.map(p => p.total));
+        const parcelasExistentes = s.parcelas.map(p => p.num).sort((a, b) => a - b);
+        const ultimaPaga = Math.max(...parcelasExistentes);
+        const valorTotal = s.valor * totalParcelas;
+        const valorPago = s.valor * parcelasExistentes.length;
+
+        let dotsHTML = '';
+        for (let i = 1; i <= totalParcelas; i++) {
+          const exists = parcelasExistentes.includes(i);
+          const isCurrent = i === ultimaPaga;
+          const cls = exists ? (isCurrent ? 'parcela-dot-current' : 'parcela-dot-paid') : 'parcela-dot-future';
+          dotsHTML += `<div class="parcela-dot ${cls}" title="Parcela ${i}/${totalParcelas}">${i}<\/div>`;
+        }
+
+        return `
+          <div class="parcela-serie">
+            <div class="parcela-serie-header">
+              <div class="parcela-serie-nome">${s.descricao}<\/div>
+              <div class="parcela-serie-info">${s.categoria} · ${fmt(s.valor)}/mês<\/div>
+            <\/div>
+            <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">
+              Pago: ${fmt(valorPago)} de ${fmt(valorTotal)} · Falta: ${fmt(valorTotal - valorPago)}
+              · ${ultimaPaga}/${totalParcelas} parcelas
+            <\/div>
+            <div class="parcela-timeline">${dotsHTML}<\/div>
+          <\/div>
+        `;
+      }).join('');
+    }
 
     /* ==========================================================
        RENDER ALL
