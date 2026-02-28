@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f1117">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
   <title>💰 Lean Finance — Leandro &amp; Leidiane</title>
   <style>
     /* ======================================================
@@ -653,9 +657,275 @@
     .mt-8 { margin-top: 8px; }
     .mb-16 { margin-bottom: 16px; }
     .hidden { display: none !important; }
+
+    /* ======================================================
+       NAVEGAÇÃO MENSAL
+    ====================================================== */
+    .month-nav {
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      padding: 12px 24px; background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+    .month-nav-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--bg-input); color: var(--text-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; transition: all var(--transition-speed);
+      border: 1px solid var(--border);
+    }
+    .month-nav-btn:hover { background: var(--accent-light); color: var(--accent); }
+    .month-label { font-size: 1.15rem; font-weight: 800; min-width: 200px; text-align: center; }
+    .month-select {
+      padding: 8px 14px; border-radius: 50px;
+      background: var(--bg-input); color: var(--text-primary);
+      border: 1px solid var(--border); font-size: 0.85rem;
+      font-weight: 600; transition: border var(--transition-speed);
+    }
+    .month-select:focus { border-color: var(--accent); }
+    .btn-fechar-mes {
+      padding: 8px 18px; border-radius: 50px;
+      background: var(--green-light); color: var(--green);
+      font-weight: 700; font-size: 0.85rem;
+      transition: all var(--transition-speed);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-fechar-mes:hover { background: var(--green); color: #fff; }
+    .month-comparison-section {
+      background: var(--bg-card); border-radius: var(--radius);
+      padding: 24px; border: 1px solid var(--border); margin-bottom: 28px;
+    }
+    .comparison-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px;
+    }
+    .comparison-card {
+      background: var(--bg-input); border-radius: var(--radius-sm);
+      padding: 16px; text-align: center;
+    }
+    .comparison-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+    .comparison-values { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 6px; }
+    .comparison-arrow { font-size: 0.85rem; font-weight: 700; }
+    .comparison-prev { font-size: 0.75rem; color: var(--text-muted); }
+    @media (max-width: 768px) {
+      .month-nav { flex-wrap: wrap; padding: 10px 16px; }
+      .month-label { min-width: auto; font-size: 1rem; }
+      .comparison-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ======================================================
+       ORÇAMENTO POR CATEGORIA
+    ====================================================== */
+    .orcamento-section {
+      background: var(--bg-card); border-radius: var(--radius);
+      padding: 24px; border: 1px solid var(--border); margin-bottom: 28px;
+    }
+    .orcamento-section h3 {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .orcamento-grid { display: flex; flex-direction: column; gap: 12px; }
+    .orcamento-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-radius: var(--radius-sm);
+      background: var(--bg-input); transition: background var(--transition-speed);
+    }
+    .orcamento-item:hover { background: var(--bg-hover); }
+    .orcamento-item-info { flex: 1; min-width: 0; }
+    .orcamento-item-cat { font-weight: 600; font-size: 0.9rem; }
+    .orcamento-item-vals { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+    .orcamento-bar-track {
+      flex: 2; height: 10px; border-radius: 5px;
+      background: var(--bg-primary); overflow: hidden; min-width: 120px;
+    }
+    .orcamento-bar-fill {
+      height: 100%; border-radius: 5px; transition: width 0.6s ease;
+    }
+    .orcamento-bar-safe { background: linear-gradient(90deg, var(--green), #55efc4); }
+    .orcamento-bar-warn { background: linear-gradient(90deg, var(--yellow), #ffeaa7); }
+    .orcamento-bar-danger { background: linear-gradient(90deg, var(--red), #fab1a0); }
+    .orcamento-pct { min-width: 55px; text-align: right; font-weight: 700; font-size: 0.85rem; }
+    .orcamento-btn-add {
+      padding: 6px 14px; border-radius: 50px;
+      background: var(--accent-light); color: var(--accent);
+      font-size: 0.8rem; font-weight: 600;
+      transition: all var(--transition-speed);
+    }
+    .orcamento-btn-add:hover { background: var(--accent); color: #fff; }
+    .orcamento-no-data {
+      text-align: center; color: var(--text-muted); padding: 20px;
+      font-size: 0.9rem;
+    }
+
+    /* ======================================================
+       GRÁFICO DE EVOLUÇÃO MENSAL
+    ====================================================== */
+    .evolucao-section {
+      background: var(--bg-card); border-radius: var(--radius);
+      padding: 24px; border: 1px solid var(--border); margin-bottom: 28px;
+    }
+    .evolucao-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; }
+    .evolucao-chart {
+      display: flex; align-items: flex-end; gap: 8px;
+      height: 200px; padding: 0 8px;
+      border-bottom: 2px solid var(--border); position: relative;
+    }
+    .evolucao-bar-group {
+      flex: 1; display: flex; gap: 3px; align-items: flex-end;
+      height: 100%; position: relative;
+    }
+    .evolucao-bar {
+      flex: 1; border-radius: 4px 4px 0 0; min-width: 14px;
+      transition: height 0.8s ease; position: relative; cursor: pointer;
+    }
+    .evolucao-bar:hover { opacity: 0.85; }
+    .evolucao-bar-receita { background: var(--green); }
+    .evolucao-bar-despesa { background: var(--red); }
+    .evolucao-labels { display: flex; gap: 8px; margin-top: 8px; }
+    .evolucao-label {
+      flex: 1; text-align: center; font-size: 0.7rem;
+      color: var(--text-muted); font-weight: 600;
+    }
+    .evolucao-legenda {
+      display: flex; gap: 20px; justify-content: center; margin-top: 16px;
+    }
+    .evolucao-legenda-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-secondary); }
+    .evolucao-legenda-color { width: 12px; height: 12px; border-radius: 3px; }
+    .evolucao-tooltip {
+      position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
+      padding: 6px 10px; font-size: 0.75rem; white-space: nowrap;
+      pointer-events: none; opacity: 0; transition: opacity 0.2s;
+      box-shadow: var(--shadow); z-index: 10;
+    }
+    .evolucao-bar:hover .evolucao-tooltip { opacity: 1; }
+
+    /* ======================================================
+       GERENCIAMENTO DE CATEGORIAS
+    ====================================================== */
+    .cat-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
+    .cat-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-radius: var(--radius-sm);
+      background: var(--bg-input);
+    }
+    .cat-item-name { font-weight: 600; font-size: 0.9rem; }
+    .cat-item-actions { display: flex; gap: 6px; }
+    .cat-new-row { display: flex; gap: 8px; margin-top: 12px; }
+    .cat-new-row input {
+      flex: 1; padding: 8px 12px; border-radius: var(--radius-sm);
+      background: var(--bg-input); color: var(--text-primary);
+      border: 1px solid var(--border); font-size: 0.85rem;
+    }
+
+    /* ======================================================
+       PWA INSTALL BUTTON
+    ====================================================== */
+    .btn-install-pwa {
+      display: none; padding: 8px 18px; border-radius: 50px;
+      background: var(--accent-light); color: var(--accent);
+      font-weight: 700; font-size: 0.85rem;
+      transition: all var(--transition-speed);
+      align-items: center; gap: 6px;
+    }
+    .btn-install-pwa:hover { background: var(--accent); color: #fff; }
+    .btn-install-pwa.show { display: flex; }
+
+    /* ======================================================
+       TELA DE LOGIN
+    ====================================================== */
+    .login-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--bg-primary);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; transition: opacity 0.5s ease;
+    }
+    .login-overlay.hidden {
+      opacity: 0; pointer-events: none;
+    }
+    .login-card {
+      background: var(--bg-card); border-radius: var(--radius);
+      padding: 48px 40px; border: 1px solid var(--border);
+      box-shadow: 0 12px 48px rgba(0,0,0,.3);
+      text-align: center; max-width: 420px; width: 90%;
+      animation: modalIn 0.5s ease;
+    }
+    .login-card .login-logo { font-size: 3rem; margin-bottom: 16px; }
+    .login-card h1 {
+      font-size: 1.6rem; font-weight: 800; margin-bottom: 6px;
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .login-card .login-sub {
+      color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 32px;
+    }
+    .btn-google {
+      display: inline-flex; align-items: center; gap: 12px;
+      padding: 14px 32px; border-radius: 50px;
+      background: #fff; color: #333; font-size: 1rem;
+      font-weight: 700; border: 1px solid #ddd;
+      box-shadow: 0 2px 8px rgba(0,0,0,.1);
+      transition: all var(--transition-speed);
+      cursor: pointer;
+    }
+    .btn-google:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,.15);
+      transform: translateY(-2px);
+    }
+    .btn-google svg { width: 22px; height: 22px; }
+    .login-error {
+      margin-top: 16px; padding: 12px; border-radius: var(--radius-sm);
+      background: var(--red-light); color: var(--red);
+      font-size: 0.85rem; font-weight: 500;
+      display: none;
+    }
+    .login-error.show { display: block; }
+    .user-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 2px solid var(--accent); cursor: pointer;
+      transition: all var(--transition-speed);
+    }
+    .user-avatar:hover { border-color: var(--blue); transform: scale(1.1); }
+    .user-menu {
+      position: absolute; top: 60px; right: 24px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); box-shadow: var(--shadow);
+      padding: 12px 16px; min-width: 200px; z-index: 300;
+      display: none; animation: modalIn 0.2s ease;
+    }
+    .user-menu.show { display: block; }
+    .user-menu-info { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+    .user-menu-name { font-weight: 700; color: var(--text-primary); }
+    .user-menu-email { font-size: 0.8rem; color: var(--text-muted); }
+    .btn-logout {
+      width: 100%; padding: 8px 14px; border-radius: var(--radius-sm);
+      background: var(--red-light); color: var(--red);
+      font-weight: 600; font-size: 0.85rem;
+      transition: all var(--transition-speed);
+      display: flex; align-items: center; gap: 8px; justify-content: center;
+    }
+    .btn-logout:hover { background: var(--red); color: #fff; }
+
+    @media (max-width: 768px) {
+      .orcamento-item { flex-wrap: wrap; }
+      .orcamento-bar-track { min-width: 100%; }
+      .evolucao-chart { height: 150px; }
+    }
   </style>
 </head>
 <body>
+
+  <!-- ========== TELA DE LOGIN ========== -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <div class="login-logo">💰</div>
+      <h1>Lean Finance</h1>
+      <div class="login-sub">Leandro & Leidiane — Gestão Financeira Pessoal</div>
+      <button class="btn-google" id="btnGoogleLogin" onclick="loginComGoogle()">
+        <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Entrar com Google
+      </button>
+      <div class="login-error" id="loginError"></div>
+    </div>
+  </div>
 
   <!-- ========== HEADER ========== -->
   <header class="header">
@@ -666,9 +936,18 @@
         <span id="saldoHeaderVal" class="money-value">R$ 0,00</span>
       </div>
     </div>
-    <div class="header-right">
+    <div class="header-right" style="position:relative;">
+      <button class="btn-install-pwa" id="btnInstallPwa" title="Instalar App" onclick="instalarPWA()">📲 Instalar</button>
       <button class="btn-focus" id="btnFocus" title="Modo Foco — ocultar valores" onclick="toggleFocusMode()">👁️</button>
       <button class="btn-theme" id="btnTheme" title="Alternar tema" onclick="toggleTheme()">🌙</button>
+      <img class="user-avatar" id="userAvatar" src="" alt="" title="Meu perfil" onclick="toggleUserMenu()" style="display:none;">
+      <div class="user-menu" id="userMenu">
+        <div class="user-menu-info">
+          <div class="user-menu-name" id="userMenuName"></div>
+          <div class="user-menu-email" id="userMenuEmail"></div>
+        </div>
+        <button class="btn-logout" onclick="fazerLogout()">🚪 Sair da Conta</button>
+      </div>
     </div>
   </header>
 
@@ -678,6 +957,15 @@
     <button class="tab-btn" onclick="switchTab('lancamentos')">📋 Lançamentos</button>
     <button class="tab-btn" onclick="switchTab('metas')">🐷 Cofrinho de Metas</button>
   </nav>
+
+  <!-- ========== NAVEGAÇÃO MENSAL ========== -->
+  <div class="month-nav">
+    <button class="month-nav-btn" onclick="navegarMes(-1)" title="Mês anterior">◀</button>
+    <div class="month-label" id="mesLabel">—</div>
+    <button class="month-nav-btn" onclick="navegarMes(1)" title="Próximo mês">▶</button>
+    <select class="month-select" id="mesSelect" onchange="irParaMes(this.value)"></select>
+    <button class="btn-fechar-mes" onclick="fecharMes()">📁 Fechar Mês</button>
+  </div>
 
   <!-- ========== DASHBOARD ========== -->
   <section id="tab-dashboard" class="tab-content active">
@@ -724,6 +1012,15 @@
         <div class="card-sub" id="cardMetasSub">Nenhuma meta criada</div>
       </div>
     </div>
+
+    <!-- Orçamento por Categoria -->
+    <div class="orcamento-section" id="orcamentoSection"></div>
+
+    <!-- Comparação Mensal -->
+    <div class="month-comparison-section" id="monthComparison"></div>
+
+    <!-- Gráfico de Evolução Mensal -->
+    <div class="evolucao-section" id="evolucaoSection"></div>
 
     <!-- Alertas -->
     <div class="alerts-container" id="alertsContainer"></div>
@@ -786,6 +1083,7 @@
             <th onclick="sortTable('descricao')">Descrição <span class="sort-icon">⇅</span></th>
             <th onclick="sortTable('categoria')">Categoria <span class="sort-icon">⇅</span></th>
             <th onclick="sortTable('valor')">Valor <span class="sort-icon">⇅</span></th>
+            <th onclick="sortTable('data')">Data <span class="sort-icon">⇅</span></th>
             <th>Tipo</th>
             <th>Parcela</th>
             <th>Ações</th>
@@ -869,6 +1167,8 @@
     <button class="fab-option" onclick="abrirModalLancamento(); toggleFabMenu();">📋 Novo Lançamento</button>
     <button class="fab-option" onclick="abrirModalMeta(); toggleFabMenu();">🐷 Nova Meta</button>
     <button class="fab-option" onclick="exportarPDF(); toggleFabMenu();">📄 Exportar PDF</button>
+    <button class="fab-option" onclick="abrirModalOrcamento(); toggleFabMenu();">📊 Orçamento</button>
+    <button class="fab-option" onclick="abrirModalCategorias(); toggleFabMenu();">🏷️ Categorias</button>
     <button class="fab-option" onclick="exportarJSON(); toggleFabMenu();">💾 Salvar JSON</button>
     <button class="fab-option" onclick="document.getElementById('importJSONInput').click(); toggleFabMenu();">📂 Carregar JSON</button>
   </div>
@@ -888,23 +1188,7 @@
       </div>
       <div class="form-group">
         <label for="lancCategoria">Categoria</label>
-        <select id="lancCategoria">
-          <option value="Receitas Fixas">Receitas Fixas</option>
-          <option value="Moradia">Moradia</option>
-          <option value="Transporte">Transporte</option>
-          <option value="Impostos">Impostos</option>
-          <option value="Educação">Educação</option>
-          <option value="Saúde">Saúde</option>
-          <option value="Lazer">Lazer</option>
-          <option value="Cartão Santander">Cartão Santander</option>
-          <option value="Cartão Nubank">Cartão Nubank</option>
-          <option value="Compras">Compras</option>
-          <option value="Vestuário">Vestuário</option>
-          <option value="Manutenção">Manutenção</option>
-          <option value="Casa">Casa</option>
-          <option value="Eventos">Eventos</option>
-          <option value="Outros">Outros</option>
-        </select>
+        <select id="lancCategoria"></select>
       </div>
       <div class="form-group">
         <label for="lancTipo">Tipo</label>
@@ -916,6 +1200,10 @@
       <div class="form-group">
         <label for="lancParcela">Parcela (ex: 2/10, ou "recorrente")</label>
         <input type="text" id="lancParcela" placeholder="Deixe vazio para à vista">
+      </div>
+      <div class="form-group">
+        <label for="lancData">Data</label>
+        <input type="date" id="lancData">
       </div>
       <input type="hidden" id="lancEditId" value="">
       <div class="modal-actions">
@@ -990,6 +1278,34 @@
     </div>
   </div>
 
+  <!-- ========== MODAL ORÇAMENTO ========== -->
+  <div class="modal-overlay" id="modalOrcamento">
+    <div class="modal">
+      <h3>📊 Orçamento por Categoria</h3>
+      <p style="color:var(--text-secondary);margin-bottom:16px;font-size:0.9rem;">Defina um limite mensal para cada categoria de despesa.</p>
+      <div id="orcamentoFormList"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="fecharModalOrcamento()">Cancelar</button>
+        <button class="btn-primary" onclick="salvarOrcamentos()">💾 Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL CATEGORIAS ========== -->
+  <div class="modal-overlay" id="modalCategorias">
+    <div class="modal">
+      <h3>🏷️ Gerenciar Categorias</h3>
+      <div class="cat-list" id="catList"></div>
+      <div class="cat-new-row">
+        <input type="text" id="novaCategoriaInput" placeholder="Nova categoria...">
+        <button class="btn-primary" onclick="adicionarCategoria()" style="padding:8px 16px;">＋</button>
+      </div>
+      <div class="modal-actions" style="margin-top:16px;">
+        <button class="btn-primary" onclick="fecharModalCategorias()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ========== CONQUISTA POPUP ========== -->
   <div class="overlay" id="conquistaOverlay" onclick="fecharConquista()"></div>
   <div class="conquista-popup" id="conquistaPopup">
@@ -1005,13 +1321,54 @@
   <div class="confetti-container" id="confettiContainer"></div>
 
   <!-- =====================================================================
+       FIREBASE SDK (CDN)
+  ====================================================================== -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <!-- =====================================================================
        JAVASCRIPT
   ====================================================================== -->
   <script>
     /* ==========================================================
+       FIREBASE — INICIALIZAÇÃO
+    ========================================================== */
+    const firebaseConfig = {
+      apiKey: "AIzaSyDVSXmY-6Y0BIaAvTtGiJLwNdp42mSw9Jk",
+      authDomain: "gestaofinanceira-9511e.firebaseapp.com",
+      databaseURL: "https://gestaofinanceira-9511e-default-rtdb.firebaseio.com",
+      projectId: "gestaofinanceira-9511e",
+      storageBucket: "gestaofinanceira-9511e.firebasestorage.app",
+      messagingSenderId: "915486047838",
+      appId: "1:915486047838:web:2a8b11997987d3fbcffecf",
+      measurementId: "G-Y5KKJYYTPN"
+    };
+
+    const firebaseApp = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    const db = firebase.database();
+    const dbRef = db.ref('leanFinanceData');
+    let firebaseConectado = false;
+    let ignorarProximoOnValue = false;
+
+    // E-mails autorizados (somente vocês dois)
+    const EMAILS_AUTORIZADOS = [
+      'lecamargo198@gmail.com',
+      'leidipequim@gmail.com'
+    ];
+
+    let usuarioLogado = null;
+
+    /* ==========================================================
        DADOS INICIAIS
     ========================================================== */
+    const CATEGORIAS_PADRAO = ['Receitas Fixas','Moradia','Transporte','Impostos','Educação','Saúde','Lazer','Cartão Santander','Cartão Nubank','Compras','Vestuário','Manutenção','Casa','Eventos','Outros'];
+
     const DADOS_INICIAIS = {
+      categorias: [...CATEGORIAS_PADRAO],
+      orcamentos: [],
       lancamentos: [
         // === Receitas ===
         { id: 'r1', descricao: 'Salário Leandro', valor: 1600, categoria: 'Receitas Fixas', tipo: 'receita', parcela: '' },
@@ -1065,6 +1422,7 @@
     let sortConfig = { col: '', dir: 'asc' };
     let fabOpen = false;
     let contadorId = 100;
+    let mesAtual = '';
 
     /* ==========================================================
        FORMATAÇÃO MONETÁRIA
@@ -1074,19 +1432,96 @@
     }
 
     /* ==========================================================
-       PERSISTÊNCIA (localStorage)
+       HELPERS DE MÊS
+    ========================================================== */
+    const NOMES_MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                         'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+    function getMesAtualStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function getMesLabel(mes) {
+      if (!mes) return '—';
+      const [ano, m] = mes.split('-');
+      return `${NOMES_MESES[parseInt(m) - 1]} ${ano}`;
+    }
+
+    function getMesAnterior(mes) {
+      const [ano, m] = mes.split('-').map(Number);
+      const d = new Date(ano, m - 2, 1);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function getMesProximo(mes) {
+      const [ano, m] = mes.split('-').map(Number);
+      const d = new Date(ano, m, 1);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function getMesesComDados() {
+      const meses = new Set(dados.lancamentos.map(l => l.mes).filter(Boolean));
+      meses.add(mesAtual);
+      return [...meses].sort();
+    }
+
+    function navegarMes(dir) {
+      mesAtual = dir > 0 ? getMesProximo(mesAtual) : getMesAnterior(mesAtual);
+      renderAll();
+    }
+
+    function irParaMes(mes) {
+      mesAtual = mes;
+      renderAll();
+    }
+
+    function renderMesNav() {
+      document.getElementById('mesLabel').textContent = getMesLabel(mesAtual);
+      const meses = getMesesComDados();
+      const select = document.getElementById('mesSelect');
+      select.innerHTML = meses.map(m =>
+        `<option value="${m}" ${m === mesAtual ? 'selected' : ''}>${getMesLabel(m)}<\/option>`
+      ).join('');
+    }
+
+    function migrarDadosMes() {
+      const mesCorrente = getMesAtualStr();
+      let migrou = false;
+      dados.lancamentos.forEach(l => {
+        if (!l.mes) {
+          l.mes = mesCorrente;
+          migrou = true;
+        }
+      });
+      return migrou;
+    }
+
+    /* ==========================================================
+       PERSISTÊNCIA (Firebase + localStorage fallback)
     ========================================================== */
     function carregarDados() {
+      // Carrega do localStorage como cache inicial (resposta imediata)
       const saved = localStorage.getItem('leanFinanceData');
       if (saved) {
         dados = JSON.parse(saved);
-        // Garante arrays
         if (!dados.lancamentos) dados.lancamentos = [];
         if (!dados.metas) dados.metas = [];
+        if (!dados.categorias) dados.categorias = [...CATEGORIAS_PADRAO];
+        if (!dados.orcamentos) dados.orcamentos = [];
       } else {
         dados = JSON.parse(JSON.stringify(DADOS_INICIAIS));
-        salvarDados();
       }
+      // Define mês atual e migra dados antigos sem campo 'mes'
+      mesAtual = getMesAtualStr();
+      const migrou = migrarDadosMes();
+      atualizarContadorId();
+      if (migrou) {
+        localStorage.setItem('leanFinanceData', JSON.stringify(dados));
+      }
+    }
+
+    function atualizarContadorId() {
       contadorId = Math.max(100, ...dados.lancamentos.map(l => {
         const n = parseInt(String(l.id).replace(/\D/g, ''));
         return isNaN(n) ? 0 : n;
@@ -1097,15 +1532,100 @@
     }
 
     function salvarDados() {
+      // Salva no localStorage (cache local)
       localStorage.setItem('leanFinanceData', JSON.stringify(dados));
+
+      // Salva no Firebase (sincronização entre dispositivos)
+      ignorarProximoOnValue = true;
+      dbRef.set(dados).then(() => {
+        if (!firebaseConectado) {
+          firebaseConectado = true;
+          mostrarToast('☁️ Conectado ao Firebase — dados sincronizados!', 'success');
+        }
+      }).catch(err => {
+        console.error('Erro ao salvar no Firebase:', err);
+        mostrarToast('⚠️ Erro ao sincronizar com Firebase. Dados salvos localmente.', 'warning');
+      });
+    }
+
+    /* ==========================================================
+       FIREBASE — ESCUTA EM TEMPO REAL
+    ========================================================== */
+    function iniciarSyncFirebase() {
+      // Monitora estado da conexão
+      db.ref('.info/connected').on('value', (snap) => {
+        if (snap.val() === true) {
+          firebaseConectado = true;
+          document.title = '💰 Lean Finance — Leandro & Leidiane';
+        } else {
+          firebaseConectado = false;
+          document.title = '💰 Lean Finance — OFFLINE';
+        }
+      });
+
+      // Escuta mudanças em tempo real
+      dbRef.on('value', (snapshot) => {
+        // Ignora o evento disparado pelo próprio salvamento
+        if (ignorarProximoOnValue) {
+          ignorarProximoOnValue = false;
+          return;
+        }
+
+        const dadosRemoto = snapshot.val();
+        if (dadosRemoto && dadosRemoto.lancamentos && dadosRemoto.metas) {
+          dados = dadosRemoto;
+          if (!dados.lancamentos) dados.lancamentos = [];
+          if (!dados.metas) dados.metas = [];
+          if (!dados.categorias) dados.categorias = [...CATEGORIAS_PADRAO];
+          if (!dados.orcamentos) dados.orcamentos = [];
+          const migrou = migrarDadosMes();
+          atualizarContadorId();
+
+          // Atualiza cache local
+          localStorage.setItem('leanFinanceData', JSON.stringify(dados));
+
+          // Re-renderiza a interface
+          renderAll();
+          mostrarToast('🔄 Dados atualizados de outro dispositivo!', 'success');
+          if (migrou) salvarDados();
+        }
+      }, (err) => {
+        console.error('Erro ao escutar Firebase:', err);
+        mostrarToast('⚠️ Sem conexão com Firebase. Usando dados locais.', 'warning');
+      });
+
+      // Tenta carregar dados iniciais do Firebase
+      dbRef.once('value').then((snapshot) => {
+        const dadosRemoto = snapshot.val();
+        if (dadosRemoto && dadosRemoto.lancamentos) {
+          // Firebase tem dados, usa eles
+          dados = dadosRemoto;
+          if (!dados.lancamentos) dados.lancamentos = [];
+          if (!dados.metas) dados.metas = [];
+          if (!dados.categorias) dados.categorias = [...CATEGORIAS_PADRAO];
+          if (!dados.orcamentos) dados.orcamentos = [];
+          migrarDadosMes();
+          atualizarContadorId();
+          localStorage.setItem('leanFinanceData', JSON.stringify(dados));
+          renderAll();
+        } else {
+          // Firebase vazio, envia dados locais para lá
+          salvarDados();
+        }
+      }).catch(() => {
+        // Sem acesso ao Firebase, continua com localStorage
+        console.log('Firebase indisponível, usando localStorage.');
+      });
     }
 
     /* ==========================================================
        CÁLCULOS BASE
     ========================================================== */
-    function calcularSaldo() {
-      const receitas = dados.lancamentos.filter(l => l.tipo === 'receita').reduce((s, l) => s + l.valor, 0);
-      const despesas = dados.lancamentos.filter(l => l.tipo === 'despesa').reduce((s, l) => s + l.valor, 0);
+    function calcularSaldo(mes) {
+      mes = mes || mesAtual;
+      const lancMes = dados.lancamentos.filter(l => l.mes === mes);
+      const receitas = lancMes.filter(l => l.tipo === 'receita').reduce((s, l) => s + l.valor, 0);
+      const despesas = lancMes.filter(l => l.tipo === 'despesa').reduce((s, l) => s + l.valor, 0);
       return { receitas, despesas, saldo: receitas - despesas };
     }
 
@@ -1113,7 +1633,7 @@
       const { receitas } = calcularSaldo();
       if (receitas === 0) return 0;
       const total = dados.lancamentos
-        .filter(l => l.tipo === 'despesa' && l.categoria === categoria)
+        .filter(l => l.mes === mesAtual && l.tipo === 'despesa' && l.categoria === categoria)
         .reduce((s, l) => s + l.valor, 0);
       return (total / receitas) * 100;
     }
@@ -1122,7 +1642,7 @@
       const { receitas } = calcularSaldo();
       if (receitas === 0) return 0;
       const total = dados.lancamentos
-        .filter(l => l.tipo === 'despesa' && (l.categoria === 'Cartão Santander' || l.categoria === 'Cartão Nubank'))
+        .filter(l => l.mes === mesAtual && l.tipo === 'despesa' && (l.categoria === 'Cartão Santander' || l.categoria === 'Cartão Nubank'))
         .reduce((s, l) => s + l.valor, 0);
       return (total / receitas) * 100;
     }
@@ -1164,7 +1684,7 @@
       const { receitas, saldo } = calcularSaldo();
 
       // Última parcela
-      dados.lancamentos.filter(l => l.tipo === 'despesa' && l.parcela && l.parcela !== 'recorrente').forEach(l => {
+      dados.lancamentos.filter(l => l.mes === mesAtual && l.tipo === 'despesa' && l.parcela && l.parcela !== 'recorrente').forEach(l => {
         const parts = l.parcela.split('/');
         if (parts.length === 2 && parts[0] === parts[1]) {
           alertas.push({ tipo: 'info', msg: `🔥 Última parcela! "${l.descricao}" — ${l.parcela}` });
@@ -1202,6 +1722,21 @@
         }
       });
 
+      // Orçamento estourado
+      if (dados.orcamentos && dados.orcamentos.length > 0) {
+        dados.orcamentos.forEach(orc => {
+          const gasto = dados.lancamentos
+            .filter(l => l.mes === mesAtual && l.tipo === 'despesa' && l.categoria === orc.categoria)
+            .reduce((s, l) => s + l.valor, 0);
+          const pct = orc.limite > 0 ? (gasto / orc.limite) * 100 : 0;
+          if (pct >= 100) {
+            alertas.push({ tipo: 'danger', msg: `🚨 Orçamento de "${orc.categoria}" estourado! ${fmt(gasto)} de ${fmt(orc.limite)} (${pct.toFixed(0)}%)` });
+          } else if (pct >= 80) {
+            alertas.push({ tipo: 'warn', msg: `⚠️ Orçamento de "${orc.categoria}" em ${pct.toFixed(0)}% — ${fmt(gasto)} de ${fmt(orc.limite)}` });
+          }
+        });
+      }
+
       return alertas;
     }
 
@@ -1223,12 +1758,12 @@
       animarContador(document.getElementById('cardSaldo'), saldo);
       document.getElementById('cardSaldo').className = 'card-value money-value ' + (saldo >= 0 ? 'text-green' : 'text-red');
 
-      const nReceitas = dados.lancamentos.filter(l => l.tipo === 'receita').length;
-      const nDespesas = dados.lancamentos.filter(l => l.tipo === 'despesa').length;
+      const nReceitas = dados.lancamentos.filter(l => l.mes === mesAtual && l.tipo === 'receita').length;
+      const nDespesas = dados.lancamentos.filter(l => l.mes === mesAtual && l.tipo === 'despesa').length;
       document.getElementById('cardReceitasSub').textContent = `${nReceitas} receita${nReceitas !== 1 ? 's' : ''} cadastrada${nReceitas !== 1 ? 's' : ''}`;
       document.getElementById('cardDespesasSub').textContent = `${nDespesas} despesa${nDespesas !== 1 ? 's' : ''} cadastrada${nDespesas !== 1 ? 's' : ''}`;
       document.getElementById('cardSaldoSub').textContent = saldo >= 0
-        ? `${((saldo / receitas) * 100).toFixed(1)}% da receita disponível`
+        ? `${receitas > 0 ? ((saldo / receitas) * 100).toFixed(1) : '0.0'}% da receita disponível`
         : 'Déficit orçamentário!';
 
       const metasAtivas = dados.metas.filter(m => (m.valorGuardado / m.valorTotal) < 1).length;
@@ -1253,6 +1788,15 @@
 
       // Nota financeira
       renderNota();
+
+      // Comparação mensal
+      renderComparacao();
+
+      // Orçamento por categoria
+      renderOrcamento();
+
+      // Gráfico de evolução mensal
+      renderEvolucao();
 
       // Footer
       document.getElementById('footerReceitas').textContent = fmt(receitas);
@@ -1280,7 +1824,7 @@
 
     /* Gráfico de pizza (CSS conic-gradient) */
     function renderPieChart() {
-      const despesas = dados.lancamentos.filter(l => l.tipo === 'despesa');
+      const despesas = dados.lancamentos.filter(l => l.mes === mesAtual && l.tipo === 'despesa');
       const catMap = {};
       despesas.forEach(l => {
         if (!catMap[l.categoria]) catMap[l.categoria] = 0;
@@ -1322,7 +1866,7 @@
 
     /* Top 5 */
     function renderTop5() {
-      const despesas = [...dados.lancamentos.filter(l => l.tipo === 'despesa')]
+      const despesas = [...dados.lancamentos.filter(l => l.mes === mesAtual && l.tipo === 'despesa')]
         .sort((a, b) => b.valor - a.valor)
         .slice(0, 5);
 
@@ -1384,6 +1928,7 @@
       const tipo = document.getElementById('filterTipo').value;
 
       let filtered = dados.lancamentos.filter(l => {
+        if (l.mes !== mesAtual) return false;
         if (search && !l.descricao.toLowerCase().includes(search)) return false;
         if (cat && l.categoria !== cat) return false;
         if (tipo && l.tipo !== tipo) return false;
@@ -1425,11 +1970,14 @@
           }
         }
 
+        const dataDisplay = l.data ? new Date(l.data + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+
         return `
           <tr>
             <td>${l.descricao}<\/td>
             <td>${l.categoria}<\/td>
             <td class="money-value ${l.tipo === 'receita' ? 'text-green' : 'text-red'}">${l.tipo === 'receita' ? '+' : '-'} ${fmt(l.valor)}<\/td>
+            <td>${dataDisplay}<\/td>
             <td>${badge}<\/td>
             <td>${parcelaDisplay}<\/td>
             <td>
@@ -1461,10 +2009,18 @@
     }
 
     function populateFilters() {
-      const cats = [...new Set(dados.lancamentos.map(l => l.categoria))].sort();
+      const cats = [...new Set(dados.lancamentos.filter(l => l.mes === mesAtual).map(l => l.categoria))].sort();
       const select = document.getElementById('filterCategoria');
       select.innerHTML = '<option value="">Todas as categorias<\/option>' +
         cats.map(c => `<option value="${c}">${c}<\/option>`).join('');
+    }
+
+    function popularSelectCategorias(selectId, valorAtual) {
+      const select = document.getElementById(selectId);
+      const allCats = [...new Set([...dados.categorias, ...dados.lancamentos.map(l => l.categoria)])];
+      select.innerHTML = allCats.map(c =>
+        `<option value="${c}" ${c === valorAtual ? 'selected' : ''}>${c}<\/option>`
+      ).join('');
     }
 
     /* ==========================================================
@@ -1474,9 +2030,10 @@
       document.getElementById('modalLancTitulo').textContent = 'Novo Lançamento';
       document.getElementById('lancDescricao').value = '';
       document.getElementById('lancValor').value = '';
-      document.getElementById('lancCategoria').value = 'Moradia';
+      popularSelectCategorias('lancCategoria', 'Moradia');
       document.getElementById('lancTipo').value = 'despesa';
       document.getElementById('lancParcela').value = '';
+      document.getElementById('lancData').value = new Date().toISOString().split('T')[0];
       document.getElementById('lancEditId').value = '';
       document.getElementById('modalLancamento').classList.add('show');
     }
@@ -1491,9 +2048,10 @@
       document.getElementById('modalLancTitulo').textContent = 'Editar Lançamento';
       document.getElementById('lancDescricao').value = l.descricao;
       document.getElementById('lancValor').value = l.valor;
-      document.getElementById('lancCategoria').value = l.categoria;
+      popularSelectCategorias('lancCategoria', l.categoria);
       document.getElementById('lancTipo').value = l.tipo;
       document.getElementById('lancParcela').value = l.parcela || '';
+      document.getElementById('lancData').value = l.data || '';
       document.getElementById('lancEditId').value = id;
       document.getElementById('modalLancamento').classList.add('show');
     }
@@ -1504,6 +2062,7 @@
       const cat = document.getElementById('lancCategoria').value;
       const tipo = document.getElementById('lancTipo').value;
       const parcela = document.getElementById('lancParcela').value.trim();
+      const dataLanc = document.getElementById('lancData').value;
       const editId = document.getElementById('lancEditId').value;
 
       if (!desc || isNaN(valor) || valor <= 0) {
@@ -1514,11 +2073,11 @@
       if (editId) {
         const idx = dados.lancamentos.findIndex(l => l.id === editId);
         if (idx >= 0) {
-          dados.lancamentos[idx] = { ...dados.lancamentos[idx], descricao: desc, valor, categoria: cat, tipo, parcela };
+          dados.lancamentos[idx] = { ...dados.lancamentos[idx], descricao: desc, valor, categoria: cat, tipo, parcela, data: dataLanc };
           mostrarToast('Lançamento atualizado!', 'success');
         }
       } else {
-        dados.lancamentos.push({ id: 'l' + (contadorId++), descricao: desc, valor, categoria: cat, tipo, parcela });
+        dados.lancamentos.push({ id: 'l' + (contadorId++), descricao: desc, valor, categoria: cat, tipo, parcela, mes: mesAtual, data: dataLanc });
         mostrarToast('Lançamento adicionado!', 'success');
       }
 
@@ -1642,7 +2201,7 @@
 
     /* Calculadora de economia (Se parar de pagar X, economiza Y) */
     function renderEconomia() {
-      const despesas = dados.lancamentos.filter(l => l.tipo === 'despesa');
+      const despesas = dados.lancamentos.filter(l => l.mes === mesAtual && l.tipo === 'despesa');
       const container = document.getElementById('economiaList');
 
       container.innerHTML = despesas.map(d => `
@@ -1954,11 +2513,12 @@
             throw new Error('Formato de arquivo inválido');
           }
           
-          if (confirm('Deseja restaurar os dados deste arquivo? Os dados atuais serão substituídos.')) {
+          if (confirm('Deseja restaurar os dados deste arquivo? Os dados atuais serão substituídos em TODOS os dispositivos.')) {
             dados = importedData;
+            atualizarContadorId();
             salvarDados();
             renderAll();
-            mostrarToast('✅ Dados restaurados com sucesso!', 'success');
+            mostrarToast('✅ Dados restaurados e sincronizados!', 'success');
           }
         } catch (err) {
           mostrarToast('❌ Erro ao importar: ' + err.message, 'error');
@@ -2006,11 +2566,12 @@
 
         <h2>📋 Lançamentos<\/h2>
         <table>
-          <tr><th>Descrição<\/th><th>Categoria<\/th><th>Tipo<\/th><th>Valor<\/th><th>Parcela<\/th><\/tr>
-          ${dados.lancamentos.map(l => `
+          <tr><th>Descrição<\/th><th>Categoria<\/th><th>Data<\/th><th>Tipo<\/th><th>Valor<\/th><th>Parcela<\/th><\/tr>
+          ${dados.lancamentos.filter(l => l.mes === mesAtual).map(l => `
             <tr>
               <td>${l.descricao}<\/td>
               <td>${l.categoria}<\/td>
+              <td>${l.data ? new Date(l.data + 'T00:00:00').toLocaleDateString('pt-BR') : '—'}<\/td>
               <td>${l.tipo === 'receita' ? 'Receita' : 'Despesa'}<\/td>
               <td class="${l.tipo === 'receita' ? 'green' : 'red'}">${fmt(l.valor)}<\/td>
               <td>${l.parcela || '—'}<\/td>
@@ -2121,9 +2682,543 @@
     });
 
     /* ==========================================================
+       FECHAR MÊS / CONTROLE MENSAL
+    ========================================================== */
+    function fecharMes() {
+      const mesProximo = getMesProximo(mesAtual);
+      const jaTemDados = dados.lancamentos.some(l => l.mes === mesProximo);
+
+      if (jaTemDados) {
+        if (!confirm(`Já existem lançamentos em ${getMesLabel(mesProximo)}.\nDeseja navegar para lá?`)) return;
+        mesAtual = mesProximo;
+        renderAll();
+        return;
+      }
+
+      if (!confirm(`Fechar ${getMesLabel(mesAtual)} e iniciar ${getMesLabel(mesProximo)}?\n\nItens recorrentes, fixos e parcelas serão copiados automaticamente para o próximo mês.`)) return;
+
+      const lancamentosMes = dados.lancamentos.filter(l => l.mes === mesAtual);
+      let copiados = 0;
+
+      lancamentosMes.forEach(l => {
+        // Copia receitas (sempre recorrentes)
+        if (l.tipo === 'receita') {
+          dados.lancamentos.push({
+            id: 'l' + (contadorId++),
+            descricao: l.descricao,
+            valor: l.valor,
+            categoria: l.categoria,
+            tipo: l.tipo,
+            parcela: l.parcela,
+            mes: mesProximo
+          });
+          copiados++;
+        }
+        // Copia despesas recorrentes ou fixas (sem parcela)
+        else if (l.parcela === 'recorrente' || l.parcela === '') {
+          dados.lancamentos.push({
+            id: 'l' + (contadorId++),
+            descricao: l.descricao,
+            valor: l.valor,
+            categoria: l.categoria,
+            tipo: l.tipo,
+            parcela: l.parcela,
+            mes: mesProximo
+          });
+          copiados++;
+        }
+        // Avança parcelas (ex: 2/10 → 3/10)
+        else if (l.parcela && l.parcela.includes('/')) {
+          const parts = l.parcela.split('/');
+          const parcelaAtual = parseInt(parts[0]);
+          const parcelaTotal = parseInt(parts[1]);
+          if (parcelaAtual < parcelaTotal) {
+            dados.lancamentos.push({
+              id: 'l' + (contadorId++),
+              descricao: l.descricao,
+              valor: l.valor,
+              categoria: l.categoria,
+              tipo: l.tipo,
+              parcela: `${parcelaAtual + 1}/${parcelaTotal}`,
+              mes: mesProximo
+            });
+            copiados++;
+          }
+        }
+      });
+
+      mesAtual = mesProximo;
+      salvarDados();
+      renderAll();
+      mostrarToast(`✅ Mês fechado! ${copiados} lançamentos copiados para ${getMesLabel(mesAtual)}.`, 'success');
+    }
+
+    /* ==========================================================
+       COMPARAÇÃO MENSAL
+    ========================================================== */
+    function renderComparacao() {
+      const mesAnterior = getMesAnterior(mesAtual);
+      const atual = calcularSaldo(mesAtual);
+      const anterior = calcularSaldo(mesAnterior);
+      const container = document.getElementById('monthComparison');
+
+      // Sem dados do mês anterior, não exibe comparação
+      if (anterior.receitas === 0 && anterior.despesas === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      function comparar(atualVal, anteriorVal, inverter) {
+        if (anteriorVal === 0) return { pct: 0, classe: '', seta: '—' };
+        const pct = ((atualVal - anteriorVal) / Math.abs(anteriorVal)) * 100;
+        let classe = pct > 0 ? 'text-green' : pct < 0 ? 'text-red' : '';
+        if (inverter) classe = pct > 0 ? 'text-red' : pct < 0 ? 'text-green' : '';
+        const seta = pct > 0 ? '▲' : pct < 0 ? '▼' : '—';
+        return { pct, classe, seta };
+      }
+
+      const recComp = comparar(atual.receitas, anterior.receitas, false);
+      const despComp = comparar(atual.despesas, anterior.despesas, true);
+      const saldoComp = comparar(atual.saldo, anterior.saldo, false);
+
+      container.innerHTML = `
+        <div class="chart-title">📊 Comparação com ${getMesLabel(mesAnterior)}<\/div>
+        <div class="comparison-grid">
+          <div class="comparison-card">
+            <div class="comparison-label">Receitas<\/div>
+            <div class="comparison-values">
+              <span class="money-value fw-700">${fmt(atual.receitas)}<\/span>
+              <span class="comparison-arrow ${recComp.classe}">${recComp.seta} ${Math.abs(recComp.pct).toFixed(1)}%<\/span>
+            <\/div>
+            <div class="comparison-prev money-value">Anterior: ${fmt(anterior.receitas)}<\/div>
+          <\/div>
+          <div class="comparison-card">
+            <div class="comparison-label">Despesas<\/div>
+            <div class="comparison-values">
+              <span class="money-value fw-700">${fmt(atual.despesas)}<\/span>
+              <span class="comparison-arrow ${despComp.classe}">${despComp.seta} ${Math.abs(despComp.pct).toFixed(1)}%<\/span>
+            <\/div>
+            <div class="comparison-prev money-value">Anterior: ${fmt(anterior.despesas)}<\/div>
+          <\/div>
+          <div class="comparison-card">
+            <div class="comparison-label">Saldo<\/div>
+            <div class="comparison-values">
+              <span class="money-value fw-700 ${atual.saldo >= 0 ? 'text-green' : 'text-red'}">${fmt(atual.saldo)}<\/span>
+              <span class="comparison-arrow ${saldoComp.classe}">${saldoComp.seta} ${Math.abs(saldoComp.pct).toFixed(1)}%<\/span>
+            <\/div>
+            <div class="comparison-prev money-value">Anterior: ${fmt(anterior.saldo)}<\/div>
+          <\/div>
+        <\/div>
+      `;
+    }
+
+    /* ==========================================================
+       ORÇAMENTO POR CATEGORIA
+    ========================================================== */
+    function renderOrcamento() {
+      const container = document.getElementById('orcamentoSection');
+      if (!dados.orcamentos || dados.orcamentos.length === 0) {
+        container.innerHTML = `
+          <h3>💰 Orçamento por Categoria
+            <button class="orcamento-btn-add" onclick="abrirModalOrcamento()">⚙️ Configurar<\/button>
+          <\/h3>
+          <div class="orcamento-no-data">Nenhum orçamento definido. Configure limites por categoria para acompanhar seus gastos.<\/div>
+        `;
+        return;
+      }
+
+      let html = `<h3>💰 Orçamento por Categoria
+        <button class="orcamento-btn-add" onclick="abrirModalOrcamento()">⚙️ Configurar<\/button>
+      <\/h3><div class="orcamento-grid">`;
+
+      dados.orcamentos.forEach(orc => {
+        if (orc.limite <= 0) return;
+        const gasto = dados.lancamentos
+          .filter(l => l.mes === mesAtual && l.tipo === 'despesa' && l.categoria === orc.categoria)
+          .reduce((s, l) => s + l.valor, 0);
+        const pct = Math.min(150, (gasto / orc.limite) * 100);
+        const barWidth = Math.min(100, pct);
+        let barCls = 'orcamento-bar-safe';
+        let pctCls = 'text-green';
+        if (pct >= 100) { barCls = 'orcamento-bar-danger'; pctCls = 'text-red'; }
+        else if (pct >= 80) { barCls = 'orcamento-bar-warn'; pctCls = 'text-yellow'; }
+
+        html += `
+          <div class="orcamento-item">
+            <div class="orcamento-item-info">
+              <div class="orcamento-item-cat">${orc.categoria}<\/div>
+              <div class="orcamento-item-vals money-value">${fmt(gasto)} de ${fmt(orc.limite)}<\/div>
+            <\/div>
+            <div class="orcamento-bar-track">
+              <div class="orcamento-bar-fill ${barCls}" style="width:${barWidth}%"><\/div>
+            <\/div>
+            <div class="orcamento-pct ${pctCls}">${pct.toFixed(0)}%<\/div>
+          <\/div>
+        `;
+      });
+
+      html += '<\/div>';
+      container.innerHTML = html;
+    }
+
+    function abrirModalOrcamento() {
+      const allCats = [...new Set([...dados.categorias, ...dados.lancamentos.map(l => l.categoria)])].filter(c => c !== 'Receitas Fixas');
+      const container = document.getElementById('orcamentoFormList');
+      let html = '<div style="display:flex;flex-direction:column;gap:10px;max-height:400px;overflow-y:auto;">';
+
+      allCats.forEach(cat => {
+        const existing = (dados.orcamentos || []).find(o => o.categoria === cat);
+        const val = existing ? existing.limite : '';
+        html += `
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="flex:1;font-weight:600;font-size:0.9rem;">${cat}<\/span>
+            <input type="number" data-orc-cat="${cat}" value="${val}" placeholder="Sem limite"
+              style="width:140px;padding:8px 10px;border-radius:8px;background:var(--bg-input);color:var(--text-primary);border:1px solid var(--border);font-size:0.85rem;" step="0.01">
+          <\/div>
+        `;
+      });
+
+      html += '<\/div>';
+      container.innerHTML = html;
+      document.getElementById('modalOrcamento').classList.add('show');
+    }
+
+    function fecharModalOrcamento() {
+      document.getElementById('modalOrcamento').classList.remove('show');
+    }
+
+    function salvarOrcamentos() {
+      const inputs = document.querySelectorAll('[data-orc-cat]');
+      dados.orcamentos = [];
+      inputs.forEach(input => {
+        const val = parseFloat(input.value);
+        if (!isNaN(val) && val > 0) {
+          dados.orcamentos.push({ categoria: input.dataset.orcCat, limite: val });
+        }
+      });
+      salvarDados();
+      fecharModalOrcamento();
+      renderAll();
+      mostrarToast('Orçamento salvo com sucesso!', 'success');
+    }
+
+    /* ==========================================================
+       GRÁFICO DE EVOLUÇÃO MENSAL
+    ========================================================== */
+    function getUltimos6Meses() {
+      const meses = [];
+      let mes = mesAtual;
+      for (let i = 0; i < 6; i++) {
+        meses.unshift(mes);
+        mes = getMesAnterior(mes);
+      }
+      return meses;
+    }
+
+    function renderEvolucao() {
+      const container = document.getElementById('evolucaoSection');
+      const meses = getUltimos6Meses();
+      const dadosMeses = meses.map(m => {
+        const s = calcularSaldo(m);
+        return { mes: m, receitas: s.receitas, despesas: s.despesas };
+      });
+
+      // Se não há dados em nenhum mês, oculta
+      const temDados = dadosMeses.some(d => d.receitas > 0 || d.despesas > 0);
+      if (!temDados) {
+        container.innerHTML = '';
+        return;
+      }
+
+      const maxVal = Math.max(...dadosMeses.map(d => Math.max(d.receitas, d.despesas)), 1);
+
+      let barsHTML = '';
+      let labelsHTML = '';
+
+      dadosMeses.forEach(d => {
+        const hRec = (d.receitas / maxVal) * 100;
+        const hDesp = (d.despesas / maxVal) * 100;
+        const [, m] = d.mes.split('-');
+        const mesLabel = NOMES_MESES[parseInt(m) - 1].substring(0, 3);
+
+        barsHTML += `
+          <div class="evolucao-bar-group">
+            <div class="evolucao-bar evolucao-bar-receita" style="height:${Math.max(hRec, 2)}%">
+              <div class="evolucao-tooltip">${mesLabel}: ${fmt(d.receitas)}<\/div>
+            <\/div>
+            <div class="evolucao-bar evolucao-bar-despesa" style="height:${Math.max(hDesp, 2)}%">
+              <div class="evolucao-tooltip">${mesLabel}: ${fmt(d.despesas)}<\/div>
+            <\/div>
+          <\/div>
+        `;
+        labelsHTML += `<div class="evolucao-label">${mesLabel}<\/div>`;
+      });
+
+      container.innerHTML = `
+        <h3>📈 Evolução Mensal (últimos 6 meses)<\/h3>
+        <div class="evolucao-chart">${barsHTML}<\/div>
+        <div class="evolucao-labels">${labelsHTML}<\/div>
+        <div class="evolucao-legenda">
+          <div class="evolucao-legenda-item">
+            <div class="evolucao-legenda-color" style="background:var(--green);"><\/div>
+            Receitas
+          <\/div>
+          <div class="evolucao-legenda-item">
+            <div class="evolucao-legenda-color" style="background:var(--red);"><\/div>
+            Despesas
+          <\/div>
+        <\/div>
+      `;
+    }
+
+    /* ==========================================================
+       GERENCIAMENTO DE CATEGORIAS
+    ========================================================== */
+    function abrirModalCategorias() {
+      renderListaCategorias();
+      document.getElementById('modalCategorias').classList.add('show');
+    }
+
+    function fecharModalCategorias() {
+      document.getElementById('modalCategorias').classList.remove('show');
+      renderAll();
+    }
+
+    function renderListaCategorias() {
+      const container = document.getElementById('catList');
+      container.innerHTML = dados.categorias.map(cat => {
+        const emUso = dados.lancamentos.some(l => l.categoria === cat);
+        return `
+          <div class="cat-item">
+            <span class="cat-item-name">${cat}<\/span>
+            <div class="cat-item-actions">
+              ${emUso ? '<span class="text-muted" style="font-size:0.75rem;">em uso<\/span>' : ''}
+              <button class="btn-danger-sm" onclick="excluirCategoria('${cat}')" ${emUso ? 'title="Categoria em uso"' : ''}>🗑️<\/button>
+            <\/div>
+          <\/div>
+        `;
+      }).join('');
+    }
+
+    function adicionarCategoria() {
+      const input = document.getElementById('novaCategoriaInput');
+      const nome = input.value.trim();
+      if (!nome) { mostrarToast('Digite o nome da categoria.', 'error'); return; }
+      if (dados.categorias.includes(nome)) { mostrarToast('Categoria já existe!', 'warning'); return; }
+      dados.categorias.push(nome);
+      salvarDados();
+      input.value = '';
+      renderListaCategorias();
+      mostrarToast(`Categoria "${nome}" adicionada!`, 'success');
+    }
+
+    function excluirCategoria(cat) {
+      const emUso = dados.lancamentos.some(l => l.categoria === cat);
+      if (emUso) {
+        if (!confirm(`A categoria "${cat}" está em uso em lançamentos.\nOs lançamentos NÃO serão excluídos, mas a categoria será removida da lista.\nDeseja continuar?`)) return;
+      }
+      dados.categorias = dados.categorias.filter(c => c !== cat);
+      // Remove orçamentos da categoria também
+      dados.orcamentos = (dados.orcamentos || []).filter(o => o.categoria !== cat);
+      salvarDados();
+      renderListaCategorias();
+      mostrarToast(`Categoria "${cat}" removida.`, 'warning');
+    }
+
+    /* ==========================================================
+       PWA — INSTALAÇÃO
+    ========================================================== */
+    let deferredPrompt = null;
+
+    function initPWA() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').then(() => {
+          console.log('Service Worker registrado com sucesso.');
+        }).catch(err => {
+          console.log('Service Worker não registrado:', err);
+        });
+      }
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const btn = document.getElementById('btnInstallPwa');
+        if (btn) btn.classList.add('show');
+      });
+
+      window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        const btn = document.getElementById('btnInstallPwa');
+        if (btn) btn.classList.remove('show');
+        mostrarToast('📱 App instalado com sucesso!', 'success');
+      });
+    }
+
+    function instalarPWA() {
+      if (!deferredPrompt) {
+        mostrarToast('O app já está instalado ou não é suportado neste navegador.', 'warning');
+        return;
+      }
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(result => {
+        if (result.outcome === 'accepted') {
+          mostrarToast('📱 Instalando app...', 'success');
+        }
+        deferredPrompt = null;
+        const btn = document.getElementById('btnInstallPwa');
+        if (btn) btn.classList.remove('show');
+      });
+    }
+
+    /* ==========================================================
+       NOTIFICAÇÕES INTELIGENTES
+    ========================================================== */
+    function initNotificacoes() {
+      if (!('Notification' in window)) return;
+      if (Notification.permission === 'default') {
+        // Pede permissão somente após interação
+        document.addEventListener('click', function pedirPermissao() {
+          Notification.requestPermission();
+          document.removeEventListener('click', pedirPermissao);
+        }, { once: true });
+      }
+    }
+
+    function verificarNotificacoes() {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+      // Metas perto do vencimento
+      dados.metas.forEach(m => {
+        if (m.dataAlvo && (m.valorGuardado / m.valorTotal) < 1) {
+          const diff = Math.ceil((new Date(m.dataAlvo) - new Date()) / (1000 * 60 * 60 * 24));
+          if (diff > 0 && diff <= 7) {
+            new Notification('⏰ Meta próxima do vencimento!', {
+              body: `"${m.nome}" vence em ${diff} dia${diff > 1 ? 's' : ''}. Faltam ${fmt(m.valorTotal - m.valorGuardado)}.`,
+              icon: '💰',
+              tag: 'meta-' + m.id
+            });
+          }
+        }
+      });
+
+      // Última parcela
+      dados.lancamentos.filter(l => l.mes === mesAtual && l.parcela && l.parcela !== 'recorrente').forEach(l => {
+        const parts = l.parcela.split('/');
+        if (parts.length === 2 && parts[0] === parts[1]) {
+          new Notification('🎉 Última parcela!', {
+            body: `"${l.descricao}" está na última parcela (${l.parcela}). Quase livre!`,
+            icon: '💰',
+            tag: 'parcela-' + l.id
+          });
+        }
+      });
+
+      // Orçamento estourado
+      (dados.orcamentos || []).forEach(orc => {
+        const gasto = dados.lancamentos
+          .filter(l => l.mes === mesAtual && l.tipo === 'despesa' && l.categoria === orc.categoria)
+          .reduce((s, l) => s + l.valor, 0);
+        if (orc.limite > 0 && gasto >= orc.limite) {
+          new Notification('🚨 Orçamento estourado!', {
+            body: `Categoria "${orc.categoria}": ${fmt(gasto)} de ${fmt(orc.limite)}.`,
+            icon: '💰',
+            tag: 'orc-' + orc.categoria
+          });
+        }
+      });
+    }
+
+    /* ==========================================================
+       AUTENTICAÇÃO GOOGLE
+    ========================================================== */
+    function loginComGoogle() {
+      const btn = document.getElementById('btnGoogleLogin');
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Entrando...';
+      document.getElementById('loginError').classList.remove('show');
+
+      auth.signInWithPopup(googleProvider).then(result => {
+        const email = result.user.email.toLowerCase();
+        if (!EMAILS_AUTORIZADOS.includes(email)) {
+          // Não autorizado — faz logout imediato
+          auth.signOut();
+          mostrarLoginError(`Acesso negado para ${email}. Apenas Leandro e Leidiane podem acessar.`);
+          btn.disabled = false;
+          btn.innerHTML = '<svg viewBox="0 0 48 48" style="width:22px;height:22px;"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Entrar com Google';
+        }
+        // Se autorizado, onAuthStateChanged vai cuidar
+      }).catch(err => {
+        console.error('Erro no login:', err);
+        if (err.code !== 'auth/popup-closed-by-user') {
+          mostrarLoginError('Erro ao fazer login. Tente novamente.');
+        }
+        btn.disabled = false;
+        btn.innerHTML = '<svg viewBox="0 0 48 48" style="width:22px;height:22px;"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Entrar com Google';
+      });
+    }
+
+    function mostrarLoginError(msg) {
+      const el = document.getElementById('loginError');
+      el.textContent = msg;
+      el.classList.add('show');
+    }
+
+    function onUsuarioAutenticado(user) {
+      usuarioLogado = user;
+
+      // Esconde login, exibe app
+      document.getElementById('loginOverlay').classList.add('hidden');
+
+      // Atualiza avatar e menu
+      const avatar = document.getElementById('userAvatar');
+      avatar.src = user.photoURL || '';
+      avatar.alt = user.displayName || user.email;
+      avatar.title = user.displayName || user.email;
+      avatar.style.display = 'block';
+
+      document.getElementById('userMenuName').textContent = user.displayName || 'Usuário';
+      document.getElementById('userMenuEmail').textContent = user.email;
+
+      // Carrega e renderiza os dados
+      carregarDados();
+      renderAll();
+      iniciarSyncFirebase();
+      initNotificacoes();
+      setTimeout(() => verificarNotificacoes(), 3000);
+
+      mostrarToast(`Bem-vindo(a), ${user.displayName || user.email}! 👋`, 'success');
+    }
+
+    function onUsuarioDeslogado() {
+      usuarioLogado = null;
+      document.getElementById('loginOverlay').classList.remove('hidden');
+      document.getElementById('userAvatar').style.display = 'none';
+      document.getElementById('userMenu').classList.remove('show');
+    }
+
+    function fazerLogout() {
+      auth.signOut().then(() => {
+        document.getElementById('userMenu').classList.remove('show');
+        mostrarToast('Você saiu da conta.', 'warning');
+      });
+    }
+
+    function toggleUserMenu() {
+      document.getElementById('userMenu').classList.toggle('show');
+    }
+
+    // Fechar menu ao clicar fora
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.user-avatar') && !e.target.closest('.user-menu')) {
+        document.getElementById('userMenu').classList.remove('show');
+      }
+    });
+
+    /* ==========================================================
        RENDER ALL
     ========================================================== */
     function renderAll() {
+      renderMesNav();
       renderDashboard();
       populateFilters();
       renderTable();
@@ -2135,8 +3230,23 @@
     ========================================================== */
     document.addEventListener('DOMContentLoaded', () => {
       loadTheme();
-      carregarDados();
-      renderAll();
+      initPWA();
+
+      // Observa estado de autenticação
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          const email = user.email.toLowerCase();
+          if (EMAILS_AUTORIZADOS.includes(email)) {
+            onUsuarioAutenticado(user);
+          } else {
+            // Logado mas não autorizado
+            auth.signOut();
+            mostrarLoginError(`Acesso negado para ${email}.`);
+          }
+        } else {
+          onUsuarioDeslogado();
+        }
+      });
     });
   </script>
 </body>
